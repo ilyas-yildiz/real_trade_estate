@@ -2,10 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
-// --- YENİ (Breeze) ---
-// use App\Http\Controllers\ProfileController; // Artık kullanılmıyor
+// --- Breeze Profil Rotaları İçin Gerekli Controller ---
+use App\Http\Controllers\ProfileController; // YENİ: Tekrar eklendi
 
-// --- ESKİ (Senin Admin Panelinden) ---
+// --- Senin Admin Paneli Controller'ların ---
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommonController;
@@ -21,11 +21,12 @@ use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ReferenceController;
+use App\Http\Controllers\Admin\UserProfileController;
 
 
 /*
 |--------------------------------------------------------------------------
-| Frontend Routes (Eski projeden taşındı)
+| Frontend Routes
 |--------------------------------------------------------------------------
 */
 Route::name('frontend.')->group(function () {
@@ -43,7 +44,7 @@ Route::name('frontend.')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Auth Routes (YENİ - Breeze tarafından yönetiliyor)
+| Auth Routes (Breeze)
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
@@ -54,16 +55,34 @@ require __DIR__.'/auth.php';
 |--------------------------------------------------------------------------
 */
 
-// BÖLÜM 1: TÜM GİRİŞ YAPAN KULLANICILARIN GİREBİLECEĞİ ALAN (Sadece Dashboard)
-// 'admin' middleware'i BURADA YOK.
+// BÖLÜM 1: TÜM GİRİŞ YAPAN KULLANICILARIN GİREBİLECEĞİ ALAN
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // "Profilim" Sayfası (Finansal Bilgiler)
+    Route::get('/profile', [UserProfileController::class, 'index'])->name('profile.index');
+    Route::post('/profile/bank-account', [UserProfileController::class, 'storeBankAccount'])->name('profile.storeBankAccount');
+    Route::delete('/profile/bank-account/{bankAccount}', [UserProfileController::class, 'destroyBankAccount'])->name('profile.destroyBankAccount');
+    Route::post('/profile/crypto-wallet', [UserProfileController::class, 'storeCryptoWallet'])->name('profile.storeCryptoWallet');
+    Route::delete('/profile/crypto-wallet/{cryptoWallet}', [UserProfileController::class, 'destroyCryptoWallet'])->name('profile.destroyCryptoWallet');
 
 });
 
+// YENİ EKLENDİ: Breeze'in Profil/Şifre Güncelleme Rotaları
+// Bu rotalar, `admin.profile.index` sayfasındaki `@include` edilen formlar için gereklidir.
+// Not: Prefix ve name('admin.') YOK, çünkü Breeze'in formları bu isimleri bekliyor.
+Route::middleware('auth')->group(function () {
+    // Breeze'in profil güncelleme rotaları (`profile.update`, `profile.destroy`)
+    // Not: Breeze'in `edit` rotasını kullanmıyoruz, onun yerine kendi `admin.profile.index` sayfamız var.
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Şifre güncelleme rotası (`password.update`) auth.php içinde tanımlı, ona dokunmuyoruz.
+});
+
+
 // BÖLÜM 2: SADECE ADMİNLERİN GİREBİLECEĞİ YÖNETİM ALANLARI
-// 'admin' middleware'i BURADA ZORUNLU.
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Resource Controllers
@@ -92,9 +111,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Gallery Item Rotaları
     Route::post('/galleries/{gallery}/items', [GalleryItemController::class, 'store'])->name('galleries.items.store');
-    // HATA DÜZELTİLDİ: Route.delete -> Route::delete
     Route::delete('galleries/items/{galleryItem}', [GalleryItemController::class, 'destroy'])->name('galleries.items.destroy');
-    // HATA DÜZELTİLDİ: Route.put -> Route::put
     Route::put('galleries/{gallery}/cover-image', [GalleryController::class, 'updateCoverImage'])->name('galleries.updateCoverImage');
 
     // Blog Modülü AI Rotaları
@@ -104,7 +121,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('blogs/ai/prepare', [BlogController::class, 'prepareFromAi'])->name('blogs.prepareFromAi');
     Route::post('blogs/ai/save-chat', [BlogController::class, 'saveCurrentChat'])->name('blogs.saveAiChat');
     Route::get('blogs/ai/load-chat/{chat}', [BlogController::class, 'loadChat'])->name('blogs.loadAiChat');
-    // HATA DÜZELTİLDİ: Route.delete -> Route::delete
     Route::delete('blogs/ai/delete-chat/{chat}', [BlogController::class, 'destroyAiChat'])->name('blogs.destroyAiChat');
 
     // Laravel File Manager
@@ -120,7 +136,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 /*
 |--------------------------------------------------------------------------
-| Sistem Temizleme Rotaları (Eski projeden taşındı)
+| Sistem Temizleme Rotaları
 |--------------------------------------------------------------------------
 */
 Route::get('/sistemi-temizle-12345', function () {
@@ -131,7 +147,6 @@ Route::get('/sistemi-temizle-12345', function () {
         Artisan::call('route:clear');
         return "Butun onbellekler temizlendi!";
     } catch (Exception $e) {
-        // HATA DÜZELTİLDİ: $e.getMessage() -> $e->getMessage()
         return "Hata: " . $e->getMessage();
     }
 });
@@ -141,7 +156,6 @@ Route::get('/run-user-seeder-a1b2c3d4e5f6', function () {
         Artisan::call('db:seed', ['--class' => 'UserSeeder', '--force' => true]);
         return 'UserSeeder başarıyla çalıştırıldı.';
     } catch (\Exception $e) {
-        // HATA DÜZELTİLDİ: $e.getMessage() -> $e->getMessage()
         return 'Hata: ' . $e->getMessage();
     }
 });
@@ -151,7 +165,6 @@ Route::get('/migrate-now', function () {
         Artisan::call('migrate', ['--force' => true]);
         return 'Veritabanı başarıyla güncellendi!';
     } catch (Exception $e) {
-        // HATA DÜZELTİLDİ: $e.getMessage() -> $e->getMessage()
         return 'Hata oluştu: ' . $e->getMessage();
     }
 });

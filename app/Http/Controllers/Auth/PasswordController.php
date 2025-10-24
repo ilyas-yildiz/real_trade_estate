@@ -24,6 +24,10 @@ class PasswordController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back()->with('status', 'password-updated');
+        // DEĞİŞİKLİK:
+        // 'back()' yerine 'admin.profile.index' rotasına yönlendir.
+        // Session mesajını 'status' yerine 'success' yap ve metni güncelle.
+        return redirect()->route('admin.profile.index')->with('success', 'Şifre başarıyla güncellendi.');
+        // Orijinal Kod: return back()->with('status', 'password-updated');
     }
 }

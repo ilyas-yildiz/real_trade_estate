@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail; // Bu satır zaten vardı
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany; // 1. Doğru HasMany sınıfını dahil et
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+// GÜNCELLEME: 'MustVerifyEmail' arayüzünü (interface) ekliyoruz.
+// Breeze'in e-posta doğrulama sistemi ('verified' middleware) için bu gereklidir.
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -59,5 +61,23 @@ class User extends Authenticatable
     public function aiChats(): HasMany
     {
         return $this->hasMany(AiChat::class);
+    }
+
+    // YENİ EKLENDİ: Banka Hesapları İlişkisi
+    /**
+     * Kullanıcının banka hesaplarını temsil eden ilişki.
+     */
+    public function bankAccounts(): HasMany
+    {
+        return $this->hasMany(UserBankAccount::class);
+    }
+
+    // YENİ EKLENDİ: Kripto Cüzdanları İlişkisi
+    /**
+     * Kullanıcının kripto cüzdanlarını temsil eden ilişki.
+     */
+    public function cryptoWallets(): HasMany
+    {
+        return $this->hasMany(UserCryptoWallet::class);
     }
 }
