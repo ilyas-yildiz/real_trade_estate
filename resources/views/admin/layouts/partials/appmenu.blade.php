@@ -34,20 +34,39 @@
                     <i class="mdi mdi-home"></i> <span data-key="t-widgets">Anasayfa</span>
                 </a>
             </li>
-            {{-- YENİ EKLENDİ: Profilim Linki --}}
             <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->routeIs('admin.profile.index') ? 'active' : '' }}" href="{{ route('admin.profile.index') }}">
                     <i class="mdi mdi-account-cog"></i> <span data-key="t-profile">Profilim</span>
                 </a>
             </li>
-            {{-- (Gelecekte buraya "Dekont Yükle" gibi üye linkleri eklenecek) --}}
+            {{-- YENİ EKLENDİ: Yeni Ödeme Bildirimi Linki --}}
+            {{-- Not: Sadece admin olmayanlar bu linki görmeli --}}
+            @if(!Auth::user()->is_admin)
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments.create') ? 'active' : '' }}" href="{{ route('admin.payments.create') }}">
+                        <i class="ri-upload-cloud-2-line"></i> <span data-key="t-payment-create">Yeni Ödeme Bildirimi</span>
+                    </a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments.index') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
+                        <i class="ri-list-check-3"></i> <span data-key="t-payment-index">Ödeme Bildirimlerim</span>
+                    </a>
+                </li>
+            @endif
 
 
             <!-- === BÖLÜM 2: SADECE ADMİNLER === -->
             @if(Auth::user()->is_admin)
                 <li class="menu-title"><span data-key="t-menu">Admin Yönetimi</span></li>
+                {{-- YENİ EKLENDİ: Admin için Ödeme Yönetimi Linki --}}
+                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
+                        <i class="ri-bank-card-line"></i> <span data-key="t-payment-admin">Ödeme Yönetimi</span>
+                    </a>
+                </li>
+                {{-- Mevcut Admin Linkleri --}}
                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->is('admin/categories*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}"> {{-- route() kullanımı daha iyi --}}
+                    <a class="nav-link menu-link {{ request()->is('admin/categories*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
                         <i class="mdi mdi-tag-outline"></i> <span data-key="t-widgets">Blog Kategorileri</span>
                     </a>
                 </li>
@@ -96,13 +115,6 @@
                         <i class="mdi mdi-account-group"></i> <span data-key="t-widgets">Referans Yönetimi</span>
                     </a>
                 </li>
-                {{-- Ürünler modülü hala yorumda
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
-                        <i class="mdi mdi-view-grid-outline"></i> <span data-key="t-widgets">Ürünler</span>
-                    </a>
-                </li>
-                --}}
             @endif
             <!-- === ADMİN BÖLÜMÜ SONU === -->
 
@@ -121,7 +133,6 @@
         Enderun AI CMS (V.1.1)
     </div>
 </div>
-
 
 <div class="sidebar-background">
 </div>

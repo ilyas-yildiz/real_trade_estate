@@ -45,6 +45,9 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        // --- CHANGE HERE ---
+        // Redirect to the admin dashboard instead of the removed Breeze dashboard.
+        return redirect(route('admin.dashboard', absolute: false));
+        // Original: return redirect(route('dashboard', absolute: false));
     }
 }

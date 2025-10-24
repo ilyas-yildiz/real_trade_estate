@@ -2,22 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail; // Bu satır zaten vardı
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-// GÜNCELLEME: 'MustVerifyEmail' arayüzünü (interface) ekliyoruz.
-// Breeze'in e-posta doğrulama sistemi ('verified' middleware) için bu gereklidir.
 class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
-     *
      * @var list<string>
      */
     protected $fillable = [
@@ -28,7 +24,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * The attributes that should be hidden for serialization.
-     *
      * @var list<string>
      */
     protected $hidden = [
@@ -38,7 +33,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the attributes that should be cast.
-     *
      * @return array<string, string>
      */
     protected function casts(): array
@@ -50,20 +44,21 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Bu kullanıcının yazdığı blog yazılarını temsil eden ilişki.
-     * Bir kullanıcı, birden fazla blog yazısı yazabilir (HasMany).
+     * Kullanıcının blog yazılarını temsil eden ilişki.
      */
-    public function blogs()
+    public function blogs(): HasMany // Return type hint ekledim
     {
         return $this->hasMany(Blog::class);
     }
 
+    /**
+     * Kullanıcının AI sohbetlerini temsil eden ilişki.
+     */
     public function aiChats(): HasMany
     {
         return $this->hasMany(AiChat::class);
     }
 
-    // YENİ EKLENDİ: Banka Hesapları İlişkisi
     /**
      * Kullanıcının banka hesaplarını temsil eden ilişki.
      */
@@ -72,12 +67,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserBankAccount::class);
     }
 
-    // YENİ EKLENDİ: Kripto Cüzdanları İlişkisi
     /**
      * Kullanıcının kripto cüzdanlarını temsil eden ilişki.
      */
     public function cryptoWallets(): HasMany
     {
         return $this->hasMany(UserCryptoWallet::class);
+    }
+
+    // YENİ EKLENDİ: Ödeme Bildirimleri İlişkisi
+    /**
+     * Kullanıcının ödeme bildirimlerini temsil eden ilişki.
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 }
