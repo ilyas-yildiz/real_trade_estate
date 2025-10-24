@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\AdminMiddleware; // YENİ EKLENDİ
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,9 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // $middleware->alias([
-        //     'adminer' => \Onecentlin\Adminer\Http\Middleware\Authenticate::class,
-        // ]);
+        // YENİ EKLENDİ: 'admin' kısayolunu AdminMiddleware'e bağlıyoruz
+        $middleware->alias([
+            'admin' => AdminMiddleware::class,
+            // 'adminer' => \Onecentlin\Adminer\Http\Middleware\Authenticate::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
