@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\RouteServiceProvider;
+// DİKKAT: RouteServiceProvider'ı sildim çünkü Breeze'in varsayılan
+// kurulumunda HOME sabiti artık burada kullanılmıyor.
+// Eğer sende bu dosya varsa (eski projeden) ve hata alırsan
+// 'use App\Providers\RouteServiceProvider;' satırını geri ekleyebiliriz.
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +24,8 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                // DEĞİŞİKLİK: Yönlendirme hedefi 'admin.dashboard' rotası olarak güncellendi.
+                return redirect()->route('admin.dashboard');
             }
         }
 
