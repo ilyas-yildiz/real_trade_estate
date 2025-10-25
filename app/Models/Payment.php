@@ -15,17 +15,29 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',          // create metodunda 'user_id' dolaylı olarak (payments() ilişkisi) ekleniyor, ama burada olması iyidir.
         'amount',
         'payment_date',
         'reference_number',
         'receipt_path',
         'user_notes',
+        'status',
+        
+        // --- UPDATE METODU İÇİN EKLENMESİ GEREKEN ALANLAR ---
+        'admin_notes',
+        'reviewed_by',
+        'reviewed_at',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
-        'payment_date' => 'date',
-        'amount' => 'decimal:2',
+        'payment_date' => 'datetime',
         'reviewed_at' => 'datetime',
+        'amount' => 'decimal:2', // Tutar için 'decimal' cast'i kullanmak iyi bir pratiktir
     ];
 
     public function user(): BelongsTo

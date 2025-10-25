@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 // --- Controllers ---
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommonController;
 use App\Http\Controllers\Admin\GalleryController;
@@ -12,7 +13,6 @@ use App\Http\Controllers\Admin\GalleryItemController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -23,7 +23,11 @@ use App\Http\Controllers\Admin\UserProfileController;
 use App\Http\Controllers\Admin\PaymentController;
 
 
-/* Frontend Routes */
+/*
+|--------------------------------------------------------------------------
+| Frontend Routes
+|--------------------------------------------------------------------------
+*/
 Route::name('frontend.')->group(function () {
     Route::get('/', [FrontendController::class, 'index'])->name('home');
     Route::get('/hakkimizda', [FrontendController::class, 'about'])->name('about');
@@ -37,24 +41,39 @@ Route::name('frontend.')->group(function () {
     Route::post('/iletisim', [FrontendController::class, 'handleContactForm'])->name('contact.submit');
 });
 
-/* Auth Routes (Breeze) */
+/*
+|--------------------------------------------------------------------------
+| Auth Routes (Breeze)
+|--------------------------------------------------------------------------
+*/
 require __DIR__.'/auth.php';
 
-/* Admin Paneli Rotaları - YENİ GÜVENLİ YAPI */
+/*
+|--------------------------------------------------------------------------
+| Admin Paneli Rotaları - YENİ GÜVENLİ YAPI
+|--------------------------------------------------------------------------
+*/
 
 // BÖLÜM 1: TÜM GİRİŞ YAPAN KULLANICILAR
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // "Profilim" Sayfası (Finansal Bilgiler)
     Route::get('/profile', [UserProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile/bank-account', [UserProfileController::class, 'storeBankAccount'])->name('profile.storeBankAccount');
     Route::delete('/profile/bank-account/{bankAccount}', [UserProfileController::class, 'destroyBankAccount'])->name('profile.destroyBankAccount');
     Route::post('/profile/crypto-wallet', [UserProfileController::class, 'storeCryptoWallet'])->name('profile.storeCryptoWallet');
     Route::delete('/profile/crypto-wallet/{cryptoWallet}', [UserProfileController::class, 'destroyCryptoWallet'])->name('profile.destroyCryptoWallet');
-    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
-    Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
-    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
-    Route::delete('/payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
+
+    // Ödeme Bildirim Sistemi (Kullanıcı Tarafı)
+    Route::resource('/payments', PaymentController::class)->only([
+        'index', 'create', 'store', 'destroy'
+    ]);
+    
+    // Güvenli Dekont Görüntüleme Rotası
     Route::get('/payments/{payment}/receipt', [PaymentController::class, 'showReceipt'])->name('payments.showReceipt');
+
 });
 
 // Breeze Profil Güncelleme Rotaları
@@ -66,24 +85,31 @@ Route::middleware('auth')->group(function () {
 
 // BÖLÜM 2: SADECE ADMİNLER
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Mevcut Resource ve Diğer Admin Rotaları...
-       $resourceControllers = [
-        'categories' => CategoryController::class,
-        'galleries' => GalleryController::class,
-        'blogs' => BlogController::class,
-        'authors' => AuthorController::class,
-        'products' => ProductController::class,
-        'abouts' => AboutController::class,
-        'services' => ServiceController::class,
-        'projects' => ProjectController::class,
-        'slides' => SlideController::class,
-        'references' => ReferenceController::class,
-    ];
-        foreach ($resourceControllers as $name => $controller) { Route::resource($name, $controller); }
+
+    // Mevcut Resource Controllers
+    Route::resource('categories', CategoryController::class);
+    Route::resource('galleries', GalleryController::class);
+    Route::resource('blogs', BlogController::class);
+    Route::resource('authors', AuthorController::class);
+    Route::resource('products', ProductController::class);
+    Route::resource('abouts', AboutController::class);
+    Route::resource('services', ServiceController::class);
+    Route::resource('projects', ProjectController::class);
+    Route::resource('slides', SlideController::class);
+    Route::resource('references', ReferenceController::class);
+
+    // Payment için Admin'e özel 'edit' ve 'update' rotaları
+    Route::resource('/payments', PaymentController::class)->only([
+        'edit', 'update' // 'edit' (JSON döner), 'update' (formu işler)
+    ]);
+
+    // Common (Generic) Rotalar
     Route::patch('{model}/{id}/status', [CommonController::class, 'updateStatus'])->name('common.updateStatus');
     Route::post('{model}/update-order', [CommonController::class, 'updateOrder'])->name('common.updateOrder');
     Route::post('{model}/bulk-delete', [CommonController::class, 'bulkDestroy'])->name('common.bulkDestroy');
     Route::post('common/upload-image', [CommonController::class, 'uploadImage'])->name('common.uploadImage');
+
+    // Diğer admin rotaları...
     Route::post('/galleries/{gallery}/items', [GalleryItemController::class, 'store'])->name('galleries.items.store');
     Route::delete('galleries/items/{galleryItem}', [GalleryItemController::class, 'destroy'])->name('galleries.items.destroy');
     Route::put('galleries/{gallery}/cover-image', [GalleryController::class, 'updateCoverImage'])->name('galleries.updateCoverImage');
@@ -97,11 +123,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () { \UniSharp\LaravelFilemanager\Lfm::routes(); });
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
-
-    // Ödeme Yönetimi (Admin Tarafı)
-    // YENİ EKLENDİ: Modal için JSON veri çekme rotası
-Route::get('/payments/{id}/edit-json', [PaymentController::class, 'editJson'])->name('payments.editJson');    Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show'); // İnceleme sayfası (Belki ileride kullanılır diye SİLMEDİM)
-    Route::match(['put', 'patch'], '/payments/{payment}', [PaymentController::class, 'update'])->name('payments.update'); // Onay/Red işlemi
 });
 
 /* Sistem Temizleme Rotaları */

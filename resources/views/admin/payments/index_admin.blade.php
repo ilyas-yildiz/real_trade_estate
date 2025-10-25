@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.app')
+@extends('admin.layouts.app')
 
 @section('title', 'Ödeme Yönetimi')
 
@@ -15,17 +15,22 @@
         <div class="card">
             <div class="card-header align-items-center d-flex">
                 <h4 class="card-title mb-0 flex-grow-1">Ödeme Bildirimleri Yönetimi</h4>
-            </div>
+                {{-- Admin yeni bildirim ekleyemez --}}
+            </div><!-- end card header -->
 
             <div class="card-body">
+
+                {{-- Mesajlar dahil ediliyor --}}
                 @include('admin.layouts.partials._messages')
 
-                {{-- Filtreleme Formu --}}
+{{-- Filtreleme Formu --}}
                 <form action="{{ route('admin.payments.index') }}" method="GET" class="mb-3 border p-3 rounded bg-light shadow-sm">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-4">
-                            <label for="status" class="form-label">Durum</label>
-                            <select name="status" id="status" class="form-select form-select-sm">
+                            
+                            {{-- DÜZELTME: ID çakışmasını önlemek için 'id' ve 'for' 'filter_status' olarak değiştirildi --}}
+                            <label for="filter_status" class="form-label">Durum</label>
+                            <select name="status" id="filter_status" class="form-select form-select-sm">
                                 <option value="">Tümü</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Beklemede</option>
                                 <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Onaylandı</option>
@@ -33,8 +38,12 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="user_id" class="form-label">Kullanıcı</label>
-                            <select name="user_id" id="user_id" class="form-select form-select-sm">
+                            
+                            {{-- DÜZELTME 2: (İhtiyati olarak) Kullanıcı filtresinin ID'sini de benzersiz yapalım --}}
+                            <label for="filter_user_id" class="form-label">Kullanıcı</label>
+                            <select name="user_id" id="filter_user_id" class="form-select form-select-sm" 
+                                    {{-- Temanız büyük ihtimalle 'data-choices' niteliğine göre stillendiriyor --}}
+                                    data-choices> 
                                 <option value="">Tüm Kullanıcılar</option>
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }} ({{ $user->email }})</option>
@@ -42,8 +51,8 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <button type="submit" class="btn btn-sm btn-primary shadow-none me-1"><i class="ri-filter-3-line align-bottom"></i> Filtrele</button>
-                            <a href="{{ route('admin.payments.index') }}" class="btn btn-sm btn-secondary shadow-none"><i class="ri-refresh-line align-bottom"></i> Temizle</a>
+                             <button type="submit" class="btn btn-sm btn-primary shadow-none me-1"><i class="ri-filter-3-line align-bottom"></i> Filtrele</button>
+                             <a href="{{ route('admin.payments.index') }}" class="btn btn-sm btn-secondary shadow-none"><i class="ri-refresh-line align-bottom"></i> Temizle</a>
                         </div>
                     </div>
                 </form>
@@ -56,7 +65,6 @@
                                 <th scope="col">Kullanıcı</th>
                                 <th scope="col">Tutar</th>
                                 <th scope="col">Ödeme Tarihi</th>
-                                <th scope="col">Bildirim Tarihi</th>
                                 <th scope="col">Durum</th>
                                 <th scope="col">Dekont</th>
                                 <th scope="col">İşlemler</th>
@@ -76,22 +84,18 @@
                                         default => 'Beklemede',
                                     };
                                 @endphp
-                                <tr>
+                                <tr data-id="{{ $payment->id }}">
                                     <td>{{ $payment->id }}</td>
                                     <td>
                                         @if($payment->user)
-                                            {{ $payment->user->name }} <br>
-                                            <small class="text-muted">{{ $payment->user->email }}</small>
+                                            {{ $payment->user->name }}
                                         @else
                                             <span class="text-danger small">Kullanıcı Silinmiş</span>
                                         @endif
                                     </td>
                                     <td>{{ number_format($payment->amount, 2, ',', '.') }}</td>
                                     <td>{{ $payment->payment_date->format('d.m.Y') }}</td>
-                                    <td>{{ $payment->created_at->format('d.m.Y H:i') }}</td>
-                                    <td>
-                                        <span class="badge {{ $statusClass }}">{{ $statusText }}</span>
-                                    </td>
+                                    <td><span class="badge {{ $statusClass }}">{{ $statusText }}</span></td>
                                     <td>
                                         @if ($payment->receipt_url)
                                             <a href="{{ $payment->receipt_url }}" target="_blank" class="btn btn-sm btn-outline-info shadow-none py-0 px-1" title="Dekontu Görüntüle">
@@ -103,12 +107,12 @@
                                     </td>
                                     <td>
                                         <div class="hstack gap-1">
-                                            {{-- DÜZELTME: Modal ID'si ve data-target güncellendi --}}
+                                            {{-- Buton Blog modülüyle uyumlu --}}
                                             <button type="button" class="btn btn-sm btn-soft-primary shadow-none py-0 px-1 openEditModal"
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#editPaymentModal" 
+                                                    data-bs-target="#editModal" {{-- Ortak ID --}}
                                                     data-id="{{ $payment->id }}"
-                                                    data-fetch-url="{{ route('admin.payments.editJson', $payment->id) }}"
+                                                    data-fetch-url="{{ route('admin.payments.edit', $payment->id) }}" {{-- 'edit' rotası --}}
                                                     data-update-url="{{ route('admin.payments.update', $payment->id) }}"
                                                     title="İncele/Düzenle">
                                                 <i class="ri-pencil-line"></i>
@@ -127,11 +131,9 @@
                         </tbody>
                     </table>
                 </div>
-
                  <div class="mt-3">
                     {{ $payments->appends(request()->query())->links() }}
                 </div>
-
             </div>
         </div>
     </div>
@@ -143,13 +145,15 @@
 @endsection
 
 @push('scripts')
+    {{-- Kütüphaneler --}}
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    {{-- Session Mesajları --}}
     @if(session('success')) <script> document.addEventListener('DOMContentLoaded', function() { iziToast.success({ title: 'Başarılı!', message: '{{ session('success') }}', position: 'topRight' }); }); </script> @endif
     @if(session('error')) <script> document.addEventListener('DOMContentLoaded', function() { iziToast.error({ title: 'Hata!', message: '{{ session('error') }}', position: 'topRight' }); }); </script> @endif
     
-    {{-- YENİ JS DOSYASI: resource-handler.js'in çakışmalarını önlemek için --}}
-    <script src="{{ asset('js/admin/payments-handler.js') }}?v={{ time() }}" defer></script>
-    {{-- Ortak JS (resource-handler) hala SweetAlert ve Form submit işini yapması için çağrılıyor --}}
+    {{-- Ortak JS (SweetAlert, Form Submit, Modal Doldurma) --}}
     <script src="{{ asset('js/admin/common/resource-handler.js') }}?v={{ time() }}" defer></script> 
 @endpush
+
