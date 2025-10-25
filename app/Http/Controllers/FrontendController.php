@@ -3,209 +3,168 @@
 namespace App\Http\Controllers;
 
 use App\Models\About;
-use App\Models\Service;
 use App\Models\Blog;
 use App\Models\Category;
 use App\Models\Project;
-use App\Models\Slide;
-use App\Models\Gallery;
+use App\Models\Reference;
+use App\Models\Service;
 use App\Models\Setting;
+use App\Models\Slide;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\View; // View::share için (opsiyonel ama kullanışlı)
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 
 class FrontendController extends Controller
 {
+    protected $settings;
+
+    /**
+     * Controller başlatıldığında, tüm view'larla ayarları paylaş.
+     */
     public function __construct()
     {
-        // Footer için son yazıları tüm frontend view'larına gönderelim
-        $latestPosts = Blog::where('status', true)->latest()->take(3)->get();
-        View::share('latestPosts', $latestPosts);
-
-        // YENİ: Ayarları da tüm view'larla paylaşabiliriz (opsiyonel)
-        // Ayarları tek seferde çekip bir diziye atalım (key => value)
-        $settings = Setting::pluck('value', 'key')->all();
-        View::share('settings', $settings);
+        // Ayarları veritabanından çek ve bir diziye dönüştür
+        $this->settings = Setting::pluck('value', 'key')->all();
+        
+        // Ayarları tüm frontend view'larıyla paylaş
+        View::share('settings', $this->settings);
     }
 
-    // Anasayfa metodu (varsa kalsın)
+    /**
+     * Anasayfayı gösterir.
+     * Gerekli tüm dinamik verileri çeker.
+     */
     public function index()
     {
-        $slides = Slide::where('status', true)->orderBy('order', 'asc')->get();
-        // Anasayfada gösterilecek aktif projeleri çek (örneğin son 3 tane, sıralamaya göre)
-        $projects = Project::where('status', true)->orderBy('order', 'asc')->take(3)->get();
+        $slides = Slide::where('status', 1)->orderBy('order', 'asc')->get();
+        
+        // Sadece ilk "hakkımızda" kaydını al
+        $about = About::where('status', 1)->first(); 
+        
+        $services = Service::where('status', 1)->orderBy('order', 'asc')->get();
+        
+        // Blogları kategorileriyle birlikte çek (Eager Loading)
+        $blogs = Blog::with('category')
+                    ->where('status', 1)
+                    ->latest() // En son eklenenler
+                    ->take(3)  // Sadece 3 tane al (home.blade.php 3'lü setler halinde gösteriyor)
+                    ->get();
+                    
+        $references = Reference::where('status', 1)->get();
 
-        // Verileri view'a gönder
-        return view('frontend.pages.home', [ // View yolunu 'pages' altına aldık
-            'slides' => $slides,
-            'projects' => $projects,
-        ]);
+        return view('frontend.home', compact(
+            'slides',
+            'about',
+            'services',
+            'blogs',
+            'references'
+            // $settings zaten View::share ile paylaşıldı
+        ));
     }
 
-    // YENİ METOT: Hakkımızda sayfası
+    /**
+     * Hakkımızda sayfasını gösterir.
+     */
     public function about()
     {
-        // Veritabanından Hakkımızda içeriğini çek (genellikle ilk veya tek kayıt)
-        $aboutData = About::where('status', true)->first(); // Aktif olan ilk kaydı al
-
-        // "Neler Yapıyoruz?" bölümü için aktif hizmetleri çek (sıralı)
-        $services = Service::where('status', true)->orderBy('order', 'asc')->get();
-
-        // View::share ile $latestPosts'u tüm view'larda kullanılabilir yapabiliriz
-        // veya sadece bu view'a gönderebiliriz. Şimdilik sadece gönderelim.
-        // View::share('latestPosts', $latestPosts); 
-
-        // Verileri view'a gönder
-        return view('frontend.pages.about', [
-            'about' => $aboutData, // View içinde $about değişkeniyle erişilecek
-            'services' => $services, // View içinde $services değişkeniyle erişilecek
-        
-        ]);
+        $about = About::where('status', 1)->first();
+        // İleride referansları vb. de bu sayfaya gönderebiliriz
+        return view('frontend.about', compact('about'));
     }
 
-    // YENİ METOT: Hizmetler Listeleme Sayfası
+    /**
+     * Hizmetler (Hesap Türleri) listeleme sayfasını gösterir.
+     */
     public function servicesIndex()
     {
-        // Aktif hizmetleri sıralı olarak çek
-        $services = Service::where('status', true)->orderBy('order', 'asc')->get();
-
-        // latestPosts share ediliyor
-        return view('frontend.pages.services.index', compact('services')); // Yeni view yolu
+        $services = Service::where('status', 1)->orderBy('order', 'asc')->paginate(9);
+        return view('frontend.services.index', compact('services'));
     }
 
-    // YENİ METOT: Hizmet Detay Sayfası
-    // Slugify edilmiş başlığı URL'de kullanacağız
-    public function serviceDetail($slug) 
+    /**
+     * Tek bir hizmetin (Hesap Türü) detay sayfasını gösterir.
+     */
+    public function serviceDetail($slug)
     {
-        // Slug'a göre aktif hizmeti bul, bulunamazsa 404 döndür
-        $service = Service::where('slug', $slug)->where('status', true)->firstOrFail(); 
-
-        // latestPosts share ediliyor
-        return view('frontend.pages.services.detail', compact('service')); // Yeni view yolu
+        $service = Service::where('slug', $slug)->where('status', 1)->firstOrFail();
+        return view('frontend.services.detail', compact('service'));
     }
 
-    // Blog listesi metodu (varsa kalsın)
-public function blogIndex()
+    /**
+     * Projeler listeleme sayfasını gösterir.
+     */
+    public function projectsIndex()
     {
-        // Aktif blog yazılarını en yeniden eskiye doğru sayfalı olarak çek
-        // Örneğin, sayfa başına 10 yazı gösterelim
-        $posts = Blog::where('status', true)->latest()->paginate(10); 
-
-        // Sidebar için son yazılar (footer'dakiyle aynı olabilir)
-        $latestPostsSidebar = Blog::where('status', true)->latest()->take(5)->get(); // Sidebar için 5 tane alalım
-
-        // Sidebar için kategoriler (Blog modelinde category ilişkisi varsa)
-        // $categories = Category::where('status', true)->where('type', 'blog')->orderBy('order', 'asc')->get();
-
-        return view('frontend.pages.blogs.index', compact('posts', 'latestPostsSidebar'/*, 'categories'*/));
+        $projects = Project::where('status', 1)->orderBy('order', 'asc')->paginate(9);
+        return view('frontend.projects.index', compact('projects'));
     }
 
-    // GÜNCELLENDİ: Blog Detay Sayfası
+    /**
+     * Tek bir projenin detay sayfasını gösterir.
+     */
+    public function projectDetail($slug)
+    {
+        $project = Project::where('slug', $slug)->where('status', 1)->firstOrFail();
+        return view('frontend.projects.detail', compact('project'));
+    }
+
+    /**
+     * Blog listeleme sayfasını gösterir.
+     */
+    public function blogIndex(Request $request)
+    {
+        $query = Blog::with('category')->where('status', 1);
+
+        // Kategoriye göre filtreleme (opsiyonel)
+        if ($request->has('category')) {
+            $categorySlug = $request->get('category');
+            $query->whereHas('category', function ($q) use ($categorySlug) {
+                $q->where('slug', $categorySlug);
+            });
+        }
+        
+        $blogs = $query->latest()->paginate(9);
+        $categories = Category::all();
+        
+        return view('frontend.blog.index', compact('blogs', 'categories'));
+    }
+
+    /**
+     * Tek bir blog yazısının detay sayfasını gösterir.
+     */
     public function blogDetail($slug)
     {
-        // Slug'a göre aktif yazıyı bul
-        $post = Blog::where('slug', $slug)->where('status', true)->firstOrFail();
-
-        // Önceki yazı (mevcut yazıdan daha eski olan ilk yazı)
-        $previousPost = Blog::where('status', true)
-                            ->where('created_at', '<', $post->created_at)
-                            ->orderBy('created_at', 'desc')
-                            ->first();
-
-        // Sonraki yazı (mevcut yazıdan daha yeni olan ilk yazı)
-        $nextPost = Blog::where('status', true)
-                        ->where('created_at', '>', $post->created_at)
-                        ->orderBy('created_at', 'asc')
-                        ->first();
-
-        // Önerilen yazılar (mevcut yazı ve önceki/sonraki hariç, rastgele 3 tane)
-        $suggestedPosts = Blog::where('status', true)
-                            ->where('id', '!=', $post->id) // Mevcut yazı hariç
-                            ->when($previousPost, fn($q) => $q->where('id', '!=', $previousPost->id)) // Önceki hariç (varsa)
-                            ->when($nextPost, fn($q) => $q->where('id', '!=', $nextPost->id)) // Sonraki hariç (varsa)
-                            ->inRandomOrder()
-                            ->take(3)
-                            ->get();
-
-
-        return view('frontend.pages.blogs.detail', compact('post', 'previousPost', 'nextPost', 'suggestedPosts'));
+        $blog = Blog::where('slug', $slug)->where('status', 1)->firstOrFail();
+        $latestBlogs = Blog::where('status', 1)->where('id', '!=', $blog->id)->latest()->take(3)->get();
+        $categories = Category::all();
+        
+        return view('frontend.blog.detail', compact('blog', 'latestBlogs', 'categories'));
     }
 
- 
-public function projectsIndex() 
+    /**
+     * İletişim sayfasını gösterir.
+     */
+    public function contact()
     {
-        // Tüm aktif projeleri sıralı olarak çek
-        $projects = Project::where('status', true)->orderBy('order', 'asc')->get(); 
-
-        // Proje tiplerini alıp filtreleme için view'a gönderebiliriz (opsiyonel)
-        // $projectTypes = Project::where('status', true)->distinct()->pluck('project_type')->filter()->sort();
-
-        return view('frontend.pages.projects.index', compact('projects'/*, 'projectTypes'*/)); 
+        // $settings zaten paylaşıldı (telefon, adres vb. için)
+        return view('frontend.contact');
     }
 
-    // YENİ METOT: Proje Detay Sayfası
-    public function projectDetail($slug) 
-    {
-        // Slug'a göre aktif projeyi bul, ilişkili galeriyi de yükle ('with')
-        $project = Project::with('gallery.items') // Galeri ve içindeki item'ları eager load et
-                         ->where('slug', $slug)
-                         ->where('status', true)
-                         ->firstOrFail(); 
-
-        // Benzer (diğer) projeleri çek (şimdilik rastgele 5 tane, mevcut proje hariç)
-        $otherProjects = Project::where('status', true)
-                               ->where('id', '!=', $project->id) // Mevcut projeyi hariç tut
-                               ->inRandomOrder() // Rastgele sırala
-                               ->take(5) // İlk 5 tanesini al
-                               ->get();
-
-        return view('frontend.pages.projects.detail', compact('project', 'otherProjects')); 
-    }
-  public function contact()
-    {
-        // Ayarlar zaten View::share ile paylaşıldığı için burada tekrar çekmeye gerek yok.
-        // Eğer paylaşmasaydık burada çekecektik:
-        // $settings = Setting::pluck('value', 'key')->all();
-
-        // Sadece view'ı döndür
-        return view('frontend.pages.contact'); 
-        // Eğer ayarları sadece bu view'a göndermek isteseydik:
-        // return view('frontend.pages.contact', compact('settings'));
-    }
-
-    // YENİ: İletişim Formunu İşleme Metodu
+    /**
+     * İletişim formunu işler.
+     */
     public function handleContactForm(Request $request)
     {
-        // Formdan gelen veriyi doğrula
         $validated = $request->validate([
-            'username' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'message' => 'required|string|max:5000',
+            'message' => 'required|string|max:2000',
+            // 'phone', 'subject' vb. eklenebilir
         ]);
 
-        // E-posta gönderme mantığı buraya gelecek
-        // Örnek: Laravel Mail kullanarak
-        try {
-             // Ayarlardan admin e-postasını al
-            $adminEmail = Setting::where('key', 'email')->value('value'); // veya $this->settings['email'] eğer share edildiyse
+        // TODO: E-posta gönderme veya veritabanına kaydetme mantığı
+        // Örn: Mail::to($this->settings['admin_email'])->send(new ContactFormMail($validated));
 
-            \Illuminate\Support\Facades\Mail::raw("Gönderen: {$validated['username']} ({$validated['email']})\n\nMesaj:\n{$validated['message']}", function ($message) use ($validated, $adminEmail) {
-                $message->to($adminEmail)
-                        ->subject('Web Sitesi İletişim Formu Mesajı');
-                $message->from($validated['email'], $validated['username']); // Gönderen olarak kullanıcının e-postasını ayarla
-            });
-
-            // Başarılı olursa geri yönlendir ve başarı mesajı göster
-            return redirect()->route('frontend.contact')
-                             ->with('success', 'Mesajınız başarıyla gönderildi. Teşekkür ederiz!');
-
-        } catch (\Exception $e) {
-            // Hata olursa geri yönlendir ve hata mesajı göster
-             \Illuminate\Support\Facades\Log::error('İletişim formu e-posta gönderme hatası: ' . $e->getMessage()); // Hatayı logla
-            return redirect()->route('frontend.contact')
-                             ->with('error', 'Mesajınız gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
-        }
+        return back()->with('success', 'Mesajınız başarıyla gönderildi!');
     }
-
-
 }
