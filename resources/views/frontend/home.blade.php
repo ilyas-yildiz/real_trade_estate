@@ -1,8 +1,10 @@
 ﻿@extends('frontend.layouts.app')
 
 {{-- SEO Başlığı ve Açıklaması (Ayarlardan veya varsayılan) --}}
-@section('title', $settings['seo_title'] ?? 'Tradebro - Anasayfa')
-@section('description', $settings['seo_description'] ?? 'Güvenli ve hızlı trading platformu.')
+{{-- GÜNCELLEME: 'Tradebro - Anasayfa' -> 'Real Trade Estate - Homepage' --}}
+@section('title', $settings['seo_title'] ?? 'Real Trade Estate - Homepage')
+{{-- GÜNCELLEME: Türkçe açıklama -> İngilizce açıklama --}}
+@section('description', $settings['seo_description'] ?? 'Secure and fast trading platform.')
 
 @section('content')
 
@@ -89,7 +91,7 @@
                     @forelse ($slides as $slide)
                     <div class="swiper-slide">
                         {{-- DÜZELTME: 'storage/' kaldırıldı (Paylaşımlı sunucu uyumlu) --}}
-                        <div class="image-layer" style="background-image: url({{ $slide->image_path ? asset($slide->image_path) : asset('frontend/assets/images/slides/slide-v1-1.jpg') }});">
+                        <div class="image-layer" style="background-image: url({{ $slide->image_url ? asset('storage/slide-images/1920x1080/' . $slide->image_url) : asset('assets/images/main-slider/slider5/slide1.jpg') }});">
                         </div>
                         <div class="container">
                             <div class="content-box">
@@ -97,20 +99,13 @@
                                     <h2>{!! $slide->title !!}</h2> 
                                 </div>
                                 <div class="text">
-                                    <p>{{ $slide->description }}</p>
+                                    <p>{{ $slide->subtitle }}</p>
                                 </div>
                                 <div class="bottom-box">
                                     <div class="btn-box">
-                                        <a class="btn-one" href="{{ $slide->button_url ?? '#' }}">
-                                            <span class="txt">{{ $slide->button_text ?? 'Explore Markets' }}</span>
+                                        <a class="btn-one" href="{{ $slide->link ?? '#' }}">
+                                            <span class="txt">{{ $slide->button_text ?? 'Details' }}</span>
                                             <i class="icon-right-arrow"></i>
-                                        </a>
-                                    </div>
-                                    {{-- Video linki statik --}}
-                                    <div class="text-box">
-                                        <h4>Master Trading <br>in Minutes...</h4>
-                                        <a class="video-popup" title="Video Gallery" href="https://www.youtube.com/watch?v=bZ3pffta3-A">
-                                            <span class="icon-play"></span>
                                         </a>
                                     </div>
                                 </div>
@@ -195,17 +190,17 @@
                 <div class="col-xl-6 col-lg-6">
                     <div class="about-style1__img">
                         <div class="img-box wow fadeInLeft animated" data-wow-delay="00ms" data-wow-duration="1500ms">
-                             {{-- DÜZELTME: 'storage/' kaldırıldı --}}
+                            {{-- DÜZELTME: 'storage/' kaldırıldı --}}
                             <img src="{{ $about->image ? asset($about->image) : asset('frontend/assets/images/about/about-v1-1.jpg') }}" alt="About Image">
                         </div>
                         {{-- Statik Award Badge --}}
                         <div class="about-style1__img-award text-center wow fadeInUp animated" data-wow-delay="00ms" data-wow-duration="1500ms">
-                             <div class="about-style1__img-award-top">
+                            <div class="about-style1__img-award-top">
                                 <div class="top">
                                     <div class="shape1"><img src="{{ asset('frontend/assets/images/about/about-v1-badge.png') }}" alt="Award"></div>
                                     <div class="text"><h5>Top <br>Trading <br>Broker</h5><h6>2023</h6></div>
                                 </div>
-                             </div>
+                            </div>
                         </div>
                         {{-- Statik Yıl --}}
                         <div class="about-style1-round-text wow fadeInRight animated" data-wow-delay="00ms" data-wow-duration="1500ms">
@@ -217,7 +212,8 @@
                 <div class="col-xl-6 col-lg-6">
                     <div class="about-style1__content wow fadeInRight animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                         <div class="sec-title">
-                            <div class="sub-title"><h4>About Tradebro</h4></div>
+                            {{-- GÜNCELLEME: 'About Tradebro' -> 'About Real Trade Estate' --}}
+                            <div class="sub-title"><h4>About Real Trade Estate</h4></div>
                             <h2>{!! $about->title !!}</h2>
                         </div>
                         <div class="text">
@@ -369,7 +365,8 @@
                                                                 <div class="top-box">
                                                                     <div class="category">
                                                                         <div class="icon"><i class="icon-hashtag"></i></div>
-                                                                        <h6>{{ $firstBlog->category->name ?? 'Kategori' }}</h6>
+                                                                        {{-- GÜNCELLEME: 'Kategori' -> 'Category' --}}
+                                                                        <h6>{{ $firstBlog->category->name ?? 'Category' }}</h6>
                                                                     </div>
                                                                     <div class="date">
                                                                         <div class="icon"><i class="fa fa fa-calendar"></i></div>
@@ -426,7 +423,7 @@
 
                                     <div class="col-xl-4 col-lg-6">
                                         <div class="blog-style1-subscribe">
-                                             <div class="shape1"><img class="float-bob-x" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape1.png') }}" alt="Shape"></div>
+                                            <div class="shape1"><img class="float-bob-x" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape1.png') }}" alt="Shape"></div>
                                             {{-- ... (Statik subscribe formu) ... --}}
                                         </div>
                                     </div>
@@ -488,7 +485,7 @@
             </div>
          </div>
     </section>
-    @endsection
+@endsection
 
 @push('scripts')
     {{-- Anasayfaya özel dashboard/slider script'i --}}

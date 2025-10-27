@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     {{-- Dinamik Başlık (Sayfaya özel veya varsayılan) --}}
-    <title>@yield('title', config('app.name', 'Tradebro'))</title>
+    {{-- GÜNCELLEME: 'Tradebro' -> 'Real Trade Estate' --}}
+    <title>@yield('title', config('app.name', 'Real Trade Estate'))</title>
     
     {{-- Favicons (Bunları public/frontend/assets... içine koyduğunu varsayıyorum) --}}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('frontend/assets/images/favicons/apple-touch-icon.png') }}" />
@@ -14,7 +15,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('frontend/assets/images/favicons/favicon-16x16.png') }}" />
     
     {{-- Meta Açıklama (Sayfaya özel) --}}
-    <meta name="description" content="@yield('description', 'Tradebro HTML 5 Template')" />
+    {{-- GÜNCELLEME: 'Tradebro HTML 5 Template' -> 'Real Trade Estate HTML 5 Template' --}}
+    <meta name="description" content="@yield('description', 'Real Trade Estate HTML 5 Template')" />
 
     {{-- Vendor (Plugin) CSS Dosyaları --}}
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/animate/animate.min.css') }}" />
@@ -60,7 +62,6 @@
 
 <body class="body-bg-1">
 
-    <!-- Preloader -->
     <div class="loader-wrap">
         <div class="preloader">
             <div id="handle-preloader" class="handle-preloader">
@@ -73,18 +74,12 @@
             </div>
         </div>
     </div>
-    <!-- Preloader End -->
-
-    <!-- Cursor -->
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
-    <!-- Cursor End -->
-    
     {{-- 
         Not: 'xs-sidebar-group' (sağdan açılan info menüsü) static bir yapıya benziyor. 
         İleride $settings'den gelen datayla doldurabiliriz ama şimdilik layout'ta kalabilir.
     --}}
-    <!-- Start sidebar widget content -->
     <div class="xs-sidebar-group info-group info-sidebar">
         <div class="xs-overlay xs-bg-black"></div>
         <div class="xs-sidebar-widget">
@@ -126,9 +121,6 @@
             </div>
         </div>
     </div>
-    <!-- End sidebar widget content -->
-
-
     <div class="page-wrapper boxed_wrapper">
 
         {{-- Header (Menü) --}}
@@ -144,9 +136,6 @@
         @include('frontend.partials._footer')
 
     </div>
-    <!-- /.page-wrapper -->
-
-
     {{-- Mobil Navigasyon (Statik kalabilir) --}}
     <div class="mobile-nav__wrapper">
         <div class="mobile-nav__overlay mobile-nav__toggler"></div>
@@ -203,9 +192,6 @@
             </div>
         </div>
     </div>
-    <!-- Scroll to top End -->
-
-
     {{-- Vendor (Plugin) JS Dosyaları --}}
     <script src="{{ asset('frontend/assets/vendors/jquery/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('frontend/assets/vendors/bootstrap/js/bootstrap.bundle.min.js') }}"></script>

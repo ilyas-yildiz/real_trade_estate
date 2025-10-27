@@ -1,13 +1,10 @@
-<!--Start footer Style1 -->
 <footer class="footer-style1">
 
-    <!--Start Footer Main-->
     <div class="footer-main">
         <div class="footer-main-top">
             <div class="container">
                 <div class="row">
 
-                    <!--Start Single Footer Widget-->
                     <div class="col-xl-3 col-lg-6 col-md-6 single-widget">
                         <div class="single-footer-widget wow fadeInUp" data-wow-duration="1200ms"
                             data-wow-delay="000ms">
@@ -44,9 +41,6 @@
                             </div>
                         </div>
                     </div>
-                    <!--End Single Footer Widget-->
-
-                    <!--Start Single Footer Widget-->
                     <div class="col-xl-2 col-lg-6 col-md-6 single-widget">
                         <div class="single-footer-widget wow fadeInDown" data-wow-duration="1200ms"
                             data-wow-delay="100ms">
@@ -90,9 +84,6 @@
                             </div>
                         </div>
                     </div>
-                    <!--End Single Footer Widget-->
-
-                    <!--Start Single Footer Widget-->
                     <div class="col-xl-2 col-lg-6 col-md-6 single-widget">
                         <div class="single-footer-widget wow fadeInDown" data-wow-duration="1200ms"
                             data-wow-delay="200ms">
@@ -121,9 +112,6 @@
                             </div>
                         </div>
                     </div>
-                    <!--End Single Footer Widget-->
-
-                    <!--Start Single Footer Widget-->
                     <div class="col-xl-2 col-lg-6 col-md-6 single-widget">
                         <div class="single-footer-widget wow fadeInDown" data-wow-duration="1200ms"
                             data-wow-delay="400ms">
@@ -139,9 +127,6 @@
                             </div>
                         </div>
                     </div>
-                    <!--End Single Footer Widget-->
-
-                    <!--Start Single Footer Widget-->
                     <div class="col-xl-3 col-lg-6 col-md-6 single-widget">
                         <div class="single-footer-widget ml30 wow fadeInDown" data-wow-duration="1200ms"
                             data-wow-delay="500ms">
@@ -165,9 +150,7 @@
                             </div>
                         </div>
                     </div>
-                    <!--End Single Footer Widget-->
-
-                </div>
+                    </div>
             </div>
         </div>
 
@@ -237,15 +220,13 @@
             </div>
         </div>
     </div>
-    <!--End Footer Main-->
-
-    <!--Start Footer Bottom-->
     <div class="footer-bottom">
         <div class="container">
             <div class="bottom-inner">
                 <div class="copyright-text wow fadeInLeft" data-wow-duration="1500ms" data-wow-delay="000ms">
                     {{-- Copyright (Ayarlardan) --}}
-                    <p>{{ $settings['copyright_text'] ?? 'Copyrights © 2025 Tradebro. All rights reserved.' }}</p>
+                    {{-- GÜNCELLEME: 'Tradebro' -> 'Real Trade Estate' --}}
+                    <p>{{ $settings['copyright_text'] ?? 'Copyrights © 2025 Real Trade Estate. All rights reserved.' }}</p>
                 </div>
                 <div class="footer-menu wow fadeInRight" data-wow-duration="1500ms" data-wow-delay="200ms">
                     {{-- Bu linkler statik kalabilir veya admin panelinden yönetilebilir --}}
@@ -258,6 +239,4 @@
             </div>
         </div>
     </div>
-    <!--End Footer Bottom-->
-</footer>
-<!--End footer Style1 -->
+    </footer>

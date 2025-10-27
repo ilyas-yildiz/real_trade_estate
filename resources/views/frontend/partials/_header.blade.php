@@ -8,7 +8,8 @@
                         <div class="header-logo-box-style1">
                             <a href="{{ route('frontend.home') }}">
                                 {{-- Logo'yu ileride $settings'den çekebiliriz, şimdilik statik --}}
-                                <img src="{{ asset('frontend/assets/images/resources/logo-1.png') }}" alt="Logo" title="Tradebro">
+                                {{-- GÜNCELLEME: title="Tradebro" -> title="Real Trade Estate" --}}
+                                <img src="{{ asset('frontend/assets/images/resources/logo-1.png') }}" alt="Logo" title="Real Trade Estate">
                             </a>
                         </div>
                         {{-- Opsiyonel: Trading saatleri - Şimdilik statik --}}
@@ -49,7 +50,8 @@
                                     <p><a href="{{ route('login') }}">Login</a> - or - <a href="{{ route('register') }}">Register</a></p>
                                 @endguest
                                 @auth
-                                    <p><a href="{{ route('admin.dashboard') }}">Hesabım</a> - (<a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-frontend').submit();">Çıkış Yap</a>)</p>
+                                    {{-- GÜNCELLEME: 'Hesabım' -> 'My Account', 'Çıkış Yap' -> 'Logout' --}}
+                                    <p><a href="{{ route('admin.dashboard') }}">My Account</a> - (<a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-frontend').submit();">Logout</a>)</p>
                                     <form id="logout-form-frontend" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
@@ -66,13 +68,13 @@
 
                 <div class="main-header-style1__content-bottom">
                     <div class="main-header-style1__content-bottom-left">
-                        <!--Start Main Menu Style1-->
                         <nav class="main-menu main-menu-style1">
                             <div class="main-menu__wrapper clearfix">
                                 <div class="main-menu__wrapper-inner">
                                     <div class="sticky-logo-box-style1">
                                         <a href="{{ route('frontend.home') }}">
-                                            <img src="{{ asset('frontend/assets/images/resources/logo-1.png') }}" alt="Logo" title="Tradebro">
+                                            {{-- GÜNCELLEME: title="Tradebro" -> title="Real Trade Estate" --}}
+                                            <img src="{{ asset('frontend/assets/images/resources/logo-1.png') }}" alt="Logo" title="Real Trade Estate">
                                         </a>
                                     </div>
                                     <div class="main-menu-style1__left">
@@ -83,23 +85,24 @@
 
                                             <ul class="main-menu__list">
                                                 {{-- Dinamik Menü Linkleri --}}
+                                                {{-- GÜNCELLEME: Menü isimleri Türkçeden İngilizceye çevrildi --}}
                                                 <li class="{{ request()->routeIs('frontend.home') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.home') }}">Anasayfa</a>
+                                                    <a href="{{ route('frontend.home') }}">Home</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.about') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.about') }}">Hakkımızda</a>
+                                                    <a href="{{ route('frontend.about') }}">About Us</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.services*') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.services') }}">Hizmetler</a>
+                                                    <a href="{{ route('frontend.services') }}">Services</a>
                                                 </li>
                                                  <li class="{{ request()->routeIs('frontend.projects*') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.projects') }}">Projeler</a>
+                                                    <a href="{{ route('frontend.projects') }}">Projects</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.blog*') ? 'current' : '' }}">
                                                     <a href="{{ route('frontend.blog.index') }}">Blog</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.contact') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.contact') }}">İletişim</a>
+                                                    <a href="{{ route('frontend.contact') }}">Contact</a>
                                                 </li>
                                                 {{-- 
                                                     Temadaki orijinal çok seviyeli (dropdown) menü yapısı 
@@ -111,8 +114,7 @@
                                 </div>
                             </div>
                         </nav>
-                        <!--End Main Menu Style1-->
-                    </div>
+                        </div>
 
                     <div class="main-header-style1__content-bottom-right">
                         {{-- Dil Seçici (Statik) --}}
@@ -121,9 +123,10 @@
                                 <i class="icon-language"></i>
                             </div>
                             <div class="select-box clearfix">
+                                {{-- GÜNCELLEME: Varsayılan dil EN olarak ayarlandı --}}
                                 <select class="wide">
-                                    <option data-display="TR">TR</option>
-                                    <option value="1">EN</option>
+                                    <option data-display="EN">EN</option>
+                                    <option value="1">TR</option>
                                 </select>
                             </div>
                         </div>
@@ -134,7 +137,8 @@
                             </div>
                             <div class="text">
                                 <a href="{{ route('register') }}">
-                                    İşleme <br>Başla
+                                    {{-- GÜNCELLEME: 'İşleme Başla' -> 'Start Trading' --}}
+                                    Start <br>Trading
                                     <i class="icon-right-arrow"></i>
                                 </a>
                             </div>
