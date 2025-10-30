@@ -9,7 +9,7 @@
                             <a href="{{ route('frontend.home') }}">
                                 {{-- Logo'yu ileride $settings'den çekebiliriz, şimdilik statik --}}
                                 {{-- GÜNCELLEME: title="Tradebro" -> title="Real Trade Estate" --}}
-                                <img src="{{ asset('frontend/assets/images/resources/logo-1.png') }}" alt="Logo" title="Real Trade Estate">
+                                <img src="{{ asset('frontend/assets/images/resources/logo-7.png') }}" alt="Logo" title="Real Trade Estate" width="130">
                             </a>
                         </div>
                         {{-- Opsiyonel: Trading saatleri - Şimdilik statik --}}
@@ -74,7 +74,7 @@
                                     <div class="sticky-logo-box-style1">
                                         <a href="{{ route('frontend.home') }}">
                                             {{-- GÜNCELLEME: title="Tradebro" -> title="Real Trade Estate" --}}
-                                            <img src="{{ asset('frontend/assets/images/resources/logo-1.png') }}" alt="Logo" title="Real Trade Estate">
+                                            <img src="{{ asset('frontend/assets/images/resources/logo-7.png') }}" alt="Logo" title="Real Trade Estate" width="130">
                                         </a>
                                     </div>
                                     <div class="main-menu-style1__left">
@@ -93,10 +93,7 @@
                                                     <a href="{{ route('frontend.about') }}">About Us</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.services*') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.services') }}">Services</a>
-                                                </li>
-                                                 <li class="{{ request()->routeIs('frontend.projects*') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.projects') }}">Projects</a>
+                                                    <a href="{{ route('frontend.services') }}">Invest</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.blog*') ? 'current' : '' }}">
                                                     <a href="{{ route('frontend.blog.index') }}">Blog</a>

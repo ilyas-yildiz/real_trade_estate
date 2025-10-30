@@ -197,8 +197,7 @@
                         <div class="about-style1__img-award text-center wow fadeInUp animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                             <div class="about-style1__img-award-top">
                                 <div class="top">
-                                    <div class="shape1"><img src="{{ asset('frontend/assets/images/about/about-v1-badge.png') }}" alt="Award"></div>
-                                    <div class="text"><h5>Top <br>Trading <br>Broker</h5><h6>2023</h6></div>
+                                    <div class="shape1"><img src="{{ asset('frontend/assets/images/about/logo-5.png') }}" alt="Real Trade Estate"></div>
                                 </div>
                             </div>
                         </div>
@@ -217,16 +216,15 @@
                             <h2>{!! $about->title !!}</h2>
                         </div>
                         <div class="text">
-                            <p>{{ $about->description }}</p>
+                            <p>{{ $about->short_content }}</p>
                         </div>
-                        {{-- 'The Goal' kısmı statik --}}
-                        <div class="title-box">
-                            <h3>The Goal</h3>
-                            <h6>Purpose-Driven and Goal-Oriented</h6>
-                        </div>
+                        
                         <div class="text-box">
                             <div class="icon"><div class="inner"><span class="icon-target"><span class="path1"></span></span></div></div>
-                            <div class="text1"><p>Expound the actual teaching of the great of the master-builder human do not know how pursues business it will frequently.</p></div>
+<div class="text1">
+    <p>{{ Str::limit(strip_tags($about->content), 100) }}</p>
+</div>
+
                         </div>
                         <div class="btn-box">
                             <a href="{{ route('frontend.about') }}">
@@ -247,85 +245,284 @@
         </div>
         {{-- ... (index.html'den statik sayaç bölümünün geri kalanı) ... --}}
     </section>
-    @if(isset($services) && $services->count() > 0)
-    <section class="account-style1">
-        <div class="container">
-            <div class="sec-title">
-                <div class="sub-title"><h4>Account Types</h4></div>
-                <h2>Explore Our Account Options</h2>
-            </div>
-            <div class="row">
-                <div class="col-xl-12">
-                    <div class="owl-carousel owl-theme thm-owl__carousel account-style1-carousel owl-nav-style-one"
-                        data-owl-options='{
-                        "loop": true, "autoplay": true, "margin": 30, "nav": true, "dots": false, "smartSpeed": 500, "autoplayTimeout": 10000,
-                        "navText": ["<span class=\"left icon-arrow-left\"></span>","<span class=\"icon-arrow-right\"></span>"],
-                        "responsive": {"0": {"items": 1}, "768": {"items": 2}, "992": {"items": 2}, "1200": {"items": 3}}
-                    }'>
+  
+    {{-- Bu bölüm STATİK --}}
+    <section class="platforms-style1">
+            <div class="container">
+                <div class="sec-title white">
+                    <div class="sub-title">
+                        <h4>Platforms</h4>
+                    </div>
+                    <h2>Powerful Trading Platforms for Every Trader</h2>
+                </div>
+                <div class="platforms-style1__inner">
 
-                        @foreach ($services as $service)
-                        <div class="single-account-style1">
-                            <div class="content-box">
-                                <h3><a href="{{ route('frontend.services.detail', $service->slug) }}">{{ $service->title }}</a></h3>
-                                <p>{{ $service->short_description ?? Str::limit(strip_tags($service->description), 80) }}</p>
+                    <div class="platforms-style1__tab">
+
+                        <div class="platforms-style1__img">
+                            <div class="shape">
+                                <img class="float-bob-y" src="{{ asset('frontend/assets/images/shapes/platforms-v1-shape1.png') }}" alt="Shape">
                             </div>
-                            <div class="img-box">
-                                <div class="inner">
-                                    {{-- DÜZELTME: 'storage/' kaldırıldı --}}
-                                    <img src="{{ $service->image ? asset($service->image) : asset('frontend/assets/images/resources/account-v1-1.jpg') }}" alt="{{ $service->title }}">
-                                </div>
-                                <div class="overlay-icon">
-                                    <span class="icon-crown"><span class="path1"></span></span>
-                                </div>
-                            </div>
-                            <div class="bottom-box">
-                                <a href="{{ route('frontend.services.detail', $service->slug) }}">
-                                    Read More
-                                    <i class="icon-right-arrow"></i>
-                                </a>
-                                <p>#{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</p>
+                            <div class="inner">
+                                <img src="{{ asset('frontend/assets/images/resources/platforms-v1-11.png') }}" alt="Image" style="max-width: 400px;">
                             </div>
                         </div>
-                        @endforeach
 
+
+
+                        <div class="platforms-style1__content">
+
+                            <div class="platforms-style1__tab-btn">
+                                <ul class="tabs-button-box clearfix">
+                                    <li data-tab="#trader-4" class="tab-btn-item active-btn-item">
+                                        <div class="icon">
+                                            <i class="icon-check"></i>
+                                        </div>
+                                        <h4>Meta <br>Trader 4</h4>
+                                    </li>
+                                    <li data-tab="#trader-5" class="tab-btn-item">
+                                        <div class="icon">
+                                            <i class="icon-check"></i>
+                                        </div>
+                                        <h4>Meta <br>Trader 5</h4>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="tabs-content-box">
+
+                                <!--Start Tab Single-->
+                                <div class="tab-content-box-item tab-content-box-item-active" id="trader-4">
+                                    <div class="platforms-style1-tab-content-box-item">
+
+                                        <!--Start Single Platforms Style1 Tab -->
+                                        <div class="single-platforms-style1-tab">
+                                            <div class="text">
+                                                <p>Denouncing pleasure and praising pain was born and will give complete
+                                                    account of the system and expound.</p>
+                                            </div>
+                                            <ul class="list-item">
+                                                <li>
+                                                    <div class="icon">
+                                                        <img src="{{ asset('frontend/assets/images/icon/icon-1.png') }}" alt="Icon">
+                                                    </div>
+                                                    <p>Extensive Technical Indicators</p>
+                                                </li>
+                                                <li>
+                                                    <div class="icon">
+                                                        <img src="{{ asset('frontend/assets/images/icon/icon-1.png') }}" alt="Icon">
+                                                    </div>
+                                                    <p>Automated Trading with Expert Advisors</p>
+                                                </li>
+                                                <li>
+                                                    <div class="icon">
+                                                        <img src="{{ asset('frontend/assets/images/icon/icon-1.png') }}" alt="Icon">
+                                                    </div>
+                                                    <p>Low Resource Requirements</p>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <!--End Single Platforms Style1 Tab -->
+
+                                    </div>
+                                </div>
+                                <!--End Tab Single-->
+
+                                <!--Start Tab Single-->
+                                <div class="tab-content-box-item" id="trader-5">
+                                    <div class="platforms-style1-tab-content-box-item">
+
+                                        <!--Start Single Platforms Style1 Tab -->
+                                        <div class="single-platforms-style1-tab">
+                                            <div class="text">
+                                                <p>Denouncing pleasure and praising pain was born and will give complete
+                                                    account of the system and expound.</p>
+                                            </div>
+                                            <ul class="list-item">
+                                                <li>
+                                                    <div class="icon">
+<img src="{{ asset('frontend/assets/images/icon/icon-1.png') }}" alt="Icon">
+                                                    </div>
+                                                    <p>Extensive Technical Indicators</p>
+                                                </li>
+                                                <li>
+                                                    <div class="icon">
+                                                        <img src="{{ asset('frontend/assets/images/icon/icon-1.png') }}" alt="Icon">
+                                                    </div>
+                                                    <p>Automated Trading with Expert Advisors</p>
+                                                </li>
+                                                <li>
+                                                    <div class="icon">
+                                                        <img src="{{ asset('frontend/assets/images/icon/icon-1.png') }}" alt="Icon">
+                                                    </div>
+                                                    <p>Low Resource Requirements</p>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!--End Tab Single-->
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    {{-- Bu bölüm STATİK --}}
+<section class="how-it-work-style1">
+            <div class="container">
+                <div class="how-it-work-style1__top">
+                    <div class="sec-title white">
+                        <div class="sub-title">
+                            <h4>How It’s Work</h4>
+                        </div>
+                        <h2>Step-by-Step Trading Guide</h2>
+                    </div>
+                    <div class="text">
+                        <p>Pleasure and praising pain was born and will give complete system.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="owl-carousel owl-theme thm-owl__carousel how-it-work-style1-carousel owl-nav-style-one owl-loaded owl-drag" data-owl-options="{
+                            &quot;loop&quot;: false,
+                            &quot;autoplay&quot;: false,
+                            &quot;margin&quot;: 30,
+                            &quot;nav&quot;: true,
+                            &quot;dots&quot;: false,
+                            &quot;smartSpeed&quot;: 500,
+                            &quot;autoplayTimeout&quot;: 10000,
+                            &quot;navText&quot;: [&quot;&lt;span class=\&quot;left icon-arrow-left\&quot;&gt;&lt;/span&gt;&quot;,&quot;&lt;span class=\&quot;icon-arrow-right\&quot;&gt;&lt;/span&gt;&quot;],
+                            &quot;responsive&quot;: {
+                                    &quot;0&quot;: {
+                                        &quot;items&quot;: 1
+                                    },
+                                    &quot;768&quot;: {
+                                        &quot;items&quot;: 2
+                                    },
+                                    &quot;992&quot;: {
+                                        &quot;items&quot;: 2
+                                    },
+                                    &quot;1200&quot;: {
+                                        &quot;items&quot;: 3
+                                    }
+                                }
+                            }">
+
+
+
+                            <!-- Start Single How It Work Style1 -->
+                            
+                            <!-- End Single How It Work Style1 -->
+                            <!-- Start Single How It Work Style1 -->
+                            
+                            <!-- End Single How It Work Style1 -->
+                            <!-- Start Single How It Work Style1 -->
+                            
+                            <!-- End Single How It Work Style1 -->
+
+
+                            <!-- Start Single How It Work Style1 -->
+                            
+                            <!-- End Single How It Work Style1 -->
+                            <!-- Start Single How It Work Style1 -->
+                            
+                            <!-- End Single How It Work Style1 -->
+                            <!-- Start Single How It Work Style1 -->
+                            
+                            <!-- End Single How It Work Style1 -->
+
+
+                        <div class="owl-stage-outer"><div class="owl-stage" style="transform: translate3d(0px, 0px, 0px); transition: 0.5s; width: 2400px;"><div class="owl-item active" style="width: 370px; margin-right: 30px;"><div class="single-how-it-work-style1">
+                                <div class="count-box counted">
+                                    <div class="step">
+                                        <h6>Step 01</h6>
+                                    </div>
+                                </div>
+                                <div class="content-box">
+                                    <div class="title">
+                                        <h3><a href="#">Open Your Account</a></h3>
+                                        <p>Always holds these matters to this principle of selection or else cases
+                                            he endures pains.</p>
+                                    </div>
+                                </div>
+                            </div></div><div class="owl-item active" style="width: 370px; margin-right: 30px;"><div class="single-how-it-work-style1">
+                                <div class="count-box counted">
+                                    <div class="step">
+                                        <h6>Step 02</h6>
+                                    </div>
+                                </div>
+                                <div class="content-box">
+                                    <div class="title">
+                                        <h3><a href="#">Fund Your Account</a></h3>
+                                        <p>Beguiled and demoralized the charms of pleasure of the moment, so blinded
+                                            by desire that they foresee.</p>
+                                    </div>
+                                </div>
+                            </div></div><div class="owl-item active" style="width: 370px; margin-right: 30px;"><div class="single-how-it-work-style1">
+                                <div class="count-box counted">
+                                    <div class="step">
+                                        <h6>Step 03</h6>
+                                    </div>
+                                </div>
+                                <div class="content-box">
+                                    <div class="title">
+                                        <h3><a href="#">Choose Your Asset</a></h3>
+                                        <p>Business it will frequently occur that pleasures have to be repudiated
+                                            and annoyances accepted.</p>
+                                    </div>
+                                </div>
+                            </div></div><div class="owl-item" style="width: 370px; margin-right: 30px;"><div class="single-how-it-work-style1">
+                                <div class="count-box counted">
+                                    <div class="step">
+                                        <h6>Step 04</h6>
+                                    </div>
+                                </div>
+                                <div class="content-box">
+                                    <div class="title">
+                                        <h3><a href="#">Open Your Account</a></h3>
+                                        <p>Always holds these matters to this principle of selection or else cases
+                                            he endures pains.</p>
+                                    </div>
+                                </div>
+                            </div></div><div class="owl-item" style="width: 370px; margin-right: 30px;"><div class="single-how-it-work-style1">
+                                <div class="count-box counted">
+                                    <div class="step">
+                                        <h6>Step 05</h6>
+                                    </div>
+                                </div>
+                                <div class="content-box">
+                                    <div class="title">
+                                        <h3><a href="#">Fund Your Account</a></h3>
+                                        <p>Beguiled and demoralized the charms of pleasure of the moment, so blinded
+                                            by desire that they foresee.</p>
+                                    </div>
+                                </div>
+                            </div></div><div class="owl-item" style="width: 370px; margin-right: 30px;"><div class="single-how-it-work-style1">
+                                <div class="count-box counted">
+                                    <div class="step">
+                                        <h6>Step 06</h6>
+                                    </div>
+                                </div>
+                                <div class="content-box">
+                                    <div class="title">
+                                        <h3><a href="#">Choose Your Asset</a></h3>
+                                        <p>Business it will frequently occur that pleasures have to be repudiated
+                                            and annoyances accepted.</p>
+                                    </div>
+                                </div>
+                            </div></div></div></div>
+                           
+                            <div class="owl-dots disabled"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    @endif
-    {{-- Bu bölüm STATİK --}}
-    <section class="platforms-style1">
-         <div class="container">
-            <div class="sec-title white">
-                <div class="sub-title"><h4>Platforms</h4></div>
-                <h2>Powerful Trading Platforms for Every Trader</h2>
-            </div>
-            {{-- ... (index.html'den statik platform içeriği) ... --}}
-        </div>
-    </section>
-    {{-- Bu bölüm STATİK --}}
-    <section class="choose-style1">
-         <div class="container">
-             <div class="sec-title withtext text-center">
-                <div class="sub-title"><h4>Why Choose Us</h4></div>
-                <h2>The Top Choice for Traders</h2>
-            </div>
-            {{-- ... (index.html'den statik "Neden Biz" içeriği) ... --}}
-         </div>
-    </section>
-    {{-- Bu bölüm STATİK --}}
-    <section class="how-it-work-style1">
-        <div class="container">
-            <div class="how-it-work-style1__top">
-                <div class="sec-title white">
-                    <div class="sub-title"><h4>How it’s Work</h4></div>
-                    <h2>Step-by-Step Trading Guide</h2>
-                </div>
-            </div>
-            {{-- ... (index.html'den statik "Nasıl Çalışır" içeriği) ... --}}
-        </div>
-    </section>
+        </section>
     @if(isset($blogs) && $blogs->count() > 0)
     <section class="blog-style1">
         <div class="container">
@@ -359,7 +556,7 @@
                                                         <div class="single-blog-style1">
                                                             <div class="img-box">
                                                                 {{-- DÜZELTME: 'storage/' kaldırıldı --}}
-                                                                <img src="{{ $firstBlog->image ? asset($firstBlog->image) : asset('frontend/assets/images/blog/blog-v1-1.jpg') }}" alt="{{ $firstBlog->title }}">
+                                                                <img src="{{ $firstBlog->image_url ? asset('storage/blog-images/365x182/' . $firstBlog->image_url) : asset('frontend/assets/images/blog/blog-v1-1.jpg') }}" alt="{{ $firstBlog->title }}">
                                                             </div>
                                                             <div class="content-box">
                                                                 <div class="top-box">
@@ -422,11 +619,65 @@
                                     </div>
 
                                     <div class="col-xl-4 col-lg-6">
-                                        <div class="blog-style1-subscribe">
-                                            <div class="shape1"><img class="float-bob-x" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape1.png') }}" alt="Shape"></div>
-                                            {{-- ... (Statik subscribe formu) ... --}}
+                                            <div class="blog-style1-subscribe">
+                                                <div class="shape1">
+                                                    <img class="float-bob-x" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape1.png') }}" alt="Shape">
+                                                </div>
+                                                <div class="shape2">
+                                                    <img class="zoominout" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape2.png') }}" alt="Shape">
+                                                </div>
+                                                <div class="shape3">
+                                                    <img class="zoominout" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape3.png') }}" alt="Shape">
+                                                </div>
+                                                <div class="top-box">
+                                                    <h3>Subscribe Us</h3>
+                                                    <p>Get updates in your inbox diectly.</p>
+                                                </div>
+                                                <div class="blog-style1-subscribe__inner">
+                                                    <ul class="clearfix">
+                                                        <li>
+                                                            <div class="icon">
+                                                                <i class="icon-check"></i>
+                                                            </div>
+                                                            <p>Special Promotions</p>
+                                                        </li>
+                                                        <li>
+                                                            <div class="icon">
+                                                                <i class="icon-check"></i>
+                                                            </div>
+                                                            <p>Exclusive Market Insights</p>
+                                                        </li>
+                                                        <li>
+                                                            <div class="icon">
+                                                                <i class="icon-check"></i>
+                                                            </div>
+                                                            <p>Expert Trading Tips</p>
+                                                        </li>
+                                                    </ul>
+                                                    <div class="blog-style1-subscribe-form">
+                                                        <form action="#" method="POST">
+                                                            <div class="form-group">
+                                                                <input type="email" name="email" placeholder="Email address..." required="">
+                                                            </div>
+                                                            <div class="checked-box1">
+                                                                <input type="checkbox" name="agree" id="termsconditions2" checked="">
+                                                                <label for="termsconditions1">
+                                                                    <span></span>I agree terms &amp; conditions.
+                                                                </label>
+                                                            </div>
+                                                            <div class="btn-box">
+                                                                <button class="submit btn-one">
+                                                                    <span class="txt">
+                                                                        Subscribe
+                                                                        <i class="icon-right-arrow"></i>
+                                                                    </span>
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>

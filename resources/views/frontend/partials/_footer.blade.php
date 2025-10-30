@@ -17,7 +17,7 @@
                                 </div>
                                 <div class="text-box">
                                     {{-- Kısa açıklama (Ayarlardan) --}}
-                                    <p>{{ $settings['footer_description'] ?? 'Business it will frequently to occur that pleasures have all repudiated and annoyances accepted.' }}</p>
+                                    <p>{{ $settings['footer_aboutus'] ?? 'Business it will frequently to occur that pleasures have all repudiated and annoyances accepted.' }}</p>
                                 </div>
                                 <div class="your-trading">
                                     <div class="title1">
