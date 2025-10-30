@@ -208,7 +208,7 @@
                             <img class="rounded-circle header-profile-user" src="{{ asset('admin/images/users/avatar-3.jpg') }}" alt="Header Avatar">
                             <span class="text-start ms-xl-2">
                                 <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ Auth::user()->name }}</span>
-                                <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">Mil Hukuk</span>
+                                <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">Real Trade Estate</span>
                             </span>
                         </span>
                 </button>
