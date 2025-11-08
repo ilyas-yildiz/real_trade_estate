@@ -23,7 +23,7 @@ class PaymentController extends Controller
         $user = Auth::user();
         $query = Payment::with('user', 'reviewer')->latest();
 
-        if ($user->is_admin) {
+        if ($user->isAdmin()) {
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
             }
@@ -44,7 +44,7 @@ class PaymentController extends Controller
      */
     public function create()
     {
-        if (Auth::user()->is_admin) {
+        if (Auth::user()->isAdmin()) {
             return redirect()->route('admin.payments.index')->with('error', 'Adminler ödeme bildirimi oluşturamaz.');
         }
         return view('admin.payments.create');
@@ -55,7 +55,7 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        if (Auth::user()->is_admin) {
+        if (Auth::user()->isAdmin()) {
             abort(403, 'Adminler ödeme bildirimi oluşturamaz.');
         }
 
@@ -101,7 +101,7 @@ class PaymentController extends Controller
      */
     public function edit(Payment $payment): JsonResponse
     {
-        if (!Auth::user()->is_admin) {
+        if (!Auth::user()->isAdmin()) {
             return response()->json(['error' => 'Yetkisiz erişim.'], 403);
         }
 
@@ -137,7 +137,7 @@ class PaymentController extends Controller
      */
     public function update(Request $request, Payment $payment)
     {
-        if (!Auth::user()->is_admin) {
+        if (!Auth::user()->isAdmin()) {
             return response()->json(['success' => false, 'message' => 'Bu işleme yetkiniz yok.'], 403);
         }
 
@@ -163,7 +163,7 @@ class PaymentController extends Controller
     {
         $user = Auth::user();
 
-        if (!($user->is_admin || ($payment->user_id === $user->id && $payment->status === 'pending'))) {
+        if (!($user->isAdmin() || ($payment->user_id === $user->id && $payment->status === 'pending'))) {
             abort(403, 'Bu işleme yetkiniz yok.');
         }
 
@@ -186,7 +186,7 @@ class PaymentController extends Controller
     public function showReceipt(Payment $payment)
     {
         $user = Auth::user();
-        if (!($user->is_admin || $payment->user_id === $user->id)) {
+        if (!($user->isAdmin() || $payment->user_id === $user->id)) {
             abort(403, 'Bu dekontu görüntüleme yetkiniz yok.');
         }
         if (!$payment->receipt_path || !Storage::disk('local')->exists($payment->receipt_path)) {

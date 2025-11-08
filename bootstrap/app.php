@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // YENİ EKLENDİ: 'admin' kısayolunu AdminMiddleware'e bağlıyoruz
         $middleware->alias([
             'admin' => AdminMiddleware::class,
+            'bayi'  => \App\Http\Middleware\BayiMiddleware::class,
             // 'adminer' => \Onecentlin\Adminer\Http\Middleware\Authenticate::class,
         ]);
     })

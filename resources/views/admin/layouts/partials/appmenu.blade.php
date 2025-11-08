@@ -21,63 +21,32 @@
     </button>
 </div>
 
-<div id="scrollbar" class="position-relative">
+<div id="scrollbar">
     <div class="container-fluid">
-
         <div id="two-column-menu"></div>
         <ul class="navbar-nav" id="navbar-nav">
+            
+            {{-- =================================================== --}}
+            {{-- 1. ADMİN MENÜSÜ (role == 2) --}}
+            {{-- =================================================== --}}
+            @if(Auth::user()->isAdmin())
 
-            <!-- === BÖLÜM 1: TÜM KULLANICILAR (Üye ve Admin) === -->
-            <li class="menu-title"><span data-key="t-menu">Kullanıcı Menüsü</span></li>
-            <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
-                    <i class="mdi mdi-home"></i> <span data-key="t-widgets">Anasayfa</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->routeIs('admin.profile.index') ? 'active' : '' }}" href="{{ route('admin.profile.index') }}">
-                    <i class="mdi mdi-account-cog"></i> <span data-key="t-profile">Profilim</span>
-                </a>
-            </li>
-            {{-- YENİ EKLENDİ: Yeni Ödeme Bildirimi Linki --}}
-            {{-- Not: Sadece admin olmayanlar bu linki görmeli --}}
-            @if(!Auth::user()->is_admin)
+ {{-- Finansal Yönetim --}}
+                <li class="menu-title"><span data-key="t-menu">FİNANSAL Yönetim</span></li>
+                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
+                        <i class="ri-wallet-line"></i> <span data-key="t-payments">Ödeme Yönetimi</span>
+                    </a>
+                </li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments.create') ? 'active' : '' }}" href="{{ route('admin.payments.create') }}">
-                        <i class="ri-upload-cloud-2-line"></i> <span data-key="t-payment-create">Yeni Ödeme Bildirimi</span>
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
+                        <i class="ri-hand-coin-line"></i> <span data-key="t-withdrawals">Çekim Talepleri</span>
                     </a>
                 </li>
-                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments.index') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
-                        <i class="ri-list-check-3"></i> <span data-key="t-payment-index">Ödeme Bildirimlerim</span>
-                    </a>
-                </li>
-            @endif
-            {{-- YENİ: Çekim Talepleri --}}
-@if(Auth::user()->is_admin)
-    <li class="nav-item">
-        <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
-            <i class="ri-hand-coin-line"></i> <span data-key="t-withdrawals">Çekim Talepleri</span>
-        </a>
-    </li>
-@else
-    <li class="nav-item">
-        <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
-            <i class="ri-hand-coin-line"></i> <span data-key="t-withdrawals">Çekim Taleplerim</span>
-        </a>
-    </li>
-@endif
 
 
-            <!-- === BÖLÜM 2: SADECE ADMİNLER === -->
-            @if(Auth::user()->is_admin)
-                <li class="menu-title"><span data-key="t-menu">Admin Yönetimi</span></li>
-                {{-- YENİ EKLENDİ: Admin için Ödeme Yönetimi Linki --}}
-                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
-                        <i class="ri-bank-card-line"></i> <span data-key="t-payment-admin">Ödeme Yönetimi</span>
-                    </a>
-                </li>
+                <li class="menu-title"><span data-key="t-menu">SİTE Yönetimi</span></li>
+              
                 {{-- Mevcut Admin Linkleri --}}
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->is('admin/categories*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
@@ -129,24 +98,81 @@
                         <i class="mdi mdi-account-group"></i> <span data-key="t-widgets">Referans Yönetimi</span>
                     </a>
                 </li>
-            @endif
-            <!-- === ADMİN BÖLÜMÜ SONU === -->
 
+               
 
-            <!-- === BÖLÜM 3: TEKRAR TÜM KULLANICILAR === -->
-            <li class="nav-item">
-                <a class="nav-link menu-link" href="{{ url('/') }}" target="_blank">
-                    <i class="mdi mdi-web"></i> <span data-key="t-widgets">Siteye Git</span>
+                {{-- Sistem --}}
+                <li class="menu-title"><span data-key="t-menu">Sistem</span></li>
+                <li class="nav-item">
+                <a class="nav-link menu-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                    <i class="ri-user-settings-line"></i> <span data-key="t-users">Kullanıcı Yönetimi</span>
                 </a>
             </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.settings*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
+                        <i class="ri-settings-4-line"></i> <span data-key="t-settings">Genel Ayarlar</span>
+                    </a>
+                </li>
+                {{-- Not: Buraya 'Kullanıcı Yönetimi' ve 'Bayi Yönetimi' linkleri eklenebilir --}}
+
+
+            {{-- =================================================== --}}
+            {{-- 2. BAYİ MENÜSÜ (role == 1) --}}
+            {{-- =================================================== --}}
+            @elseif(Auth::user()->isBayi())
+                <li class="menu-title"><span data-key="t-menu">Bayi Paneli</span></li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('bayi.dashboard') ? 'active' : '' }}" href="{{ route('bayi.dashboard') }}">
+                        <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboard">Bayi Dashboard</span>
+                    </a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('bayi.customers') ? 'active' : '' }}" href="{{ route('bayi.customers') }}">
+                        <i class="ri-team-line"></i> <span data-key="t-customers">Müşterilerim</span>
+                    </a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('bayi.withdrawals') ? 'active' : '' }}" href="{{ route('bayi.withdrawals') }}">
+                        <i class="ri-line-chart-line"></i> <span data-key="t-reports">Müşteri Çekim Raporu</span>
+                    </a>
+                </li>
+                {{-- Not: Bayi buraya tıklar ve ref linkini görür --}}
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.profile.index') ? 'active' : '' }}" href="{{ route('admin.profile.index') }}">
+                        <i class="ri-user-settings-line"></i> <span data-key="t-profile">Hesap Bilgileri</span>
+                    </a>
+                </li>
+
+
+            {{-- =================================================== --}}
+            {{-- 3. MÜŞTERİ MENÜSÜ (role == 0) --}}
+            {{-- =================================================== --}}
+            @elseif(Auth::user()->isCustomer())
+                <li class="menu-title"><span data-key="t-menu">Müşteri Paneli</span></li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                        <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboard">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.profile.index') ? 'active' : '' }}" href="{{ route('admin.profile.index') }}">
+                        <i class="ri-bank-card-line"></i> <span data-key="t-profile">Ödeme Hesaplarım</span>
+                    </a>
+                </li>
+
+                <li class="menu-title"><span data-key="t-menu">Finansal İşlemler</span></li>
+                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
+                        <i class="ri-wallet-line"></i> <span data-key="t-payments">Ödeme Bildirimlerim</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
+                        <i class="ri-hand-coin-line"></i> <span data-key="t-withdrawals">Çekim Taleplerim</span>
+                    </a>
+                </li>
+            @endif
+
         </ul>
     </div>
-
-    <!-- Sidebar Footer -->
-    <div class="sidebar-footer text-center text-white">
-        Enderun AI CMS (V.1.1)
-    </div>
-</div>
-
-<div class="sidebar-background">
 </div>

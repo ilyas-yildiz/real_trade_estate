@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\ReferenceController;
 use App\Http\Controllers\Admin\UserProfileController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\WithdrawalRequestController;
+use App\Http\Controllers\Admin\UserController;
 
 
 /*
@@ -49,6 +50,19 @@ Route::name('frontend.')->group(function () {
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
+
+
+// YENİ GRUP: Sadece Bayiler (role=1) girebilir
+Route::middleware(['auth', 'bayi'])->prefix('bayi')->name('bayi.')->group(function () {
+    
+    // Bayi Controller'ını en üste 'use' ile eklemeyi unutma
+    // use App\Http\Controllers\Bayi\DashboardController;
+    
+    Route::get('/dashboard', [App\Http\Controllers\Bayi\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/customers', [App\Http\Controllers\Bayi\DashboardController::class, 'customers'])->name('customers');
+    Route::get('/withdrawals', [App\Http\Controllers\Bayi\DashboardController::class, 'withdrawals'])->name('withdrawals');
+
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -135,6 +149,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () { \UniSharp\LaravelFilemanager\Lfm::routes(); });
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::resource('users', UserController::class)->only([
+        'index', 'edit', 'update'
+    ]);
 });
 
 /* Sistem Temizleme Rotaları */
