@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontendController;
+use App\Models\WithdrawalRequest; // YENİ EKLENECEK SATIR
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommonController;
 use App\Http\Controllers\Admin\GalleryController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ReferenceController;
 use App\Http\Controllers\Admin\UserProfileController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\WithdrawalRequestController;
 
 
 /*
@@ -74,6 +76,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Güvenli Dekont Görüntüleme Rotası
     Route::get('/payments/{payment}/receipt', [PaymentController::class, 'showReceipt'])->name('payments.showReceipt');
 
+    // Çekim Talebi Sistemi (Kullanıcı Tarafı)
+    Route::resource('/withdrawals', WithdrawalRequestController::class)->only([
+        'index', 'create', 'store', 'destroy'
+    ]);
+
 });
 
 // Breeze Profil Güncelleme Rotaları
@@ -100,6 +107,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Payment için Admin'e özel 'edit' ve 'update' rotaları
     Route::resource('/payments', PaymentController::class)->only([
+        'edit', 'update' // 'edit' (JSON döner), 'update' (formu işler)
+    ]);
+
+    // Withdrawal için Admin'e özel 'edit' ve 'update' rotaları
+    Route::resource('/withdrawals', WithdrawalRequestController::class)->only([
         'edit', 'update' // 'edit' (JSON döner), 'update' (formu işler)
     ]);
 
@@ -155,3 +167,4 @@ Route::get('/migrate-now', function () {
         return 'Hata oluştu: ' . $e->getMessage();
     }
 });
+

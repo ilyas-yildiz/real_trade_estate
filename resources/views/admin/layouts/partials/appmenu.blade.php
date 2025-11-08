@@ -53,6 +53,20 @@
                     </a>
                 </li>
             @endif
+            {{-- YENİ: Çekim Talepleri --}}
+@if(Auth::user()->is_admin)
+    <li class="nav-item">
+        <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
+            <i class="ri-hand-coin-line"></i> <span data-key="t-withdrawals">Çekim Talepleri</span>
+        </a>
+    </li>
+@else
+    <li class="nav-item">
+        <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
+            <i class="ri-hand-coin-line"></i> <span data-key="t-withdrawals">Çekim Taleplerim</span>
+        </a>
+    </li>
+@endif
 
 
             <!-- === BÖLÜM 2: SADECE ADMİNLER === -->
