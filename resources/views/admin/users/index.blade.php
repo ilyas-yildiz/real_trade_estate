@@ -133,4 +133,36 @@
     
     {{-- Çalışan resource-handler.js'i kullanıyoruz --}}
     <script src="{{ asset('js/admin/common/resource-handler.js') }}?v={{ time() }}" defer></script> 
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('editModal');
+        // 'editForm' içindeki 'role' ID'li select'i bul
+        const roleSelect = modal.querySelector('#editForm [name="role"]'); 
+        const commissionWrapper = modal.querySelector('#commissionRateWrapper');
+        const commissionInput = modal.querySelector('#commission_rate');
+
+        function toggleCommissionField(selectedRole) {
+            // Rol "1" (Bayi) ise göster
+            if (selectedRole === '1') {
+                commissionWrapper.style.display = 'block';
+                commissionInput.setAttribute('required', 'required');
+            } else {
+                commissionWrapper.style.display = 'none';
+                commissionInput.removeAttribute('required');
+                // commissionInput.value = '0'; // İsteğe bağlı: Bayi değilse 0'a çek
+            }
+        }
+
+        // 1. Modal açıldığında 'resource-handler.js' formu doldurur.
+        // Biz 'shown.bs.modal' (tamamen açıldıktan sonra) anlık değeri kontrol edelim.
+        modal.addEventListener('shown.bs.modal', function () {
+            toggleCommissionField(roleSelect.value);
+        });
+
+        // 2. Kullanıcı rolu anlık değiştirirse
+        roleSelect.addEventListener('change', function () {
+            toggleCommissionField(this.value);
+        });
+    });
+    </script>
 @endpush

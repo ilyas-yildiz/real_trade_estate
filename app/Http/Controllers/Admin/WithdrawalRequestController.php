@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\WithdrawalRequest;
 use App\Models\User;
-use App\Models\UserBankAccount;   // Doğru model
-use App\Models\UserCryptoWallet; // Doğru model
+use App\Models\UserBankAccount;
+use App\Models\UserCryptoWallet;
+use App\Models\BayiCommission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Illuminate\Http\JsonResponse; // YENİ: JSON yanıtı için eklendi
+use Illuminate\Http\JsonResponse;
+use Exception;
 
 class WithdrawalRequestController extends Controller
 {
@@ -40,15 +43,22 @@ class WithdrawalRequestController extends Controller
     }
 
     /**
-     * Kullanıcının yeni çekim talebi oluşturma formunu gösterir.
+     * GÜNCELLENDİ: Kullanıcının yeni çekim talebi oluşturma formunu gösterir.
      */
     public function create()
     {
+        // HATA DÜZELTMESİ: isAdmin -> isAdmin()
         if (Auth::user()->isAdmin()) {
              return redirect()->route('admin.withdrawals.index')->with('error', 'Adminler çekim talebi oluşturamaz.');
         }
 
         $user = Auth::user();
+
+        // YENİ ÖZELLİK: Bakiye Kontrolü
+        if ($user->balance <= 0) {
+            return redirect()->route('admin.withdrawals.index')->with('error', 'Çekim talebi oluşturmak için yeterli bakiyeniz bulunmamaktadır.');
+        }
+        
         $bankAccounts = $user->bankAccounts;
         $cryptoWallets = $user->cryptoWallets;
 
@@ -59,10 +69,13 @@ class WithdrawalRequestController extends Controller
         return view('admin.withdrawals.create', compact('bankAccounts', 'cryptoWallets'));
     }
 
- public function store(Request $request)
+    /**
+     * Kullanıcının gönderdiği yeni çekim talebini kaydeder.
+     */
+    public function store(Request $request)
     {
         $user = Auth::user();
-        if ($user->isAdmin()) { // is_admin -> isAdmin()
+        if ($user->isAdmin()) {
             abort(403, 'Adminler çekim talebi oluşturamaz.');
         }
 
@@ -70,14 +83,12 @@ class WithdrawalRequestController extends Controller
             'amount' => 'required|numeric|min:10', 
             'payment_method' => 'required|string|starts_with:bank-,crypto-',
         ]);
-
-        // --- YENİ BAKIYE KONTROLÜ BAŞLANGIÇ ---
+        
         $amountToWithdraw = $validated['amount'];
+        // Bakiye Kontrolü
         if ($user->balance < $amountToWithdraw) {
-            // Yetersiz bakiye
             return back()->with('error', 'Yetersiz bakiye. Çekmek istediğiniz tutar ('.$amountToWithdraw.') mevcut bakiyenizden ('.$user->balance.') fazla.')->withInput();
         }
-        // --- YENİ BAKIYE KONTROLÜ SON ---
 
         try {
             list($type, $id) = explode('-', $validated['payment_method'], 2);
@@ -120,27 +131,25 @@ class WithdrawalRequestController extends Controller
     }
 
     /**
-     * YENİ: Modal'da düzenlenecek çekim talebi verisini JSON olarak döndürür.
+     * Modal'da düzenlenecek çekim talebi verisini JSON olarak döndürür.
      */
-    public function edit(WithdrawalRequest $withdrawal): JsonResponse // Model otomatik çekilecek
+    public function edit(WithdrawalRequest $withdrawal): JsonResponse
     {
         if (!Auth::user()->isAdmin()) {
             return response()->json(['error' => 'Yetkisiz erişim.'], 403);
         }
         
         $withdrawal->load('user:id,name,email', 'method');
-
-        // resource-handler.js'in doldurması için özel bir dizi oluşturalım
+        
         $data = [
             'status' => $withdrawal->status,
             'admin_notes' => $withdrawal->admin_notes,
             'user_info' => $withdrawal->user ? $withdrawal->user->name . ' (' . $withdrawal->user->email . ')' : 'Kullanıcı Silinmiş',
             'amount_formatted' => number_format($withdrawal->amount, 2, ',', '.'),
             'created_at_formatted' => $withdrawal->created_at->format('d.m.Y H:i'),
-            'method_details' => '', // Başlangıçta boş
+            'method_details' => '',
         ];
         
-        // Polimorfik ilişkiyi (method) manuel olarak doldur
         if ($withdrawal->method) {
             if ($withdrawal->method_type == 'App\Models\UserBankAccount') {
                 $data['method_details'] = '[Banka] ' . $withdrawal->method->bank_name . ' - ' . $withdrawal->method->iban . ' (Alıcı: ' . $withdrawal->method->account_holder_name . ')';
@@ -154,8 +163,8 @@ class WithdrawalRequestController extends Controller
         return response()->json(['item' => $data]);
     }
 
-/**
-     * YENİ: Adminin çekim talebini onaylama/reddetme işlemini yapar.
+    /**
+     * Adminin çekim talebini onaylama/reddetme işlemini yapar.
      */
     public function update(Request $request, WithdrawalRequest $withdrawal): JsonResponse
     {
@@ -168,39 +177,77 @@ class WithdrawalRequestController extends Controller
             'admin_notes' => 'nullable|string|max:2000',
         ]);
 
-        // --- YENİ BAKIYE DÜŞÜRME MANTIĞI BAŞLANGIÇ ---
         $originalStatus = $withdrawal->getOriginal('status');
         $newStatus = $validated['status'];
-        $user = $withdrawal->user;
+        $customer = $withdrawal->user;
         $amount = $withdrawal->amount;
 
-        // 1. Durum "Onaylandı" olarak DEĞİŞTİYSE (ve daha önce Onaylı değilse)
-        if ($newStatus === 'approved' && $originalStatus !== 'approved') {
-            
-            // Yetersiz bakiye kontrolü (Admin onay anında tekrar yapılır)
-            if ($user->balance < $amount) {
-                 return response()->json([
-                    'success' => false, 
-                    'message' => 'İşlem Başarısız! Kullanıcının mevcut bakiyesi ('.$user->balance.') talep edilen tutardan ('.$amount.') az.'
-                ], 422); // 422 - İşlenemeyen Varlık
-            }
-            
-            // Bakiye yeterliyse, tutarı düş
-            $user->decrement('balance', $amount);
+        if ($originalStatus === $newStatus) {
+            return response()->json(['success' => true, 'message' => 'Durum zaten aynı, işlem yapılmadı.']);
         }
-        // 2. Durum "Onaylandı"dan başka bir şeye DEĞİŞTİYSE (İptal/Reversal)
-        elseif ($newStatus !== 'approved' && $originalStatus === 'approved') {
-            // Kullanıcının bakiyesine bu tutarı geri ekle
-            $user->increment('balance', $amount);
-        }
-        // --- YENİ BAKIYE DÜŞÜRME MANTIĞI SON ---
 
-        $withdrawal->update([
-            'status' => $validated['status'],
-            'admin_notes' => $validated['admin_notes'],
-            'reviewed_by' => Auth::id(),
-            'reviewed_at' => now(),
-        ]);
+        try {
+            DB::transaction(function () use ($withdrawal, $newStatus, $originalStatus, $customer, $amount, $validated) {
+                
+                if ($newStatus === 'approved') {
+                    
+                    $customerForUpdate = User::where('id', $customer->id)->lockForUpdate()->first();
+                    
+                    if ($customerForUpdate->balance < $amount) {
+                        throw new Exception('İşlem Başarısız! Müşterinin bakiyesi ('.$customerForUpdate->balance.') talep edilen tutardan ('.$amount.') az.');
+                    }
+                    
+                    $customerForUpdate->decrement('balance', $amount);
+
+                    if ($customer->bayi_id && $customer->bayi->commission_rate > 0) {
+                        $bayi = $customer->bayi;
+                        $rate = $bayi->commission_rate;
+                        $commissionAmount = ($amount * $rate) / 100;
+
+                        $bayi->increment('balance', $commissionAmount);
+
+                        BayiCommission::create([
+                            'bayi_id' => $bayi->id,
+                            'customer_id' => $customer->id,
+                            'withdrawal_request_id' => $withdrawal->id,
+                            'withdrawal_amount' => $amount,
+                            'commission_rate' => $rate,
+                            'commission_amount' => $commissionAmount,
+                        ]);
+                    }
+                }
+                
+                elseif ($originalStatus === 'approved') {
+                    
+                    $customer->increment('balance', $amount);
+                    $commissionLog = $withdrawal->bayiCommission;
+                    
+                    if ($commissionLog) {
+                        $bayi = $commissionLog->bayi;
+                        $commissionAmount = $commissionLog->commission_amount;
+                        
+                        if ($bayi) {
+                            $bayi->decrement('balance', $commissionAmount);
+                        }
+                        
+                        $commissionLog->delete();
+                    }
+                }
+
+                $withdrawal->update([
+                    'status' => $validated['status'],
+                    'admin_notes' => $validated['admin_notes'],
+                    'reviewed_by' => Auth::id(),
+                    'reviewed_at' => now(),
+                ]);
+
+            }); 
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Hata: ' . $e->getMessage()
+            ], 422);
+        }
 
         return response()->json(['success' => true, 'message' => 'Çekim talebi durumu başarıyla güncellendi.']);
     }

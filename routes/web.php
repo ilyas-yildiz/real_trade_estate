@@ -61,6 +61,7 @@ Route::middleware(['auth', 'bayi'])->prefix('bayi')->name('bayi.')->group(functi
     Route::get('/dashboard', [App\Http\Controllers\Bayi\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/customers', [App\Http\Controllers\Bayi\DashboardController::class, 'customers'])->name('customers');
     Route::get('/withdrawals', [App\Http\Controllers\Bayi\DashboardController::class, 'withdrawals'])->name('withdrawals');
+    Route::get('/commissions', [App\Http\Controllers\Bayi\DashboardController::class, 'commissions'])->name('commissions');
 
 });
 
