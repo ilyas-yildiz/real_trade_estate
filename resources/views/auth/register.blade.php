@@ -1,7 +1,13 @@
 <x-guest-layout>
     <form method="POST" action="{{ route('register') }}">
         @csrf
-
+@if(isset($bayi_id))
+        <input type="hidden" name="bayi_id" value="{{ $bayi_id }}">
+        
+        <div class="alert alert-info" role="alert">
+            Bir bayi referansıyla kaydoluyorsunuz.
+        </div>
+    @endif
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />

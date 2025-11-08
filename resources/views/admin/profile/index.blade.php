@@ -7,14 +7,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
 @endpush
 
+{{-- YENİ: SweetAlert2 CSS eklendi --}}
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+@endpush
+
 @section('content')
     <div class="row">
         <div class="col-xxl-12">
-             {{-- DÜZELTME: mt-n5 sınıfı kaldırıldı --}}
             <div class="card">
                 <div class="card-header">
                     <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
-                        {{-- Sekme 1: Kişisel Bilgiler --}}
+                        {{-- Sekme 1: Kişisel Bilgiler (Varsayılan Aktif) --}}
                         <li class="nav-item">
                             <a class="nav-link active" data-bs-toggle="tab" href="#personalDetailsTab" role="tab">
                                 <i class="fas fa-home"></i> Kişisel Bilgiler
@@ -32,11 +36,20 @@
                                 <i class="ri-bit-coin-line"></i> Kripto Cüzdanları
                             </a>
                         </li>
+                        
+                        {{-- YENİ: Sekme 4: Bayilik (Sadece Bayiler Görür) --}}
+                        @if(Auth::user()->isBayi())
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#bayiTab" role="tab">
+                                    <i class="ri-links-line"></i> Bayilik Linkim
+                                </a>
+                            </li>
+                        @endif
                     </ul>
                 </div>
                 <div class="card-body p-4">
 
-                    {{-- Başarı ve Hata Mesajları Alanı --}}
+                    {{-- Başarı ve Hata Mesajları Alanı (Mevcut) --}}
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
@@ -63,7 +76,7 @@
 
                     {{-- Sekme İçerikleri --}}
                     <div class="tab-content">
-                        {{-- ================= TAB 1: Kişisel Bilgiler ================= --}}
+                        {{-- ================= TAB 1: Kişisel Bilgiler (Varsayılan Aktif) ================= --}}
                         <div class="tab-pane active" id="personalDetailsTab" role="tabpanel">
                             <div class="row">
                                 <div class="col-lg-6">
@@ -85,13 +98,6 @@
                                              @include('profile.partials.update-password-form')
                                          </div>
                                      </div>
-                                     {{-- Hesap Silme Bölümü (İsteğe bağlı) --}}
-                                     {{--
-                                     <div class="card shadow-sm mb-4">
-                                         <div class="card-header bg-danger text-white"><h5 class="mb-0 text-white">Hesabı Sil</h5></div>
-                                         <div class="card-body">@include('profile.partials.delete-user-form')</div>
-                                     </div>
-                                     --}}
                                 </div>
                             </div>
                         </div>
@@ -159,7 +165,8 @@
                                                                   <td>{{ $bankAccount->account_holder_name }}</td>
                                                                   <td>{{ $bankAccount->iban }}</td>
                                                                   <td>
-                                                                      <form action="{{ route('admin.profile.destroyBankAccount', $bankAccount->id) }}" method="POST" onsubmit="return confirm('Bu banka hesabını silmek istediğinizden emin misiniz?');">
+                                                                      {{-- GÜNCELLEME: onsubmit kaldırıldı, class="delete-form" eklendi --}}
+                                                                      <form action="{{ route('admin.profile.destroyBankAccount', $bankAccount->id) }}" method="POST" class="delete-form">
                                                                           @csrf @method('DELETE')
                                                                           <button type="submit" class="btn btn-sm btn-danger shadow-none">Sil</button>
                                                                       </form>
@@ -170,11 +177,11 @@
                                                           @endforelse
                                                       </tbody>
                                                   </table>
-                                              </div>
+                                               </div>
                                           </div>
                                       </div>
                                  </div>
-                             </div>
+                            </div>
                         </div>
                         {{-- ================= END TAB 2 ================= --}}
 
@@ -210,7 +217,7 @@
                                       </div>
                                  </div>
                                  <div class="col-lg-7">
-                                     <div class="card shadow-sm mb-4">
+                                      <div class="card shadow-sm mb-4">
                                           <div class="card-header"><h5 class="mb-0">Mevcut Kripto Cüzdanlarım</h5></div>
                                           <div class="card-body">
                                                <div class="table-responsive">
@@ -230,7 +237,8 @@
                                                                   <td>{{ $cryptoWallet->network ?? '-' }}</td>
                                                                   <td style="word-break: break-all;">{{ $cryptoWallet->wallet_address }}</td>
                                                                   <td>
-                                                                       <form action="{{ route('admin.profile.destroyCryptoWallet', $cryptoWallet->id) }}" method="POST" onsubmit="return confirm('Bu kripto cüzdanını silmek istediğinizden emin misiniz?');">
+                                                                      {{-- GÜNCELLEME: onsubmit kaldırıldı, class="delete-form" eklendi --}}
+                                                                      <form action="{{ route('admin.profile.destroyCryptoWallet', $cryptoWallet->id) }}" method="POST" class="delete-form">
                                                                           @csrf @method('DELETE')
                                                                           <button type="submit" class="btn btn-sm btn-danger shadow-none">Sil</button>
                                                                       </form>
@@ -241,25 +249,52 @@
                                                           @endforelse
                                                       </tbody>
                                                   </table>
-                                              </div>
+                                               </div>
                                           </div>
                                       </div>
                                  </div>
-                             </div>
+                            </div>
                         </div>
                         {{-- ================= END TAB 3 ================= --}}
+
+                        {{-- YENİ: Sekme 4 İçeriği: Bayilik (Sadece Bayiler Görür) --}}
+                        @if(Auth::user()->isBayi())
+                            <div class="tab-pane" id="bayiTab" role="tabpanel">
+                                <div class="card shadow-sm">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Bayi Referans Linkiniz</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted">Müşterilerinizin sizin referansınızla kaydolması için aşağıdaki linki onlarla paylaşın. Kaydolan her müşteri otomatik olarak sizin alt üyeniz olacaktır.</p>
+                                        
+                                        @php
+                                            // Controller'da tanımladığımız referans linki mantığı
+                                            $referralLink = route('register') . '?ref=' . Auth::id();
+                                        @endphp
+                        
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="referralLinkInput" value="{{ $referralLink }}" readonly>
+                                            <button class="btn btn-primary" type="button" id="copyReferralLinkBtn">
+                                                <i class="ri-file-copy-line align-bottom me-1"></i> Kopyala
+                                            </button>
+                                        </div>
+                                        <div id="copyMessage" class="form-text text-success" style="display: none; margin-top: 5px;">Link panoya kopyalandı!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        {{-- ================= END TAB 4 ================= --}}
+
                     </div>
-                </div><!-- end card body -->
-            </div><!-- end card -->
-        </div><!-- end col -->
-    </div><!-- end row -->
-@endsection
+                </div></div></div></div>@endsection
 
 @push('scripts')
     {{-- iziToast JS --}}
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+    {{-- YENİ: SweetAlert2 JS eklendi --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    {{-- Başarı/Hata mesajları için scriptler --}}
+    {{-- Başarı/Hata mesajları için scriptler (Mevcut) --}}
     @if(session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -274,4 +309,57 @@
             });
         </script>
     @endif
+    
+    {{-- YENİ: Kopyalama ve SweetAlert Silme Onayı için script --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // GÜNCELLEME: 'onsubmit' yerine SweetAlert2 eklendi
+            document.querySelectorAll('.delete-form').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Emin misiniz?',
+                        text: "Bu ödeme yöntemi silinecek!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Evet, sil!',
+                        cancelButtonText: 'Vazgeç'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            // YENİ: Referans Linki Kopyalama Script'i
+            const copyBtn = document.getElementById('copyReferralLinkBtn');
+            const copyInput = document.getElementById('referralLinkInput');
+            const copyMsg = document.getElementById('copyMessage');
+
+            if (copyBtn && copyInput) {
+                copyBtn.addEventListener('click', function () {
+                    copyInput.select();
+                    copyInput.setSelectionRange(0, 99999); // Mobil cihazlar için
+
+                    try {
+                        navigator.clipboard.writeText(copyInput.value).then(() => {
+                            copyMsg.style.display = 'block';
+                            copyBtn.innerHTML = '<i class="ri-check-line align-bottom me-1"></i> Kopyalandı!';
+                            
+                            setTimeout(() => {
+                                copyMsg.style.display = 'none';
+                                copyBtn.innerHTML = '<i class="ri-file-copy-line align-bottom me-1"></i> Kopyala';
+                            }, 2000);
+                        });
+                    } catch (err) {
+                        alert('Link kopyalanamadı. Lütfen manuel olarak kopyalayın.');
+                    }
+                });
+            }
+        });
+    </script>
 @endpush

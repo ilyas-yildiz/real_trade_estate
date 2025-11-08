@@ -22,7 +22,7 @@ class WithdrawalRequestController extends Controller
         $user = Auth::user();
         $query = WithdrawalRequest::with('user', 'reviewer', 'method')->latest();
 
-        if ($user->is_admin) {
+        if ($user->isAdmin()) {
             
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
@@ -44,7 +44,7 @@ class WithdrawalRequestController extends Controller
      */
     public function create()
     {
-        if (Auth::user()->is_admin) {
+        if (Auth::user()->isAdmin()) {
              return redirect()->route('admin.withdrawals.index')->with('error', 'Adminler çekim talebi oluşturamaz.');
         }
 
@@ -65,7 +65,7 @@ class WithdrawalRequestController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if ($user->is_admin) {
+        if ($user->isAdmin()) {
             abort(403, 'Adminler çekim talebi oluşturamaz.');
         }
 
@@ -119,7 +119,7 @@ class WithdrawalRequestController extends Controller
      */
     public function edit(WithdrawalRequest $withdrawal): JsonResponse // Model otomatik çekilecek
     {
-        if (!Auth::user()->is_admin) {
+        if (!Auth::user()->isAdmin()) {
             return response()->json(['error' => 'Yetkisiz erişim.'], 403);
         }
         
@@ -154,7 +154,7 @@ class WithdrawalRequestController extends Controller
      */
 public function update(Request $request, WithdrawalRequest $withdrawal): JsonResponse
     {
-        if (!Auth::user()->is_admin) {
+        if (!Auth::user()->isAdmin()) {
             return response()->json(['success' => false, 'message' => 'Bu işleme yetkiniz yok.'], 403);
         }
 
@@ -183,7 +183,7 @@ public function update(Request $request, WithdrawalRequest $withdrawal): JsonRes
     {
         $user = Auth::user();
 
-        if ($user->is_admin || ($withdrawal->user_id === $user->id && $withdrawal->status === 'pending')) {
+        if ($user->isAdmin() || ($withdrawal->user_id === $user->id && $withdrawal->status === 'pending')) {
             
             $withdrawal->delete();
             return redirect()->route('admin.withdrawals.index')->with('success', 'Talep başarıyla silindi/iptal edildi.');
