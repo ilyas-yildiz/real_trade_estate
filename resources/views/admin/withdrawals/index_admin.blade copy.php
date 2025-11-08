@@ -28,13 +28,10 @@
                             <select name="status" id="filter_status" class="form-select form-select-sm">
                                 <option value="">Tümü</option>
                                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Beklemede</option>
-                                {{-- GÜNCELLEME 1: Filtreye eklendi --}}
-                                <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Ödeme Sürecinde</option>
                                 <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Onaylandı</option>
                                 <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Reddedildi</option>
                             </select>
                         </div>
-                        {{-- ... (Kullanıcı filtresi ve butonlar) ... --}}
                         <div class="col-md-4">
                             <label for="filter_user_id" class="form-label">Kullanıcı</label>
                             <select name="user_id" id="filter_user_id" class="form-select form-select-sm" data-choices>
@@ -53,7 +50,7 @@
 
                 <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle mb-0">
-                           <thead>
+                        <thead>
                             <tr>
                                 <th scope="col">ID</th>
                                 <th scope="col">Kullanıcı</th>
@@ -67,22 +64,18 @@
                         <tbody>
                             @forelse ($withdrawals as $withdrawal)
                                 @php
-                                    // GÜNCELLEME 2: 'processing' durumu 'match'e eklendi (Mavi/Info rengi)
                                     $statusClass = match ($withdrawal->status) {
                                         'approved' => 'bg-success-subtle text-success',
                                         'rejected' => 'bg-danger-subtle text-danger',
-                                        'processing' => 'bg-info-subtle text-info',
-                                        default => 'bg-warning-subtle text-warning', // pending
+                                        default => 'bg-warning-subtle text-warning',
                                     };
                                     $statusText = match ($withdrawal->status) {
                                         'approved' => 'Onaylandı',
                                         'rejected' => 'Reddedildi',
-                                        'processing' => 'Ödeme Sürecinde',
-                                        default => 'Beklemede', // pending
+                                        default => 'Beklemede',
                                     };
                                 @endphp
                                 <tr data-id="{{ $withdrawal->id }}">
-                                    {{-- ... (diğer <td>'ler) ... --}}
                                     <td>{{ $withdrawal->id }}</td>
                                     <td>
                                         @if($withdrawal->user)
@@ -92,10 +85,13 @@
                                         @endif
                                     </td>
                                     <td>{{ number_format($withdrawal->amount, 2, ',', '.') }}</td>
-                                    <td>
+                                  <td>
+                                        {{-- Yöntemi Göster (Banka veya Kripto) --}}
                                         @if ($withdrawal->method)
+                                            {{-- DÜZELTME: Doğru model adı --}}
                                             @if ($withdrawal->method_type == 'App\Models\UserBankAccount')
                                                 <span class="badge bg-primary-subtle text-primary">Banka: {{ $withdrawal->method->bank_name }}</span>
+                                            {{-- DÜZELTME: Doğru model adı --}}
                                             @elseif ($withdrawal->method_type == 'App\Models\UserCryptoWallet')
                                                 <span class="badge bg-secondary-subtle text-secondary">Kripto: {{ $withdrawal->method->network }}</span>
                                             @endif
@@ -106,11 +102,11 @@
                                     <td>{{ $withdrawal->created_at->format('d.m.Y H:i') }}</td>
                                     <td><span class="badge {{ $statusClass }}">{{ $statusText }}</span></td>
                                     <td>
-                                        {{-- ... (İşlem butonları) ... --}}
                                         <div class="hstack gap-1">
+                                            {{-- Butonlar güncellendi --}}
                                             <button type="button" class="btn btn-sm btn-soft-primary shadow-none py-0 px-1 openEditModal"
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#editModal"
+                                                    data-bs-target="#editModal" {{-- Ortak ID --}}
                                                     data-id="{{ $withdrawal->id }}"
                                                     data-fetch-url="{{ route('admin.withdrawals.edit', $withdrawal->id) }}"
                                                     data-update-url="{{ route('admin.withdrawals.update', $withdrawal->id) }}"
@@ -139,6 +135,8 @@
     </div>
 </div>
 
+{{-- MODAL DAHİL --}}
+{{-- Bu dosyayı Adım 4'te oluşturacağız --}}
 @include('admin.withdrawals.modals._edit_modal')
 
 @endsection

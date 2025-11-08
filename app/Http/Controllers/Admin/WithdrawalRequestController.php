@@ -152,20 +152,19 @@ class WithdrawalRequestController extends Controller
     /**
      * YENİ: Adminin çekim talebini onaylama/reddetme işlemini yapar.
      */
-    public function update(Request $request, WithdrawalRequest $withdrawal): JsonResponse // Model otomatik çekilecek
+public function update(Request $request, WithdrawalRequest $withdrawal): JsonResponse
     {
         if (!Auth::user()->is_admin) {
             return response()->json(['success' => false, 'message' => 'Bu işleme yetkiniz yok.'], 403);
         }
 
+        // GÜNCELLEME: 'processing' ve 'pending' durumları da validasyona eklendi.
         $validated = $request->validate([
-            'status' => ['required', Rule::in(['approved', 'rejected'])],
+            'status' => ['required', Rule::in(['pending', 'processing', 'approved', 'rejected'])],
             'admin_notes' => 'nullable|string|max:2000',
         ]);
         
-        // TODO: Eğer 'approved' ise, kullanıcının bakiyesinden bu 'amount'u düşürme
-        // işlemi burada yapılmalı. (Örn: $withdrawal->user->decrement('balance', $withdrawal->amount);)
-        // Bu mantığı ekleyene kadar, onaylama işlemi sadece statü günceller.
+        // TODO: (Hatırlatma) 'approved' durumu için bakiye düşürme işlemi.
 
         $withdrawal->update([
             'status' => $validated['status'],

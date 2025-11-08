@@ -40,6 +40,8 @@
                             <label for="edit_status" class="form-label">Yeni Durum <span class="text-danger">*</span></label>
                             <select name="status" id="edit_status" class="form-select" required>
                                 <option value="pending">Beklemede</option>
+                                {{-- YENİ SEÇENEK EKLENDİ (Veritabanı key'i 'processing') --}}
+                                <option value="processing">Ödeme Sürecinde</option>
                                 <option value="approved">Onaylandı</option>
                                 <option value="rejected">Reddedildi</option>
                             </select>
