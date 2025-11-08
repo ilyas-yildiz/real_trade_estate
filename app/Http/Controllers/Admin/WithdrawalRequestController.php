@@ -59,13 +59,10 @@ class WithdrawalRequestController extends Controller
         return view('admin.withdrawals.create', compact('bankAccounts', 'cryptoWallets'));
     }
 
-    /**
-     * Kullanıcının gönderdiği yeni çekim talebini kaydeder.
-     */
-    public function store(Request $request)
+ public function store(Request $request)
     {
         $user = Auth::user();
-        if ($user->isAdmin()) {
+        if ($user->isAdmin()) { // is_admin -> isAdmin()
             abort(403, 'Adminler çekim talebi oluşturamaz.');
         }
 
@@ -73,6 +70,14 @@ class WithdrawalRequestController extends Controller
             'amount' => 'required|numeric|min:10', 
             'payment_method' => 'required|string|starts_with:bank-,crypto-',
         ]);
+
+        // --- YENİ BAKIYE KONTROLÜ BAŞLANGIÇ ---
+        $amountToWithdraw = $validated['amount'];
+        if ($user->balance < $amountToWithdraw) {
+            // Yetersiz bakiye
+            return back()->with('error', 'Yetersiz bakiye. Çekmek istediğiniz tutar ('.$amountToWithdraw.') mevcut bakiyenizden ('.$user->balance.') fazla.')->withInput();
+        }
+        // --- YENİ BAKIYE KONTROLÜ SON ---
 
         try {
             list($type, $id) = explode('-', $validated['payment_method'], 2);
@@ -149,22 +154,46 @@ class WithdrawalRequestController extends Controller
         return response()->json(['item' => $data]);
     }
 
-    /**
+/**
      * YENİ: Adminin çekim talebini onaylama/reddetme işlemini yapar.
      */
-public function update(Request $request, WithdrawalRequest $withdrawal): JsonResponse
+    public function update(Request $request, WithdrawalRequest $withdrawal): JsonResponse
     {
         if (!Auth::user()->isAdmin()) {
             return response()->json(['success' => false, 'message' => 'Bu işleme yetkiniz yok.'], 403);
         }
 
-        // GÜNCELLEME: 'processing' ve 'pending' durumları da validasyona eklendi.
         $validated = $request->validate([
             'status' => ['required', Rule::in(['pending', 'processing', 'approved', 'rejected'])],
             'admin_notes' => 'nullable|string|max:2000',
         ]);
-        
-        // TODO: (Hatırlatma) 'approved' durumu için bakiye düşürme işlemi.
+
+        // --- YENİ BAKIYE DÜŞÜRME MANTIĞI BAŞLANGIÇ ---
+        $originalStatus = $withdrawal->getOriginal('status');
+        $newStatus = $validated['status'];
+        $user = $withdrawal->user;
+        $amount = $withdrawal->amount;
+
+        // 1. Durum "Onaylandı" olarak DEĞİŞTİYSE (ve daha önce Onaylı değilse)
+        if ($newStatus === 'approved' && $originalStatus !== 'approved') {
+            
+            // Yetersiz bakiye kontrolü (Admin onay anında tekrar yapılır)
+            if ($user->balance < $amount) {
+                 return response()->json([
+                    'success' => false, 
+                    'message' => 'İşlem Başarısız! Kullanıcının mevcut bakiyesi ('.$user->balance.') talep edilen tutardan ('.$amount.') az.'
+                ], 422); // 422 - İşlenemeyen Varlık
+            }
+            
+            // Bakiye yeterliyse, tutarı düş
+            $user->decrement('balance', $amount);
+        }
+        // 2. Durum "Onaylandı"dan başka bir şeye DEĞİŞTİYSE (İptal/Reversal)
+        elseif ($newStatus !== 'approved' && $originalStatus === 'approved') {
+            // Kullanıcının bakiyesine bu tutarı geri ekle
+            $user->increment('balance', $amount);
+        }
+        // --- YENİ BAKIYE DÜŞÜRME MANTIĞI SON ---
 
         $withdrawal->update([
             'status' => $validated['status'],
