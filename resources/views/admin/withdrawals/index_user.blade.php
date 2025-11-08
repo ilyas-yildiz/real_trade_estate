@@ -39,16 +39,19 @@
                         </thead>
                         <tbody>
                             @forelse ($withdrawals as $withdrawal)
-                                @php
+                              @php
+                                    // GÜNCELLEME: 'processing' durumu 'match'e eklendi (Mavi/Info rengi)
                                     $statusClass = match ($withdrawal->status) {
                                         'approved' => 'bg-success-subtle text-success',
                                         'rejected' => 'bg-danger-subtle text-danger',
-                                        default => 'bg-warning-subtle text-warning',
+                                        'processing' => 'bg-info-subtle text-info',
+                                        default => 'bg-warning-subtle text-warning', // pending
                                     };
                                     $statusText = match ($withdrawal->status) {
                                         'approved' => 'Onaylandı',
                                         'rejected' => 'Reddedildi',
-                                        default => 'Beklemede',
+                                        'processing' => 'Ödeme Sürecinde',
+                                        default => 'Beklemede', // pending
                                     };
                                 @endphp
                                 <tr data-id="{{ $withdrawal->id }}">
