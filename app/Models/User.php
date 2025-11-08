@@ -36,7 +36,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'role', // 'is_admin' yerine eklendi
-        'bayi_id', // YENİ
+        'bayi_id',
+        'balance',
     ];
 
     /**
@@ -61,6 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => 'integer', // Yeni rol sütunu eklendi
+            'balance' => 'decimal:2',
         ];
     }
 

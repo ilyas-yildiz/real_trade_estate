@@ -132,19 +132,37 @@ class PaymentController extends Controller
     }
 
 
-    /**
+  /**
      * Adminin ödeme bildirimini onaylama/reddetme işlemini yapar.
      */
-    public function update(Request $request, Payment $payment)
+    public function update(Request $request, Payment $payment) // YENİ: Otomatik Model Binding
     {
-        if (!Auth::user()->isAdmin()) {
+        if (!Auth::user()->isAdmin()) { // is_admin -> isAdmin()
             return response()->json(['success' => false, 'message' => 'Bu işleme yetkiniz yok.'], 403);
         }
 
         $validated = $request->validate([
-            'status' => ['required', Rule::in(['approved', 'rejected'])],
+            'status' => ['required', Rule::in(['pending', 'approved', 'rejected'])],
             'admin_notes' => 'nullable|string|max:2000',
         ]);
+
+        // --- YENİ BAKIYE MANTIĞI BAŞLANGIÇ ---
+        $originalStatus = $payment->getOriginal('status');
+        $newStatus = $validated['status'];
+        $user = $payment->user;
+        $amount = $payment->amount;
+
+        // 1. Durum "Onaylandı" olarak DEĞİŞTİYSE (ve daha önce Onaylı değilse)
+        if ($newStatus === 'approved' && $originalStatus !== 'approved') {
+            // Kullanıcının bakiyesine bu tutarı ekle
+            $user->increment('balance', $amount);
+        }
+        // 2. Durum "Onaylandı"dan başka bir şeye DEĞİŞTİYSE (İptal/Reversal)
+        elseif ($newStatus !== 'approved' && $originalStatus === 'approved') {
+            // Kullanıcının bakiyesinden bu tutarı geri düş
+            $user->decrement('balance', $amount);
+        }
+        // --- YENİ BAKIYE MANTIĞI SON ---
 
         $payment->update([
             'status' => $validated['status'],

@@ -120,6 +120,16 @@
             {{-- 2. BAYİ MENÜSÜ (role == 1) --}}
             {{-- =================================================== --}}
             @elseif(Auth::user()->isBayi())
+            <li class="nav-item">
+                    <div class="card bg-primary-subtle border-0 mx-2 mt-2">
+                        <div class="card-body p-3">
+                            <h6 class="text-primary-emphasis mb-1">Mevcut Bakiye</h6>
+                            <h5 class="text-primary-emphasis mb-0">
+                                {{ number_format(Auth::user()->balance, 2, ',', '.') }}
+                            </h5>
+                        </div>
+                    </div>
+                </li>
                 <li class="menu-title"><span data-key="t-menu">Bayi Paneli</span></li>
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.dashboard') ? 'active' : '' }}" href="{{ route('bayi.dashboard') }}">
@@ -148,6 +158,16 @@
             {{-- 3. MÜŞTERİ MENÜSÜ (role == 0) --}}
             {{-- =================================================== --}}
             @elseif(Auth::user()->isCustomer())
+            <li class="nav-item">
+                    <div class="card bg-success-subtle border-0 mx-2 mt-2">
+                        <div class="card-body p-3">
+                            <h6 class="text-success-emphasis mb-1">Mevcut Bakiye</h6>
+                            <h5 class="text-success-emphasis mb-0">
+                                {{ number_format(Auth::user()->balance, 2, ',', '.') }}
+                            </h5>
+                        </div>
+                    </div>
+                </li>
                 <li class="menu-title"><span data-key="t-menu">Müşteri Paneli</span></li>
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
