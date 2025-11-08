@@ -141,9 +141,22 @@
                         <i class="ri-team-line"></i> <span data-key="t-customers">Müşterilerim</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('bayi.commissions') ? 'active' : '' }}" href="{{ route('bayi.commissions') }}">
+                        <i class="ri-pie-chart-line"></i> <span data-key="t-commissions">Komisyon Raporum</span>
+                    </a>
+                </li>
                  <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.withdrawals') ? 'active' : '' }}" href="{{ route('bayi.withdrawals') }}">
                         <i class="ri-line-chart-line"></i> <span data-key="t-reports">Müşteri Çekim Raporu</span>
+                    </a>
+                </li>
+                <li class="menu-title"><span data-key="t-menu">Kişisel İşlemler</span></li>
+                
+                {{-- YENİ EKLENEN LİNK: Bayinin kendi çekim talepleri --}}
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
+                        <i class="ri-hand-coin-line"></i> <span data-key="t-my-withdrawals">Çekim Taleplerim</span>
                     </a>
                 </li>
                 {{-- Not: Bayi buraya tıklar ve ref linkini görür --}}

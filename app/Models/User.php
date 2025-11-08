@@ -18,6 +18,7 @@ use App\Models\UserBankAccount;
 use App\Models\UserCryptoWallet;
 use App\Models\Blog; // Orijinal modelinde vardı
 use App\Models\AiChat; // Orijinal modelinde vardı
+use App\Models\BayiCommission;
 
 // 'Laravel\Sanctum\HasApiTokens' satırı KESİNLİKLE KALDIRILDI
 
@@ -38,6 +39,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'role', // 'is_admin' yerine eklendi
         'bayi_id',
         'balance',
+        'commission_rate',
     ];
 
     /**
@@ -63,6 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'role' => 'integer', // Yeni rol sütunu eklendi
             'balance' => 'decimal:2',
+            'commission_rate' => 'decimal:2',
         ];
     }
 
@@ -121,6 +124,11 @@ class User extends Authenticatable implements MustVerifyEmail
     // ===============================================
     // MEVCUT TÜM İLİŞKİLER
     // ===============================================
+
+public function commissions(): HasMany
+    {
+        return $this->hasMany(BayiCommission::class, 'bayi_id');
+    }
 
     public function payments(): HasMany
     {

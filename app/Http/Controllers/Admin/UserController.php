@@ -69,29 +69,30 @@ class UserController extends Controller
         return response()->json(['item' => $user]);
     }
 
-    /**
+ /**
      * Kullanıcının rolünü günceller.
+     * YENİ: Komisyon oranı eklendi.
      */
     public function update(Request $request, User $user): JsonResponse
     {
         // 0=Müşteri, 1=Bayi, 2=Admin
         $validated = $request->validate([
             'role' => ['required', Rule::in([0, 1, 2])],
+            // YENİ: Komisyon oranı doğrulaması eklendi (%0 ile %100 arası)
+            'commission_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
         $newRole = (int) $validated['role'];
+        // Formdan gelen oranı al, eğer rol Bayi değilse veya boşsa 0 yap
+        $newCommissionRate = ($newRole === 1) ? $request->input('commission_rate', 0) : 0.00;
 
         // === GÜVENLİK KONTROLLERİ ===
-
-        // 1. Adminin kendi rolünü değiştirmesini engelle
         if ($user->id === Auth::id()) {
             return response()->json([
                 'success' => false, 
                 'message' => 'Güvenlik nedeniyle kendi rolünüzü değiştiremezsiniz.'
             ], 403);
         }
-
-        // 2. Admin, son kalan Admin'in rolünü değiştirmeye çalışırsa engelle
         if ($user->isAdmin() && $newRole !== 2) {
             $adminCount = User::where('role', 2)->count();
             if ($adminCount <= 1) {
@@ -105,11 +106,12 @@ class UserController extends Controller
         // === GÜNCELLEME İŞLEMİ ===
         $user->update([
             'role' => $newRole,
-            // Eğer müşteri -> bayi yapılıyorsa, bayi_id'sini sıfırla (Bayi kendi kendinin bayisi olamaz)
-            'bayi_id' => $newRole === 1 ? null : $user->bayi_id, 
+            // YENİ: Sadece 'Bayi' (role=1) ise komisyon oranını kaydet, değilse 0 yap.
+            'commission_rate' => $newCommissionRate,
+            'bayi_id' => ($newRole === 1) ? null : $user->bayi_id, 
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Kullanıcı rolü başarıyla güncellendi.']);
+        return response()->json(['success' => true, 'message' => 'Kullanıcı rolü ve komisyonu başarıyla güncellendi.']);
     }
 
     /**

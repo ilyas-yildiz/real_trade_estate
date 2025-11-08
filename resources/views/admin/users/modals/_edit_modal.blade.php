@@ -8,7 +8,7 @@
                     <h5 class="modal-title" id="editModalLabel">Kullanıcı Rolünü Düzenle</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+               <div class="modal-body">
                     
                     <div id="edit-error-messages" class="alert alert-danger" style="display: none;"></div>
 
@@ -29,19 +29,22 @@
                     <div class="row">
                         <div class="col-md-6">
                             <label for="edit_role" class="form-label">Yeni Rol <span class="text-danger">*</span></label>
-                            {{-- resource-handler.js, JSON'dan gelen 'role' (0, 1, 2) değerine göre doğru seçeneği seçecek --}}
                             <select name="role" id="edit_role" class="form-select" required>
                                 <option value="0">Müşteri</option>
                                 <option value="1">Bayi</option>
                                 <option value="2">Admin</option>
                             </select>
                         </div>
-                         <div class="col-md-6">
-                            <div class="alert alert-info small mb-0">
-                                <b>Not:</b> Bir müşteriyi "Bayi" yaparsanız, o bayiye ait tüm eski müşteri (bayi_id) bağlantıları sıfırlanır.
+
+                        <div class="col-md-6" id="commissionRateWrapper" style="display: none;">
+                            <label for="commission_rate" class="form-label">Komisyon Oranı (%) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="commission_rate" name="commission_rate" 
+                                       placeholder="5.00" step="0.01" min="0" max="100">
+                                <span class="input-group-text">%</span>
                             </div>
                         </div>
-                    </div>
+                        </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>

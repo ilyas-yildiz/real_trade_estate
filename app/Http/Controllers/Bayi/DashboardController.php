@@ -51,4 +51,19 @@ class DashboardController extends Controller
         // GÜNCELLEME: 'bayi.withdrawals' -> 'admin.bayi.withdrawals'
         return view('admin.bayi.withdrawals', compact('withdrawals'));
     }
+
+    /**
+     * YENİ: Bayinin kazandığı komisyonların dökümünü listeler.
+     */
+    public function commissions()
+    {
+        $commissions = Auth::user()
+                        ->commissions() // User modelindeki HasMany(BayiCommission::class)
+                        ->with('customer', 'withdrawalRequest') // Müşteri ve Çekim bilgilerini al
+                        ->latest() // En son kazandıklarını en üstte göster
+                        ->paginate(20);
+                        
+        // Not: View yolu 'admin.bayi.commissions' olarak düzeltildi
+        return view('admin.bayi.commissions', compact('commissions'));
+    }
 }
