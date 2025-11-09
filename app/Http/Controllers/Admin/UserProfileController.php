@@ -8,6 +8,7 @@ use App\Models\UserCryptoWallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
 
 class UserProfileController extends Controller
 {
@@ -70,6 +71,87 @@ class UserProfileController extends Controller
         $bankAccount->delete();
 
         return redirect()->route('admin.profile.index')->with('success', 'Banka hesabı başarıyla silindi.');
+    }
+
+public function statement(Request $request)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        // Farklı tablolardan (Payments, Withdrawals, Commissions)
+        // 'tarih', 'tip', 'aciklama' ve 'tutar' (+/-) sütunlarını seçeceğiz.
+        
+        // 1. Para Çekme İşlemleri (Tüm roller için ortak - Negatif tutar)
+        $withdrawals = DB::table('withdrawal_requests')
+            ->where('user_id', $userId)
+            ->where('status', 'approved')
+            ->select(
+                'reviewed_at as date', // Onaylanma tarihi
+                DB::raw("'Çekim Talebi' as type"),
+                DB::raw("CONCAT('Çekim Talebi #', id) as description"),
+                DB::raw("-amount as amount") // Tutarı NEGATİF olarak al
+            );
+
+        // 2. Role göre diğer işlemleri belirle
+        if ($user->isCustomer()) {
+            // =========================
+            // MÜŞTERİ SORGULARI
+            // =========================
+            
+            // Para Yatırma İşlemleri (Pozitif tutar)
+            $deposits = DB::table('payments')
+                ->where('user_id', $userId)
+                ->where('status', 'approved')
+                ->select(
+                    'reviewed_at as date',
+                    DB::raw("'Ödeme Bildirimi' as type"),
+                    DB::raw("CONCAT('Ödeme Bildirimi #', id) as description"),
+                    'amount' // Tutar POZİTİF
+                );
+            
+            // Müşteri için toplamları hesapla
+            $totalDeposits = $user->payments()->where('status', 'approved')->sum('amount');
+            $totalWithdrawals = $user->withdrawalRequests()->where('status', 'approved')->sum('amount');
+            $totalCommissions = 0; // Müşteri komisyon kazanmaz
+
+            // İki sorguyu birleştir
+            $transactionsQuery = $deposits->unionAll($withdrawals);
+
+        } else if ($user->isBayi()) {
+            // =========================
+            // BAYİ SORGULARI
+            // =========================
+
+            // Komisyon Kazançları (Pozitif tutar)
+            $commissions = DB::table('bayi_commissions')
+                ->where('bayi_id', $userId)
+                ->select(
+                    'created_at as date', // Oluşturulma tarihi
+                    DB::raw("'Komisyon Kazancı' as type"),
+                    DB::raw("CONCAT('Müşteri #', customer_id, ' / İşlem #', withdrawal_request_id) as description"),
+                    'commission_amount as amount' // Tutar POZİTİF
+                );
+
+            // Bayi için toplamları hesapla
+            $totalDeposits = 0; // Bayi ödeme bildirimi yapmaz (şimdilik)
+            $totalWithdrawals = $user->withdrawalRequests()->where('status', 'approved')->sum('amount');
+            $totalCommissions = $user->commissions()->sum('commission_amount');
+
+            // İki sorguyu birleştir
+            $transactionsQuery = $commissions->unionAll($withdrawals);
+        }
+
+        // 3. Birleştirilmiş sorguyu tarih sırasına göre sırala ve sayfala
+        $transactions = $transactionsQuery
+                        ->orderBy('date', 'desc')
+                        ->paginate(20);
+
+        return view('admin.profile.statement', [
+            'transactions' => $transactions,
+            'totalDeposits' => $totalDeposits,
+            'totalWithdrawals' => $totalWithdrawals,
+            'totalCommissions' => $totalCommissions,
+        ]);
     }
 
     /**
