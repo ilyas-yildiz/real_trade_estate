@@ -43,6 +43,11 @@
                         <i class="ri-hand-coin-line"></i> <span data-key="t-withdrawals">Çekim Talepleri</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.financial.report') ? 'active' : '' }}" href="{{ route('admin.financial.report') }}">
+                        <i class="ri-book-read-line"></i> <span data-key="t-financial-report">Genel Hesap Dökümü</span>
+                    </a>
+                </li>
 
 
                 <li class="menu-title"><span data-key="t-menu">SİTE Yönetimi</span></li>
@@ -121,14 +126,16 @@
             {{-- =================================================== --}}
             @elseif(Auth::user()->isBayi())
             <li class="nav-item">
-                    <div class="card bg-primary-subtle border-0 mx-2 mt-2">
-                        <div class="card-body p-3">
-                            <h6 class="text-primary-emphasis mb-1">Mevcut Bakiye</h6>
-                            <h5 class="text-primary-emphasis mb-0">
-                                {{ number_format(Auth::user()->balance, 2, ',', '.') }}
-                            </h5>
+                    <a class="text-decoration-none" href="{{ route('admin.profile.statement') }}">
+                        <div class="card bg-primary-subtle border-0 mx-2 mt-2">
+                            <div class="card-body p-3">
+                                <h6 class="text-primary-emphasis mb-1">Mevcut Bakiye</h6>
+                                <h5 class="text-primary-emphasis mb-0">
+                                    {{ number_format(Auth::user()->balance, 2, ',', '.') }}
+                                </h5>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </li>
                 <li class="menu-title"><span data-key="t-menu">Bayi Paneli</span></li>
                 <li class="nav-item">
@@ -172,14 +179,16 @@
             {{-- =================================================== --}}
             @elseif(Auth::user()->isCustomer())
             <li class="nav-item">
-                    <div class="card bg-success-subtle border-0 mx-2 mt-2">
-                        <div class="card-body p-3">
-                            <h6 class="text-success-emphasis mb-1">Mevcut Bakiye</h6>
-                            <h5 class="text-success-emphasis mb-0">
-                                {{ number_format(Auth::user()->balance, 2, ',', '.') }}
-                            </h5>
+                    <a class="text-decoration-none" href="{{ route('admin.profile.statement') }}">
+                        <div class="card bg-success-subtle border-0 mx-2 mt-2">
+                            <div class="card-body p-3">
+                                <h6 class="text-success-emphasis mb-1">Mevcut Bakiye</h6>
+                                <h5 class="text-success-emphasis mb-0">
+                                    {{ number_format(Auth::user()->balance, 2, ',', '.') }}
+                                </h5>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </li>
                 <li class="menu-title"><span data-key="t-menu">Müşteri Paneli</span></li>
                 <li class="nav-item">

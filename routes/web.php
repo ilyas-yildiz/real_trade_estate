@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\UserProfileController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\WithdrawalRequestController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\FinancialReportController;
 
 
 /*
@@ -78,6 +79,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // "Profilim" Sayfası (Finansal Bilgiler)
     Route::get('/profile', [UserProfileController::class, 'index'])->name('profile.index');
+    Route::get('/account-statement', [UserProfileController::class, 'statement'])->name('profile.statement');
     Route::post('/profile/bank-account', [UserProfileController::class, 'storeBankAccount'])->name('profile.storeBankAccount');
     Route::delete('/profile/bank-account/{bankAccount}', [UserProfileController::class, 'destroyBankAccount'])->name('profile.destroyBankAccount');
     Route::post('/profile/crypto-wallet', [UserProfileController::class, 'storeCryptoWallet'])->name('profile.storeCryptoWallet');
@@ -153,6 +155,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('users', UserController::class)->only([
         'index', 'edit', 'update'
     ]);
+    Route::get('/financial-report', [FinancialReportController::class, 'index'])->name('financial.report');
 });
 
 /* Sistem Temizleme Rotaları */
