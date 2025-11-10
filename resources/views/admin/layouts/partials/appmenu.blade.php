@@ -109,6 +109,11 @@
                 {{-- Sistem --}}
                 <li class="menu-title"><span data-key="t-menu">Sistem</span></li>
                 <li class="nav-item">
+                <a class="nav-link menu-link {{ request()->routeIs('admin.deposit_methods.index') ? 'active' : '' }}" href="{{ route('admin.deposit_methods.index') }}">
+                    <i class="ri-add-box-line"></i> <span data-key="t-deposit-methods">Yatırım Hesapları (Şirket)</span>
+                </a>
+            </li>
+                <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                     <i class="ri-user-settings-line"></i> <span data-key="t-users">Kullanıcı Yönetimi</span>
                 </a>
@@ -160,7 +165,11 @@
                 </li>
                 <li class="menu-title"><span data-key="t-menu">Kişisel İşlemler</span></li>
                 
-                {{-- YENİ EKLENEN LİNK: Bayinin kendi çekim talepleri --}}
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.deposit_methods.show_page') ? 'active' : '' }}" href="{{ route('admin.deposit_methods.show_page') }}">
+                        <i class="ri-question-line"></i> <span data-key="t-how-to-deposit">Nasıl Para Yollanır?</span>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
                         <i class="ri-hand-coin-line"></i> <span data-key="t-my-withdrawals">Çekim Taleplerim</span>
@@ -203,6 +212,11 @@
                 </li>
 
                 <li class="menu-title"><span data-key="t-menu">Finansal İşlemler</span></li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.deposit_methods.show_page') ? 'active' : '' }}" href="{{ route('admin.deposit_methods.show_page') }}">
+                        <i class="ri-question-line"></i> <span data-key="t-how-to-deposit">Nasıl Para Yollanır?</span>
+                    </a>
+                </li>
                  <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.payments*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
                         <i class="ri-wallet-line"></i> <span data-key="t-payments">Ödeme Bildirimlerim</span>

@@ -65,24 +65,54 @@
                 </div>
                 </div>
             {{-- Statik Highlights Alanı --}}
-            <ul class="main-slider-style1__highlights clearfix">
-                <li>
-                    <div class="icon"><span class="icon-success"><span class="path1"></span><span class="path2"></span><span class="path3"></span></span></div>
-                    <p>Up to <span>$500 Bonus</span> on First Deposit!</p>
-                </li>
-                <li>
-                    <div class="icon"><span class="icon-success"><span class="path1"></span><span class="path2"></span><span class="path3"></span></span></div>
-                    <p>Trading with a <a href="{{ route('register') }}">Free Demo</a> Account!</p>
-                </li>
-                 <li>
-                    <div class="icon"><span class="icon-success"><span class="path1"></span><span class="path2"></span><span class="path3"></span></span></div>
-                    <p>Stay Informed, <a href="#">Subscribe</a> Now!</p>
-                </li>
-                <li>
-                    <div class="icon"><span class="icon-success"><span class="path1"></span><span class="path2"></span><span class="path3"></span></span></div>
-                    <p>Download our Free <a href="#">eBooks</a></p>
-                </li>
-            </ul>
+            <div class="main-slider-style1__highlights clearfix">
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container" id="tv-ticker-tape-container" style="width: 100%; height: 95px; background-color: transparent;">
+    <div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+    {
+      "symbols": [
+        { "description": "Bitcoin / USD", "proName": "BITSTAMP:BTCUSD" },
+        { "description": "Ethereum / USD", "proName": "BITSTAMP:ETHUSD" },
+        { "description": "Solana / USD", "proName": "COINBASE:SOLUSD" },
+        { "description": "XRP / USD", "proName": "BINANCE:XRPUSD" }
+      ],
+      "showSymbolLogo": true,
+      "colorTheme": "light",
+      "isTransparent": true,
+      "displayMode": "adaptive",
+      "locale": "en"
+    }
+    </script>
+</div>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Bu fonksiyon, widget iframe'i oluşturana kadar bekler
+    function forceTickerHeight() {
+        try {
+            // Ana konteyneri bul
+            var container = document.getElementById('tv-ticker-tape-container');
+            // Widget'ın oluşturduğu iframe'i bul
+            var iframe = container.querySelector('iframe[id^="tradingview_widget"]');
+
+            if (iframe) {
+                // iframe'i bulduysak, yüksekliğini 95px yap
+                iframe.style.height = '95px';
+            } else {
+                // Bulamadıysa, 100ms sonra tekrar dene
+                setTimeout(forceTickerHeight, 100);
+            }
+        } catch (e) {
+            console.error("TradingView Ticker hatası:", e);
+        }
+    }
+    
+    // Fonksiyonu başlat
+    forceTickerHeight();
+});
+</script>
+<!-- TradingView Widget END -->
+</div>
 
             {{-- DİNAMİK SLIDER --}}
             <div class="swiper-container banner-slider-two">
@@ -144,45 +174,8 @@
 
         </div>
     </section>
-    {{-- Not: Bu bölüm canlı API gerektirir. Şimdilik STATİK bırakıyoruz. --}}
-    <section class="instruments-style1">
-        <div class="instruments-style1__shape1">
-            <img src="{{ asset('frontend/assets/images/shapes/instruments--v1-shape1.png') }}" alt="Shape">
-        </div>
-        <div class="instruments-style1__shape2">
-            <img src="{{ asset('frontend/assets/images/shapes/instruments--v1-shape2.png') }}" alt="Shape">
-        </div>
-        <div class="instruments-style1__tab">
-            <div class="container">
-                <div class="sec-title withtext white text-center">
-                    <div class="sub-title"><h4>instruments</h4></div>
-                    <h2>Leading Market Price List</h2>
-                    <div class="text"><p>Discover the most competitive prices in the market, updated <br>regularly for your advantage.</p></div>
-                </div>
-                <div class="instruments-style1__inner">
-                    <div class="instruments-style1__tab-btn">
-                        <ul class="tabs-button-box clearfix">
-                            <li data-tab="#forex" class="tab-btn-item active-btn-item"><h4>Forex</h4><div class="icon"><i class="icon-arrow-down"></i></div></li>
-                            <li data-tab="#energies" class="tab-btn-item"><h4>Energies</h4><div class="icon"><i class="icon-arrow-down"></i></div></li>
-                            <li data-tab="#shares" class="tab-btn-item"><h4>Shares</h4><div class="icon"><i class="icon-arrow-down"></i></div></li>
-                            <li data-tab="#indices" class="tab-btn-item"><h4>Indices</h4><div class="icon"><i class="icon-arrow-down"></i></div></li>
-                            <li data-tab="#metals" class="tab-btn-item"><h4>Metals</h4><div class="icon"><i class="icon-arrow-down"></i></div></li>
-                        </ul>
-                    </div>
-                    <div class="tabs-content-box">
-                        <div class="tab-content-box-item tab-content-box-item-active" id="forex">
-                            {{-- Bu kısım (instruments-style1-tab-content-box-item) index.html'den statik olarak alınmalı --}}
-                            <p class="text-white">Forex fiyat listesi alanı (Statik)</p>
-                        </div>
-                        <div class="tab-content-box-item" id="energies">
-                             <p class="text-white">Energies fiyat listesi alanı (Statik)</p>
-                        </div>
-                        {{-- ... (Diğer tab içerikleri statik olarak burada kalabilir) ... --}}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    
+
     @if(isset($about))
     <section class="about-style1">
         <div class="container">
@@ -687,6 +680,35 @@
         </div>
     </section>
     @endif
+
+{{-- YENİ HABERLER BÖLÜMÜ (DOĞRU SCRIPT İLE) --}}
+<section class="news-style1 pdtop pdbottom">
+    <div class="container">
+        <div class="sec-title withtext text-center">
+            <div class="sub-title"><h4>Market News</h4></div>
+            <h2>Latest Crypto Updates</h2>
+        </div>
+        
+        <!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+  <div class="tradingview-widget-container__widget"></div>
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
+  {
+  "displayMode": "regular",
+  "feedMode": "all_symbols",
+  "colorTheme": "light",
+  "isTransparent": false,
+  "locale": "en",
+  "width": 1200,
+  "height": 550
+}
+  </script>
+</div>
+<!-- TradingView Widget END -->
+        </div>
+</section>
+{{-- YENİ HABERLER BÖLÜMÜ SONU --}}
+
     @if(isset($references) && $references->count() > 0)
     <section class="testimonial-style1">
         <div class="container">
