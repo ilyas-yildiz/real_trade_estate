@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\WithdrawalRequestController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FinancialReportController;
+use App\Http\Controllers\Admin\DepositMethodsController;
 
 
 /*
@@ -97,6 +98,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('/withdrawals', WithdrawalRequestController::class)->only([
         'index', 'create', 'store', 'destroy'
     ]);
+    Route::get('/how-to-deposit', [DepositMethodsController::class, 'showPage'])->name('deposit_methods.show_page');
 
 });
 
@@ -156,6 +158,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         'index', 'edit', 'update'
     ]);
     Route::get('/financial-report', [FinancialReportController::class, 'index'])->name('financial.report');
+    // YENİ: Admin Yatırım Hesapları CRUD Rotaları
+    Route::get('/deposit-methods', [DepositMethodsController::class, 'index'])->name('deposit_methods.index');
+    Route::post('/deposit-methods/bank', [DepositMethodsController::class, 'storeBank'])->name('deposit_methods.storeBank');
+    Route::post('/deposit-methods/crypto', [DepositMethodsController::class, 'storeCrypto'])->name('deposit_methods.storeCrypto');
+    Route::delete('/deposit-methods/bank/{id}', [DepositMethodsController::class, 'destroyBank'])->name('deposit_methods.destroyBank');
+    Route::delete('/deposit-methods/crypto/{id}', [DepositMethodsController::class, 'destroyCrypto'])->name('deposit_methods.destroyCrypto');
 });
 
 /* Sistem Temizleme Rotaları */
