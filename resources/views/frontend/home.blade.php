@@ -1,8 +1,7 @@
 ﻿@extends('frontend.layouts.app')
 
 {{-- SEO Başlığı ve Açıklaması (Ayarlardan veya varsayılan) --}}
-{{-- GÜNCELLEME: 'Tradebro - Anasayfa' -> 'Real Trade Estate - Homepage' --}}
-@section('title', $settings['seo_title'] ?? 'Real Trade Estate - Homepage')
+@section('title', $settings['seo_title'] ?? 'Real Trade State - Homepage')
 {{-- GÜNCELLEME: Türkçe açıklama -> İngilizce açıklama --}}
 @section('description', $settings['seo_description'] ?? 'Secure and fast trading platform.')
 
