@@ -10,7 +10,7 @@
     <section class="main-slider-style1">
         <div class="main-slider-style1__inner">
             
-            {{-- Statik Demo Mockup Alanı --}}
+            {{-- Statik Demo Mockup Alanı. silinecek sonrasında --}}
             <div class="top-box text-center">
                 <div class="top-box__pattern"
                     style="background-image: url({{ asset('frontend/assets/images/pattern/slider-v1-pattern.png') }});">
