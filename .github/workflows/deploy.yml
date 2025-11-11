@@ -1,0 +1,77 @@
+﻿name: Deploy Laravel Project to FTP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    
+    # 1. Adım: Kodu checkout et
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    # 2. Adım: PHP Ortamını Kur
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, xml, ctype, json, tokenizer, dom, pdo, pdo_mysql
+        tools: composer
+
+    # 3. Adım: Composer bağımlılıklarını kur
+    - name: Install Composer Dependencies
+      run: composer install --no-interaction --no-dev --optimize-autoloader
+
+    # 4. Adım: Node.js (NPM için) Ortamını Kur
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    # 5. Adım: NPM bağımlılıklarını kur
+    - name: Install NPM Dependencies
+      run: npm install
+
+    # 6. Adım: CSS/JS dosyalarını derle
+    - name: Build Assets (Vite)
+      run: npm run build
+
+    # 7. Adım: FTP ile Sunucuya Yükle
+    - name: Deploy to FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: ${{ secrets.SERVER_PATH }}
+        protocol: ftp
+        port: 21
+        timeout: 30000
+        
+        # DÜZELTME: Sıfırlama bitti. Artık 'false' yapıyoruz.
+        # Bu, bir sonraki deploy'un SADECE değişen dosyaları
+        # yüklemesini sağlar ve çok daha hızlı olur.
+        dangerous-clean-slate: false
+        
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          .env
+          .env.example
+          .github/**
+          storage/framework/sessions/*
+          storage/framework/views/*
+          storage/framework/cache/data/*
+          storage/logs/*
+          public/storage
+          docker-compose.yml
+          .dockerignore
+          *.md
+          *.sqlite
+
