@@ -146,23 +146,19 @@ class PaymentController extends Controller
             'admin_notes' => 'nullable|string|max:2000',
         ]);
 
-        // --- YENİ BAKIYE MANTIĞI BAŞLANGIÇ ---
+       /*
         $originalStatus = $payment->getOriginal('status');
         $newStatus = $validated['status'];
         $user = $payment->user;
         $amount = $payment->amount;
 
-        // 1. Durum "Onaylandı" olarak DEĞİŞTİYSE (ve daha önce Onaylı değilse)
         if ($newStatus === 'approved' && $originalStatus !== 'approved') {
-            // Kullanıcının bakiyesine bu tutarı ekle
             $user->increment('balance', $amount);
         }
-        // 2. Durum "Onaylandı"dan başka bir şeye DEĞİŞTİYSE (İptal/Reversal)
         elseif ($newStatus !== 'approved' && $originalStatus === 'approved') {
-            // Kullanıcının bakiyesinden bu tutarı geri düş
             $user->decrement('balance', $amount);
         }
-        // --- YENİ BAKIYE MANTIĞI SON ---
+        */
 
         $payment->update([
             'status' => $validated['status'],

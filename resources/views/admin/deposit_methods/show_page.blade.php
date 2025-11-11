@@ -71,10 +71,20 @@
                             @foreach ($bankAccounts as $account)
                                 <tr>
                                     <td>{{ $account->bank_name }}</td>
-                                    <td>{{ $account->account_holder_name }}</td>
+                                    
+                                    {{-- GÜNCELLEME BAŞLANGIÇ: Kopyalama butonu eklendi --}}
+                                    <td>
+                                        {{ $account->account_holder_name }}
+                                        <button class="btn btn-sm btn-soft-secondary py-0 px-1 ms-1 copy-to-clipboard" 
+                                                data-clipboard-text="{{ $account->account_holder_name }}" 
+                                                title="Hesap Sahibini Kopyala">
+                                            <i class="ri-file-copy-line"></i>
+                                        </button>
+                                    </td>
+                                    {{-- GÜNCELLEME SONU --}}
+                                    
                                     <td>
                                         {{ $account->iban }}
-                                        {{-- GÜNCELLEME: Kopyalama butonu eklendi --}}
                                         <button class="btn btn-sm btn-soft-secondary py-0 px-1 ms-1 copy-to-clipboard" 
                                                 data-clipboard-text="{{ $account->iban }}" 
                                                 title="IBAN Kopyala">

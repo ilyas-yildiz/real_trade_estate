@@ -12,7 +12,8 @@
             <div class="card-body">
                 <p class="text-muted">Tüm onaylanmış bakiye giriş ve çıkışlarınızın listesi.</p>
                 
-                {{-- Toplamlar Kartı --}}
+             {{-- 
+                   {{-- Toplamlar Kartı --}}
                 <div class="row mb-3">
                     @if(Auth::user()->isCustomer())
                         {{-- Müşteri Toplamları --}}
@@ -68,6 +69,7 @@
                         </div>
                     @endif
                 </div>
+                --}}
 
                 {{-- İşlem Listesi --}}
                 <div class="table-responsive">

@@ -77,7 +77,7 @@ class FinancialReportController extends Controller
             ->select(
                 'bayi_commissions.created_at as date',
                 DB::raw("'Komisyon (Gider)' as type"),
-                DB::raw("CONCAT(users.name, ' (Bayi ID: ', users.id, ') için komisyon ödemesi (İşlem #', bayi_commissions.withdrawal_request_id, ')') as description"),
+                DB::raw("CONCAT(users.name, ' (IB ID: ', users.id, ') için komisyon ödemesi (İşlem #', bayi_commissions.withdrawal_request_id, ')') as description"),
                 DB::raw("-bayi_commissions.commission_amount as amount") // Negatif
             );
 

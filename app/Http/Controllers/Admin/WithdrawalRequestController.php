@@ -54,10 +54,12 @@ class WithdrawalRequestController extends Controller
 
         $user = Auth::user();
 
+        /*
         // YENİ ÖZELLİK: Bakiye Kontrolü
         if ($user->balance <= 0) {
             return redirect()->route('admin.withdrawals.index')->with('error', 'Çekim talebi oluşturmak için yeterli bakiyeniz bulunmamaktadır.');
         }
+        */
         
         $bankAccounts = $user->bankAccounts;
         $cryptoWallets = $user->cryptoWallets;
@@ -84,11 +86,15 @@ class WithdrawalRequestController extends Controller
             'payment_method' => 'required|string|starts_with:bank-,crypto-',
         ]);
         
+       /* PASİFE ALINDI (Şirket İsteği)
+        // --- YENİ BAKIYE KONTROLÜ BAŞLANGIÇ ---
         $amountToWithdraw = $validated['amount'];
-        // Bakiye Kontrolü
         if ($user->balance < $amountToWithdraw) {
+            // Yetersiz bakiye
             return back()->with('error', 'Yetersiz bakiye. Çekmek istediğiniz tutar ('.$amountToWithdraw.') mevcut bakiyenizden ('.$user->balance.') fazla.')->withInput();
         }
+        // --- YENİ BAKIYE KONTROLÜ SON ---
+        */
 
         try {
             list($type, $id) = explode('-', $validated['payment_method'], 2);
@@ -163,8 +169,9 @@ class WithdrawalRequestController extends Controller
         return response()->json(['item' => $data]);
     }
 
-    /**
-     * Adminin çekim talebini onaylama/reddetme işlemini yapar.
+/**
+     * GÜNCELLENDİ: Adminin çekim talebini onaylama/reddetme işlemini yapar.
+     * Bakiye ve Komisyon mantığı şirket isteği üzerine PASİFE ALINDI.
      */
     public function update(Request $request, WithdrawalRequest $withdrawal): JsonResponse
     {
@@ -179,16 +186,26 @@ class WithdrawalRequestController extends Controller
 
         $originalStatus = $withdrawal->getOriginal('status');
         $newStatus = $validated['status'];
-        $customer = $withdrawal->user;
-        $amount = $withdrawal->amount;
-
+        
+        // Statü değişmediyse hiçbir şey yapma
         if ($originalStatus === $newStatus) {
             return response()->json(['success' => true, 'message' => 'Durum zaten aynı, işlem yapılmadı.']);
         }
 
         try {
-            DB::transaction(function () use ($withdrawal, $newStatus, $originalStatus, $customer, $amount, $validated) {
+            // DB::transaction'ı koruyoruz, çünkü statü güncelleme işleminin
+            // güvenli (atomic) olmasını sağlar.
+            DB::transaction(function () use ($withdrawal, $newStatus, $originalStatus, $validated) {
                 
+                // ==========================================================
+                // BAKIYE VE KOMİSYON MANTIĞI PASİFE ALINDI (BAŞLANGIÇ)
+                // ==========================================================
+                /*
+                // Bu değişkenler artık sadece bu pasif blokta gerekli
+                $customer = $withdrawal->user;
+                $amount = $withdrawal->amount;
+
+                // 1. Durum "Onaylandı" olarak DEĞİŞTİYSE
                 if ($newStatus === 'approved') {
                     
                     $customerForUpdate = User::where('id', $customer->id)->lockForUpdate()->first();
@@ -217,6 +234,7 @@ class WithdrawalRequestController extends Controller
                     }
                 }
                 
+                // 2. Durum "Onaylandı"dan başka bir şeye DEĞİŞTİYSE (İptal/Reversal)
                 elseif ($originalStatus === 'approved') {
                     
                     $customer->increment('balance', $amount);
@@ -233,7 +251,13 @@ class WithdrawalRequestController extends Controller
                         $commissionLog->delete();
                     }
                 }
+                */
+                // ==========================================================
+                // BAKIYE VE KOMİSYON MANTIĞI PASİFE ALINDI (SON)
+                // ==========================================================
 
+
+                // SADECE BU KISIM AKTİF: Statü ve Notları Güncelle
                 $withdrawal->update([
                     'status' => $validated['status'],
                     'admin_notes' => $validated['admin_notes'],
@@ -241,8 +265,10 @@ class WithdrawalRequestController extends Controller
                     'reviewed_at' => now(),
                 ]);
 
-            }); 
+            }); // DB::transaction sonu
         } catch (Exception $e) {
+            // (Pasife alınan kod hata fırlatsaydı burası çalışırdı, 
+            // şimdilik sadece statü güncelleme hatası için duruyor)
             return response()->json([
                 'success' => false, 
                 'message' => 'Hata: ' . $e->getMessage()

@@ -130,7 +130,8 @@
             {{-- 2. BAYİ MENÜSÜ (role == 1) --}}
             {{-- =================================================== --}}
             @elseif(Auth::user()->isBayi())
-            <li class="nav-item">
+           {{-- PASİFE ALINDI (Şirket İsteği)
+                <li class="nav-item">
                     <a class="text-decoration-none" href="{{ route('admin.profile.statement') }}">
                         <div class="card bg-primary-subtle border-0 mx-2 mt-2">
                             <div class="card-body p-3">
@@ -142,10 +143,11 @@
                         </div>
                     </a>
                 </li>
-                <li class="menu-title"><span data-key="t-menu">Bayi Paneli</span></li>
+                --}}
+                <li class="menu-title"><span data-key="t-menu">IB Paneli</span></li>
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.dashboard') ? 'active' : '' }}" href="{{ route('bayi.dashboard') }}">
-                        <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboard">Bayi Dashboard</span>
+                        <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboard">IB Dashboard</span>
                     </a>
                 </li>
                  <li class="nav-item">
@@ -153,11 +155,14 @@
                         <i class="ri-team-line"></i> <span data-key="t-customers">Müşterilerim</span>
                     </a>
                 </li>
-                <li class="nav-item">
+              {{-- GÜNCELLEME: Komisyon Raporu Pasife Alındı --}}
+                {{--
+                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.commissions') ? 'active' : '' }}" href="{{ route('bayi.commissions') }}">
                         <i class="ri-pie-chart-line"></i> <span data-key="t-commissions">Komisyon Raporum</span>
                     </a>
                 </li>
+                --}}
                  <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.withdrawals') ? 'active' : '' }}" href="{{ route('bayi.withdrawals') }}">
                         <i class="ri-line-chart-line"></i> <span data-key="t-reports">Müşteri Çekim Raporu</span>
@@ -187,7 +192,9 @@
             {{-- 3. MÜŞTERİ MENÜSÜ (role == 0) --}}
             {{-- =================================================== --}}
             @elseif(Auth::user()->isCustomer())
-            <li class="nav-item">
+           {{-- GÜNCELLEME: ŞİRKET İSTEĞİ ÜZERİNE BU BLOK PASİFE ALINDI --}}
+                {{--
+                <li class="nav-item">
                     <a class="text-decoration-none" href="{{ route('admin.profile.statement') }}">
                         <div class="card bg-success-subtle border-0 mx-2 mt-2">
                             <div class="card-body p-3">
@@ -199,6 +206,7 @@
                         </div>
                     </a>
                 </li>
+                --}}
                 <li class="menu-title"><span data-key="t-menu">Müşteri Paneli</span></li>
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">

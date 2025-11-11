@@ -11,7 +11,7 @@
                     <div class="d-flex align-items-lg-center flex-lg-row flex-column">
                         <div class="flex-grow-1">
                             <h4 class="fs-16 mb-1">Hoş Geldiniz, {{ Auth::user()->name }}!</h4>
-                            <p class="text-muted mb-0">Bayi panelinize hoş geldiniz.</p>
+                            <p class="text-muted mb-0">IB panelinize hoş geldiniz.</p>
                         </div>
                     </div>
                 </div>

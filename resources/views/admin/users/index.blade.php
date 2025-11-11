@@ -51,7 +51,7 @@
                                 <th scope="col">İsim</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Rol</th>
-                                <th scope="col">Ait Olduğu Bayi</th>
+                                <th scope="col">Ait Olduğu IB</th>
                                 <th scope="col">Kayıt Tarihi</th>
                                 <th scope="col">İşlemler</th>
                             </tr>
@@ -66,7 +66,7 @@
                                     };
                                     $roleText = match ($user->role) {
                                         2 => 'Admin',
-                                        1 => 'Bayi',
+                                        1 => 'IB',
                                         default => 'Müşteri',
                                     };
                                 @endphp
