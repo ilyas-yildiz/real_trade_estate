@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontendController;
-use App\Models\WithdrawalRequest; // YENİ EKLENECEK SATIR
+use App\Models\WithdrawalRequest;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommonController;
 use App\Http\Controllers\Admin\GalleryController;
@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\WithdrawalRequestController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FinancialReportController;
 use App\Http\Controllers\Admin\DepositMethodsController;
+use App\Http\Controllers\Admin\PasswordRequestController;
 
 
 /*
@@ -85,7 +86,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/profile/bank-account/{bankAccount}', [UserProfileController::class, 'destroyBankAccount'])->name('profile.destroyBankAccount');
     Route::post('/profile/crypto-wallet', [UserProfileController::class, 'storeCryptoWallet'])->name('profile.storeCryptoWallet');
     Route::delete('/profile/crypto-wallet/{cryptoWallet}', [UserProfileController::class, 'destroyCryptoWallet'])->name('profile.destroyCryptoWallet');
-
+    Route::post('/profile/request-password', [UserProfileController::class, 'requestPasswordChange'])->name('profile.requestPasswordChange');
+    
     // Ödeme Bildirim Sistemi (Kullanıcı Tarafı)
     Route::resource('/payments', PaymentController::class)->only([
         'index', 'create', 'store', 'destroy'
@@ -99,6 +101,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         'index', 'create', 'store', 'destroy'
     ]);
     Route::get('/how-to-deposit', [DepositMethodsController::class, 'showPage'])->name('deposit_methods.show_page');
+    
 
 });
 
@@ -166,6 +169,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/deposit-methods/crypto', [DepositMethodsController::class, 'storeCrypto'])->name('deposit_methods.storeCrypto');
     Route::delete('/deposit-methods/bank/{id}', [DepositMethodsController::class, 'destroyBank'])->name('deposit_methods.destroyBank');
     Route::delete('/deposit-methods/crypto/{id}', [DepositMethodsController::class, 'destroyCrypto'])->name('deposit_methods.destroyCrypto');
+    Route::get('/password-requests', [PasswordRequestController::class, 'index'])->name('password_requests.index');
+    Route::post('/password-requests/{id}/approve', [PasswordRequestController::class, 'approve'])->name('password_requests.approve');
+    Route::post('/password-requests/{id}/reject', [PasswordRequestController::class, 'reject'])->name('password_requests.reject');
+
 });
 
 /* Sistem Temizleme Rotaları */

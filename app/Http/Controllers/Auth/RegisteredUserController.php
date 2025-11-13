@@ -11,22 +11,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
-use Illuminate\Validation\Rule as ValidationRule; // YENİ: Rule import'u eklendi
+use Illuminate\Validation\Rule as ValidationRule;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
     /**
-     * YENİ: Kayıt formunu gösterir ve referans kodunu (bayi_id) kontrol eder.
+     * Kayıt formunu gösterir ve referans kodunu (bayi_id) kontrol eder.
      */
     public function create(Request $request): View
     {
-        $bayi_id = null; // Varsayılan
+        $bayi_id = null; 
         
-        // 1. URL'de 'ref' parametresi var mı? (örn: /register?ref=123)
         if ($request->has('ref')) {
             $ref_id = $request->query('ref');
-            
-            // 2. Bu ID'ye sahip bir kullanıcı var mı VE bu kullanıcı Bayi mi (role=1)?
             $bayi = User::find($ref_id);
             
             if ($bayi && $bayi->isBayi()) {
@@ -34,12 +33,11 @@ class RegisteredUserController extends Controller
             }
         }
         
-        // 3. 'bayi_id'yi view'a gönder
         return view('auth.register', compact('bayi_id'));
     }
 
     /**
-     * YENİ: Gelen kayıt isteğini işler ve 'bayi_id'yi kaydeder.
+     * Gelen kayıt isteğini işler ve kullanıcıyı kaydeder.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -48,31 +46,51 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             
-            // 4. Gizli 'bayi_id' alanını doğrula
             'bayi_id' => [
-                'nullable', // Boş olabilir (normal kayıt)
-                'integer',  // Sayı olmalı
-                // Gönderilen ID'nin 'users' tablosunda var olduğunu
-                // VE o kullanıcının 'role'ünün 1 (Bayi) olduğunu doğrula
+                'nullable', 
+                'integer',
                 ValidationRule::exists('users', 'id')->where(function ($query) {
                     $query->where('role', 1); 
                 }),
             ],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            // 5. Doğrulanmış bayi_id'yi kaydet
-            'bayi_id' => $request->bayi_id, 
-            // 'role' alanı varsayılan olarak 0 (Müşteri) olacak (migration'da belirledik)
-        ]);
+        // 1. Özel MT5 ID Oluşturma
+        do {
+            $digits = rand(100000, 999999); // 6 Rakam
+            $upper = Str::upper(Str::random(1)); // 1 Büyük Harf
+            $lower = Str::lower(Str::random(1)); // 1 Küçük Harf
+            $symbols = ['@', '#', '$', '!', '%', '*', '?']; 
+            $symbol = $symbols[array_rand($symbols)];
 
-        event(new Registered($user));
+            $rawId = $digits . $upper . $lower . $symbol;
+            $mt5_id = str_shuffle($rawId);
 
-        Auth::login($user);
+        } while (User::where('mt5_id', $mt5_id)->exists());
 
-        return redirect(route('admin.dashboard', absolute: false)); // 'admin.dashboard'a yönlendir
+        try {
+            // 2. Kullanıcıyı Kaydetme (TEK SEFERDE)
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password), // Giriş şifresi (Hash)
+                
+                'mt5_password' => Crypt::encryptString($request->password), // Görüntülenebilir şifre (Encrypt)
+                'mt5_id' => $mt5_id,
+                
+                'bayi_id' => $request->bayi_id,
+                // role varsayılan olarak 0 (Müşteri) gelir
+            ]);
+
+            event(new Registered($user));
+
+            Auth::login($user);
+
+            return redirect(route('admin.dashboard', absolute: false));
+
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            // Çift tıklama vb. durumunda hata verirse
+            return redirect()->route('login')->with('status', 'Kaydınız zaten oluşturuldu, lütfen giriş yapın.');
+        }
     }
 }

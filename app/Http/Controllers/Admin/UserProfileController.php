@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
+use App\Models\PasswordChangeRequest; 
+use Illuminate\Support\Facades\Crypt;
 
 class UserProfileController extends Controller
 {
@@ -189,5 +191,26 @@ public function statement(Request $request)
         $cryptoWallet->delete();
 
         return redirect()->route('admin.profile.index')->with('success', 'Kripto cüzdanı başarıyla silindi.');
+    }
+
+    public function requestPasswordChange(Request $request)
+    {
+        $request->validate([
+            'new_password' => 'required|confirmed|min:8',
+        ]);
+
+        // Bekleyen bir talep var mı kontrol et
+        $pending = PasswordChangeRequest::where('user_id', Auth::id())->where('status', 'pending')->first();
+        if ($pending) {
+            return back()->with('error', 'Zaten bekleyen bir şifre değişikliği talebiniz var.');
+        }
+
+        PasswordChangeRequest::create([
+            'user_id' => Auth::id(),
+            'new_password_encrypted' => Crypt::encryptString($request->new_password),
+            'status' => 'pending'
+        ]);
+
+        return back()->with('success', 'Şifre değişikliği talebiniz alındı. Yönetici onayladığında güncellenecektir.');
     }
 }

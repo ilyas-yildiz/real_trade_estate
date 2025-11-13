@@ -62,10 +62,16 @@ class UserController extends Controller
     /**
      * Modal'da düzenlenecek kullanıcının verisini JSON olarak döndürür.
      */
-    public function edit(User $user): JsonResponse
+ public function edit(User $user): JsonResponse
     {
-        // resource-handler.js'in formu doldurması için 'item' anahtarıyla
-        // 'role' dahil tüm kullanıcı verisini döndürüyoruz.
+        // Admin olduğu için şifreyi çözüp 'decrypted_mt5_password' anahtarıyla gönderiyoruz.
+        // Eğer şifre yoksa boş göndeririz.
+        try {
+            $user->decrypted_mt5_password = $user->mt5_password ? \Illuminate\Support\Facades\Crypt::decryptString($user->mt5_password) : '';
+        } catch (\Exception $e) {
+            $user->decrypted_mt5_password = 'Şifre Çözülemedi';
+        }
+
         return response()->json(['item' => $user]);
     }
 
