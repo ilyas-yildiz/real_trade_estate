@@ -123,6 +123,12 @@
                         <i class="ri-settings-4-line"></i> <span data-key="t-settings">Genel Ayarlar</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                <a class="nav-link menu-link {{ request()->routeIs('admin.password_requests.index') ? 'active' : '' }}" href="{{ route('admin.password_requests.index') }}">
+                    <i class="ri-lock-password-line"></i> <span data-key="t-pass-requests">Şifre Talepleri</span>
+                    {{-- Opsiyonel: Bekleyen talep varsa badge gösterebiliriz (ileride) --}}
+                </a>
+            </li>
                 {{-- Not: Buraya 'Kullanıcı Yönetimi' ve 'Bayi Yönetimi' linkleri eklenebilir --}}
 
 

@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('register') }}" id="registerForm">
         @csrf
 @if(isset($bayi_id))
         <input type="hidden" name="bayi_id" value="{{ $bayi_id }}">
@@ -50,9 +50,28 @@
                 {{ __('Already registered?') }}
             </a>
 
-            <x-primary-button class="ms-4">
+            <x-primary-button class="ms-4" id="btn-register">
                 {{ __('Register') }}
             </x-primary-button>
         </div>
     </form>
+    <script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        // Butonu bul
+        const btn = document.getElementById('btn-register');
+        
+        // Eğer buton zaten kilitliyse (yani ikinci kez basıldıysa), formu gönderme!
+        if (btn.disabled) {
+            e.preventDefault();
+            return false;
+        }
+
+        // İlk basışta butonu kilitle ve yazısını değiştir
+        btn.disabled = true;
+        btn.innerText = 'İşleniyor... Lütfen Bekleyin';
+        
+        // Formun gönderilmesine izin ver
+        return true;
+    });
+</script>
 </x-guest-layout>

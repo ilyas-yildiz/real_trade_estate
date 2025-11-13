@@ -22,6 +22,17 @@
                             <label class="form-label">Email</label>
                             <input type="text" name="email" class="form-control" readonly>
                         </div>
+                        {{-- YENİ EKLENEN ALAN --}}
+                        <div class="col-md-12 mt-3">
+                            <label class="form-label text-danger fw-bold">MetaTrader 5 & Site Şifresi</label>
+                            <div class="input-group">
+                                {{-- name="decrypted_mt5_password" Controller'dan gelen JSON anahtarıdır --}}
+                                <input type="text" name="decrypted_mt5_password" class="form-control text-danger fw-bold" readonly>
+                                <span class="input-group-text"><i class="ri-lock-unlock-line"></i></span>
+                            </div>
+                            <div class="form-text">Bu şifre şifrelenmiş olarak saklanır, sadece admin görebilir.</div>
+                        </div>
+                        {{-- YENİ ALAN SONU --}}
                     </div>
 
                     <hr>

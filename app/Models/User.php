@@ -40,6 +40,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'bayi_id',
         'balance',
         'commission_rate',
+        'mt5_id',       // YENİ
+        'mt5_password', // YENİ
     ];
 
     /**

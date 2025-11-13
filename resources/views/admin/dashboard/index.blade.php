@@ -13,7 +13,7 @@
                             <div class="flex-grow-1">
                                 <h4 class="fs-16 mb-1">Merhaba, {{ Auth::user()->name }}!</h4>
                                 <p class="text-muted mb-0">
-                                    @if(Auth::user()->is_admin)
+                                    @if(Auth::user()->isAdmin()) {{-- is_admin -> isAdmin() --}}
                                         Websitenizdeki genel duruma bir göz atın.
                                     @else
                                         Üye paneline hoş geldiniz.
@@ -25,24 +25,88 @@
                     </div>
                 </div>
 
-                <!-- GÜNCELLEME: Yetkisiz Alan Uyarısı -->
-                <!-- AdminMiddleware'den yönlendirilen kullanıcılar bu uyarıyı görecek -->
                 @if(session('error'))
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         <strong>Uyarı!</strong> {{ session('error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-                <!-- Uyarı Bitişi -->
+                
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Başarılı!</strong> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                {{-- =================================================== --}}
+                {{-- YENİ: MÜŞTERİYE ÖZEL MT5 BİLGİLERİ --}}
+                {{-- =================================================== --}}
+                @if(Auth::user()->isCustomer())
+                <div class="row mb-4">
+                    {{-- MT5 Bilgi Kartı --}}
+                    <div class="col-md-6">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="card-title mb-0 text-white"><i class="ri-bar-chart-line"></i> MetaTrader 5 Giriş Bilgileriniz</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Aşağıdaki bilgilerle MetaTrader 5 platformuna giriş yapabilirsiniz.</p>
+                                
+                                <div class="mb-3">
+                                    <label class="fw-bold">MT5 ID (Login):</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" value="{{ Auth::user()->mt5_id }}" readonly id="mt5_id_input">
+                                        <button class="btn btn-outline-secondary" onclick="copyToClipboard('mt5_id_input')">Kopyala</button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="fw-bold">Şifre:</label>
+                                    <div class="input-group">
+                                        {{-- Şifreyi Çözüp Gösteriyoruz --}}
+                                        <input type="text" class="form-control" value="{{ Auth::user()->mt5_password ? \Illuminate\Support\Facades\Crypt::decryptString(Auth::user()->mt5_password) : '' }}" readonly id="mt5_pass_input">
+                                        <button class="btn btn-outline-secondary" onclick="copyToClipboard('mt5_pass_input')">Kopyala</button>
+                                    </div>
+                                    <small class="text-danger">* Bu şifre aynı zamanda siteye giriş şifrenizdir.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{-- Şifre Değişiklik Talep Formu --}}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Şifre Değiştirme Talebi</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-warning small">
+                                    Şifrenizi değiştirdiğinizde, MetaTrader 5 şifreniz de değişecektir. Bu işlem yönetici onayı gerektirir.
+                                </div>
+                                <form action="{{ route('admin.profile.requestPasswordChange') }}" method="POST">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label>Yeni Şifre</label>
+                                        <input type="password" name="new_password" class="form-control" required minlength="8">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Yeni Şifre (Tekrar)</label>
+                                        <input type="password" name="new_password_confirmation" class="form-control" required minlength="8">
+                                    </div>
+                                    <button type="submit" class="btn btn-warning">Değişiklik Talep Et</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                {{-- MT5 BÖLÜMÜ SONU --}}
 
 
-                <!-- GÜNCELLEME: Tüm admin içeriği bu 'if' bloğu içine alındı -->
-                @if(Auth::user()->is_admin)
+                @if(Auth::user()->isAdmin()) {{-- is_admin -> isAdmin() --}}
 
-                    <!-- Admin Widget'ları (Toplam Yazı, Yazar, Kategori) -->
                     <div class="row">
                         <div class="col-xl-4 col-md-6">
-                            <!-- Kart: Toplam Yazı Sayısı -->
                             <div class="card card-animate">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
@@ -64,7 +128,6 @@
                         </div>
 
                         <div class="col-xl-4 col-md-6">
-                            <!-- Kart: Yazar Sayısı -->
                             <div class="card card-animate">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
@@ -86,7 +149,6 @@
                         </div>
 
                         <div class="col-xl-4 col-md-6">
-                            <!-- Kart: Kategori Sayısı -->
                             <div class="card card-animate">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
@@ -106,10 +168,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div> <!-- end row-->
-
-                    <!-- Admin Tabloları (Son Yazılar, Aktif Yazarlar) -->
-                    <div class="row">
+                    </div> <div class="row">
                         <div class="col-xl-6">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
@@ -201,33 +260,13 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                @else
-                    <!-- GÜNCELLEME: Normal Üye (is_admin=0) ise burası görünecek -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Üye Paneline Hoş Geldiniz</h5>
-                                    <p class="card-text">
-                                        Profilinizi yönetmek ve ödeme bildirimlerinizi (dekont) yüklemek için sol menüdeki ilgili alanları kullanabilirsiniz.
-                                    </p>
-                                    <p class="card-text">
-                                        (Gelecekte "Profilim" ve "Dekont Yükle" modülleri buraya eklenecektir.)
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </div> @else
+                    {{-- MT5 bilgisi yukarıda gösterildiği için burası boş kalabilir veya ek bilgi eklenebilir --}}
                 @endif
-                <!-- Admin 'if' bloğu bitişi -->
-
-            </div>
+                </div>
         </div>
 
-        <!-- GÜNCELLEME: Sağ Sidebar da Admin'e özel olmalı -->
-        @if(Auth::user()->is_admin)
+        @if(Auth::user()->isAdmin())
             <div class="col-auto layout-rightside-col">
                 <div class="overlay"></div>
                 <div class="layout-rightside">
@@ -263,7 +302,32 @@
                 </div>
             </div>
         @endif
-        <!-- Sağ Sidebar 'if' bloğu bitişi -->
-
-    </div>
+        </div>
 @endsection
+
+@push('scripts')
+<script>
+function copyToClipboard(id) {
+    var copyText = document.getElementById(id);
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // Mobil için
+    
+    try {
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            // Basit bir alert yerine daha şık bir geri bildirim için:
+            // Eğer iziToast kütüphanesi sayfada yüklüyse:
+            if(typeof iziToast !== 'undefined'){
+                iziToast.success({ title: 'Kopyalandı!', message: copyText.value, position: 'topRight' });
+            } else {
+                // Yoksa standart alert
+                alert("Kopyalandı: " + copyText.value); 
+            }
+        });
+    } catch (err) {
+        // Eski tarayıcılar için fallback
+        document.execCommand('copy');
+        alert("Kopyalandı: " + copyText.value);
+    }
+}
+</script>
+@endpush
