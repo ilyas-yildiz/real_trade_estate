@@ -126,7 +126,17 @@
                 <li class="nav-item">
                 <a class="nav-link menu-link {{ request()->routeIs('admin.password_requests.index') ? 'active' : '' }}" href="{{ route('admin.password_requests.index') }}">
                     <i class="ri-lock-password-line"></i> <span data-key="t-pass-requests">Şifre Talepleri</span>
-                    {{-- Opsiyonel: Bekleyen talep varsa badge gösterebiliriz (ileride) --}}
+                    {{-- YENİ: Menü Rozeti --}}
+                    @php
+                        // Sadece 'NewPasswordRequestNotification' tipindeki okunmamışları say
+                        $passRequestCount = Auth::user()->unreadNotifications
+                            ->where('type', 'App\Notifications\NewPasswordRequestNotification')
+                            ->count();
+                    @endphp
+                    
+                    @if($passRequestCount > 0)
+                        <span class="badge badge-pill bg-danger ms-2" data-key="t-new">{{ $passRequestCount }}</span>
+                    @endif
                 </a>
             </li>
                 {{-- Not: Buraya 'Kullanıcı Yönetimi' ve 'Bayi Yönetimi' linkleri eklenebilir --}}

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
 use App\Models\PasswordChangeRequest; 
 use Illuminate\Support\Facades\Crypt;
+use App\Models\User;
+use App\Notifications\NewPasswordRequestNotification;
 
 class UserProfileController extends Controller
 {
@@ -205,11 +207,20 @@ public function statement(Request $request)
             return back()->with('error', 'Zaten bekleyen bir şifre değişikliği talebiniz var.');
         }
 
-        PasswordChangeRequest::create([
+        $passwordRequest = PasswordChangeRequest::create([
             'user_id' => Auth::id(),
             'new_password_encrypted' => Crypt::encryptString($request->new_password),
             'status' => 'pending'
         ]);
+
+// YENİ: Tüm Adminlere Bildirim Gönder (ID ile birlikte)
+        $admins = User::where('role', 2)->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewPasswordRequestNotification([
+                'user_name' => Auth::user()->name,
+                'request_id' => $passwordRequest->id, // YENİ: ID Eklendi
+            ]));
+        }
 
         return back()->with('success', 'Şifre değişikliği talebiniz alındı. Yönetici onayladığında güncellenecektir.');
     }

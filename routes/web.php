@@ -101,7 +101,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         'index', 'create', 'store', 'destroy'
     ]);
     Route::get('/how-to-deposit', [DepositMethodsController::class, 'showPage'])->name('deposit_methods.show_page');
-    
+    // Bildirim İşlemleri
+    // Bildirim İşlemleri
+    Route::get('/notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index'); // YENİ: Liste Sayfası
+    Route::get('/notifications/{id}/read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsReadAndRedirect'])->name('notifications.read');
+    Route::get('/notifications/read-all', [App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    Route::delete('/notifications/{id}', [App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('notifications.destroy'); // YENİ: Silme
 
 });
 
