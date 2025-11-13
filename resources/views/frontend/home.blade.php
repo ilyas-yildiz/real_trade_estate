@@ -71,10 +71,38 @@
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
     {
       "symbols": [
-        { "description": "Bitcoin / USD", "proName": "BITSTAMP:BTCUSD" },
-        { "description": "Ethereum / USD", "proName": "BITSTAMP:ETHUSD" },
-        { "description": "Solana / USD", "proName": "COINBASE:SOLUSD" },
-        { "description": "XRP / USD", "proName": "BINANCE:XRPUSD" }
+      {
+          "proName": "FOREXCOM:SPXUSD",
+          "title": "S&P 500"
+        },
+        {
+          "proName": "FOREXCOM:NSXUSD",
+          "title": "US 100 (Nasdaq)"
+        },
+        {
+          "proName": "FX_IDC:EURUSD",
+          "title": "EUR/USD"
+        },
+        {
+          "description": "Gold (Ons)",
+          "proName": "OANDA:XAUUSD"
+        },
+        {
+          "description": "Silver",
+          "proName": "OANDA:XAGUSD"
+        },
+        {
+          "description": "Brent Oil",
+          "proName": "TVC:UKOIL"
+        },
+        {
+          "description": "Crude Oil",
+          "proName": "TVC:USOIL"
+        },
+        {
+          "description": "Natural Gas",
+          "proName": "TVC:NG1!"
+        }
       ],
       "showSymbolLogo": true,
       "colorTheme": "light",

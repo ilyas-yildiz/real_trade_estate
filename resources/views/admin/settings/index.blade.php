@@ -75,11 +75,46 @@
                             <div class="col-12">
                                 <h5>Footer Kısa Hakkımızda</h5>
                                 <div class="mb-3">
-{{--                                    <label for="footer_aboutus" class="form-label">Anasayfa Meta Description</label>--}}
                                     <textarea class="form-control" id="footer_aboutus" name="footer_aboutus" rows="3">{{ $settings['footer_aboutus'] ?? '' }}</textarea>
                                 </div>
                             </div>
                         </div>
+
+                        <hr class="my-4">
+
+                        {{-- YENİ EKLENEN BÖLÜM: İSTATİSTİK SAYACI --}}
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="mb-3"><i class="ri-bar-chart-grouped-line"></i> Anasayfa Sayaç Verileri</h5>
+                                <div class="row">
+                                    {{-- 1. Veri --}}
+                                    <div class="col-md-3 mb-3">
+                                        <label for="counter_investors" class="form-label">Yatırımcı Sayısı</label>
+                                        <input type="text" class="form-control" id="counter_investors" name="counter_investors" 
+                                               placeholder="Örn: 5000+" value="{{ $settings['counter_investors'] ?? '' }}">
+                                    </div>
+                                    {{-- 2. Veri --}}
+                                    <div class="col-md-3 mb-3">
+                                        <label for="counter_visits" class="form-label">Aylık Uygulama Ziyareti</label>
+                                        <input type="text" class="form-control" id="counter_visits" name="counter_visits" 
+                                               placeholder="Örn: 120K+" value="{{ $settings['counter_visits'] ?? '' }}">
+                                    </div>
+                                    {{-- 3. Veri --}}
+                                    <div class="col-md-3 mb-3">
+                                        <label for="counter_volume" class="form-label">Toplam İşlem Hacmi</label>
+                                        <input type="text" class="form-control" id="counter_volume" name="counter_volume" 
+                                               placeholder="Örn: 150M+" value="{{ $settings['counter_volume'] ?? '' }}">
+                                    </div>
+                                    {{-- 4. Veri --}}
+                                    <div class="col-md-3 mb-3">
+                                        <label for="counter_awards" class="form-label">Kazanılan Ödüller</label>
+                                        <input type="text" class="form-control" id="counter_awards" name="counter_awards" 
+                                               placeholder="Örn: 20+" value="{{ $settings['counter_awards'] ?? '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- YENİ BÖLÜM SONU --}}
 
                         <hr class="my-4">
 
@@ -107,13 +142,11 @@
     </div>
 @endsection
 
-{{-- YENİ EKLENEN BÖLÜM --}}
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
 
     @if(session('success'))
         <script>
-            // Sayfa yüklendiğinde session'da 'success' anahtarı varsa bu bildirimi gösterir.
             document.addEventListener('DOMContentLoaded', function () {
                 iziToast.success({
                     title: 'Başarılı!',

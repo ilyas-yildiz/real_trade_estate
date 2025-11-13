@@ -88,6 +88,58 @@ class PaymentController extends Controller
     }
 
     /**
+     * YENİ: ADMİN'in "Müşteri Adına" oluşturduğu ödeme bildirimini kaydeder.
+     */
+public function storeForUser(Request $request)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Bu işleme yetkiniz yok.');
+        }
+
+        $validated = $request->validate([
+            'user_id' => [
+                'required',
+                'integer',
+                Rule::exists('users', 'id')->where(function ($query) {
+                    $query->where('role', '!=', 2);
+                })
+            ],
+            'amount' => 'required|numeric|min:1',
+            'payment_date' => 'required|date_format:Y-m-d',
+            'admin_notes' => 'nullable|string|max:1000',
+            // YENİ: Dosya doğrulama (Resim veya PDF, max 5MB)
+            'receipt' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+
+        // YENİ: Dosyayı kaydet
+        // Dosyayı 'local' diske (storage/app/receipts/...) kaydediyoruz.
+        // 'local' disk güvenlik için iyidir, herkes URL'den erişemez.
+        $directory = 'receipts/user_' . $validated['user_id'];
+        $path = $request->file('receipt')->store($directory, 'local');
+
+        if (!$path) {
+            return back()->with('error', 'Dekont yüklenirken bir hata oluştu.');
+        }
+
+        $payment = Payment::create([
+            'user_id' => $validated['user_id'],
+            'amount' => $validated['amount'],
+            'payment_date' => $validated['payment_date'],
+            'reference_number' => 'ADMIN_MANUAL_ENTRY',
+            
+            // GÜNCELLEME: Gerçek dosya yolunu kaydediyoruz
+            'receipt_path' => $path, 
+            
+            'user_notes' => 'Admin tarafından manuel olarak eklendi.',
+            'status' => 'approved',
+            'admin_notes' => $validated['admin_notes'],
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return back()->with('success', 'Müşteri adına ödeme başarıyla eklendi ve onaylandı.');
+    }
+    /**
      * show() metodu kullanılmıyor, edit() JSON döndürüyor.
      */
     public function show(Payment $payment)

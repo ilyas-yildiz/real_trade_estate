@@ -15,7 +15,7 @@
         <div class="card">
             <div class="card-header align-items-center d-flex">
                 <h4 class="card-title mb-0 flex-grow-1">Ödeme Bildirimleri Yönetimi</h4>
-                {{-- Admin yeni bildirim ekleyemez --}}
+              
             </div><!-- end card header -->
 
             <div class="card-body">

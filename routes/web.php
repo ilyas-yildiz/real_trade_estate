@@ -157,6 +157,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('users', UserController::class)->only([
         'index', 'edit', 'update'
     ]);
+    // YENİ ROTALAR: Adminin Müşteri Adına Ödeme Eklemesi
+    Route::post('/payments/create-for-user', [PaymentController::class, 'storeForUser'])->name('payments.storeForUser');
     Route::get('/financial-report', [FinancialReportController::class, 'index'])->name('financial.report');
     // YENİ: Admin Yatırım Hesapları CRUD Rotaları
     Route::get('/deposit-methods', [DepositMethodsController::class, 'index'])->name('deposit_methods.index');

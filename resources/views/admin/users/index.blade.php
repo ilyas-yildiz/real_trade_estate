@@ -86,6 +86,18 @@
                                     <td>{{ $user->created_at->format('d.m.Y') }}</td>
                                     <td>
                                         <div class="hstack gap-1">
+                                            {{-- GÜNCELLEME: Ödeme Ekle Butonu --}}
+                                            {{-- Sadece Admin olmayanlara (Müşteri/Bayi) para eklenebilir --}}
+                                            @if($user->role != 2)
+                                                <button type="button" class="btn btn-sm btn-soft-success shadow-none py-0 px-1 openAddPaymentModal"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#addPaymentModal"
+                                                        data-id="{{ $user->id }}"
+                                                        data-name="{{ $user->name }}"
+                                                        title="Ödeme/Bakiye Ekle">
+                                                    <i class="ri-money-dollar-circle-line"></i>
+                                                </button>
+                                            @endif
                                             {{-- Admin kendi kendini düzenleyemesin --}}
                                             @if (Auth::id() == $user->id)
                                                 <button type="button" class="btn btn-sm btn-soft-secondary shadow-none py-0 px-1" disabled title="Kendi rolünüzü değiştiremezsiniz">
@@ -121,6 +133,7 @@
 
 {{-- MODAL DAHİL --}}
 @include('admin.users.modals._edit_modal')
+@include('admin.users.modals._add_payment_modal') {{-- YENİ --}}
 
 @endsection
 
@@ -163,6 +176,23 @@
         roleSelect.addEventListener('change', function () {
             toggleCommissionField(this.value);
         });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const addPaymentModal = document.getElementById('addPaymentModal');
+        if (addPaymentModal) {
+            addPaymentModal.addEventListener('show.bs.modal', function (event) {
+                // Butonu al
+                const button = event.relatedTarget;
+                // Verileri al
+                const userId = button.getAttribute('data-id');
+                const userName = button.getAttribute('data-name');
+
+                // Modal içindeki alanları doldur
+                addPaymentModal.querySelector('#payment_user_id').value = userId;
+                addPaymentModal.querySelector('#payment_user_name').textContent = userName;
+            });
+        }
     });
     </script>
 @endpush
