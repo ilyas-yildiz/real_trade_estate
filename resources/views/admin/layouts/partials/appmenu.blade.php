@@ -1,4 +1,4 @@
-<!-- LOGO -->
+<!-- LOGO (Bu kısım aynı kaldı) -->
 <div class="navbar-brand-box">
     <a href="{{ route('admin.dashboard') }}" class="logo logo-dark">
         <span class="logo-sm">
@@ -27,139 +27,163 @@
         <ul class="navbar-nav" id="navbar-nav">
             
             {{-- =================================================== --}}
-            {{-- 1. ADMİN MENÜSÜ (role == 2) --}}
+            {{-- 1. ADMİN MENÜSÜ (GÜNCELLENDİ) --}}
             {{-- =================================================== --}}
             @if(Auth::user()->isAdmin())
 
- {{-- Finansal Yönetim --}}
-                <li class="menu-title"><span data-key="t-menu">FİNANSAL Yönetim</span></li>
-                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
-                        <i class="ri-wallet-line"></i> <span data-key="t-payments">Ödeme Yönetimi</span>
-                    </a>
-                </li>
+                {{-- Dashboard (Her zaman açık) --}}
+                <li class="menu-title"><span data-key="t-menu">Admin Paneli</span></li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
-                        <i class="ri-hand-coin-line"></i> <span data-key="t-withdrawals">Çekim Talepleri</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.financial.report') ? 'active' : '' }}" href="{{ route('admin.financial.report') }}">
-                        <i class="ri-book-read-line"></i> <span data-key="t-financial-report">Genel Hesap Dökümü</span>
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                        <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboard">Dashboard</span>
                     </a>
                 </li>
 
-
-                <li class="menu-title"><span data-key="t-menu">SİTE Yönetimi</span></li>
-              
-                {{-- Mevcut Admin Linkleri --}}
+                {{-- GÜNCELLEME: 1. AÇILIR MENÜ (Finansal) --}}
                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->is('admin/categories*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
-                        <i class="mdi mdi-tag-outline"></i> <span data-key="t-widgets">Blog Kategorileri</span>
+                    {{-- 'menu-link' class'ı kalmalı, 'href' ID'yi işaret etmeli --}}
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments*') || request()->routeIs('admin.withdrawals*') || request()->routeIs('admin.financial.report') ? 'active' : '' }}" 
+                       href="#sidebarFinansal" data-bs-toggle="collapse" role="button" 
+                       aria-expanded="{{ request()->routeIs('admin.payments*') || request()->routeIs('admin.withdrawals*') || request()->routeIs('admin.financial.report') ? 'true' : 'false' }}" 
+                       aria-controls="sidebarFinansal">
+                        <i class="ri-money-dollar-box-line"></i> <span data-key="t-finansal">FİNANSAL Yönetim</span>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->is('admin/galleries*') ? 'active' : '' }}" href="{{ route('admin.galleries.index') }}">
-                        <i class="mdi mdi-image"></i> <span data-key="t-widgets">Galeri</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->is('admin/blogs*') ? 'active' : '' }}" href="{{ route('admin.blogs.index') }}">
-                        <i class="mdi mdi-newspaper"></i> <span data-key="t-widgets">Blog</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.abouts.index') ? 'active' : '' }}" href="{{ route('admin.abouts.index') }}">
-                        <i class="mdi mdi-information-outline"></i> <span data-key="t-widgets">Hakkımızda</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}" href="{{ route('admin.services.index') }}">
-                        <i class="mdi mdi-toolbox-outline"></i> <span data-key="t-widgets">Hizmetler</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.projects.*') ? 'active' : '' }}" href="{{ route('admin.projects.index') }}">
-                        <i class="mdi mdi-briefcase-variant-outline"></i> <span data-key="t-widgets">Projeler</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.authors.*') ? 'active' : '' }}" href="{{ route('admin.authors.index') }}">
-                        <i class="mdi mdi-account-tie"></i> <span data-key="t-widgets">Köşe Yazarları</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.settings.index') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
-                        <i class="mdi mdi-cog"></i> <span data-key="t-widgets">Ayarlar</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.slides.*') ? 'active' : '' }}" href="{{ route('admin.slides.index') }}">
-                        <i class="mdi mdi-image-multiple-outline"></i> <span data-key="t-widgets">Slide Yönetimi</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.references.*') ? 'active' : '' }}" href="{{ route('admin.references.index') }}">
-                        <i class="mdi mdi-account-group"></i> <span data-key="t-widgets">Referans Yönetimi</span>
-                    </a>
+                    {{-- Açılacak menü: 'collapse menu-dropdown' ve 'id' eşleşmeli --}}
+                    <div class="collapse menu-dropdown {{ request()->routeIs('admin.payments*') || request()->routeIs('admin.withdrawals*') || request()->routeIs('admin.financial.report') ? 'show' : '' }}" id="sidebarFinansal">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.payments*') ? 'active' : '' }}" href="{{ route('admin.payments.index') }}">
+                                    <span data-key="t-payments">Ödeme Yönetimi</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.withdrawals*') ? 'active' : '' }}" href="{{ route('admin.withdrawals.index') }}">
+                                    <span data-key="t-withdrawals">Çekim Talepleri</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.financial.report') ? 'active' : '' }}" href="{{ route('admin.financial.report') }}">
+                                    <span data-key="t-financial-report">Genel Hesap Dökümü</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
 
-               
-
-                {{-- Sistem --}}
-                <li class="menu-title"><span data-key="t-menu">Sistem</span></li>
+                {{-- GÜNCELLEME: 2. AÇILIR MENÜ (Site Yönetimi) --}}
                 <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->routeIs('admin.deposit_methods.index') ? 'active' : '' }}" href="{{ route('admin.deposit_methods.index') }}">
-                    <i class="ri-add-box-line"></i> <span data-key="t-deposit-methods">Yatırım Hesapları (Şirket)</span>
-                </a>
-            </li>
-                <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
-                    <i class="ri-user-settings-line"></i> <span data-key="t-users">Kullanıcı Yönetimi</span>
-                </a>
-            </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('admin.settings*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
-                        <i class="ri-settings-4-line"></i> <span data-key="t-settings">Genel Ayarlar</span>
+                    <a class="nav-link menu-link {{ request()->is('admin/categories*') || request()->is('admin/galleries*') || request()->is('admin/blogs*') || request()->routeIs('admin.abouts.index') || request()->routeIs('admin.services.*') || request()->routeIs('admin.projects.*') || request()->routeIs('admin.authors.*') || request()->routeIs('admin.slides.*') || request()->routeIs('admin.references.*') ? 'active' : '' }}" 
+                       href="#sidebarSite" data-bs-toggle="collapse" role="button" 
+                       aria-expanded="{{ request()->is('admin/categories*') || request()->is('admin/galleries*') || request()->is('admin/blogs*') || request()->routeIs('admin.abouts.index') || request()->routeIs('admin.services.*') || request()->routeIs('admin.projects.*') || request()->routeIs('admin.authors.*') || request()->routeIs('admin.slides.*') || request()->routeIs('admin.references.*') ? 'true' : 'false' }}" 
+                       aria-controls="sidebarSite">
+                        <i class="ri-global-line"></i> <span data-key="t-site">SİTE Yönetimi</span>
                     </a>
+                    <div class="collapse menu-dropdown {{ request()->is('admin/categories*') || request()->is('admin/galleries*') || request()->is('admin/blogs*') || request()->routeIs('admin.abouts.index') || request()->routeIs('admin.services.*') || request()->routeIs('admin.projects.*') || request()->routeIs('admin.authors.*') || request()->routeIs('admin.slides.*') || request()->routeIs('admin.references.*') ? 'show' : '' }}" id="sidebarSite">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->is('admin/categories*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
+                                    <span data-key="t-widgets">Blog Kategorileri</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->is('admin/galleries*') ? 'active' : '' }}" href="{{ route('admin.galleries.index') }}">
+                                    <span data-key="t-widgets">Galeri</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->is('admin/blogs*') ? 'active' : '' }}" href="{{ route('admin.blogs.index') }}">
+                                    <span data-key="t-widgets">Blog</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.abouts.index') ? 'active' : '' }}" href="{{ route('admin.abouts.index') }}">
+                                    <span data-key="t-widgets">Hakkımızda</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.services.*') ? 'active' : '' }}" href="{{ route('admin.services.index') }}">
+                                    <span data-key="t-widgets">Hizmetler</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.projects.*') ? 'active' : '' }}" href="{{ route('admin.projects.index') }}">
+                                    <span data-key="t-widgets">Projeler</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.authors.*') ? 'active' : '' }}" href="{{ route('admin.authors.index') }}">
+                                    <span data-key="t-widgets">Köşe Yazarları</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.slides.*') ? 'active' : '' }}" href="{{ route('admin.slides.index') }}">
+                                    <span data-key="t-widgets">Slide Yönetimi</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.references.*') ? 'active' : '' }}" href="{{ route('admin.references.index') }}">
+                                    <span data-key="t-widgets">Referans Yönetimi</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
+
+                {{-- GÜNCELLEME: 3. AÇILIR MENÜ (Sistem) --}}
                 <li class="nav-item">
-                <a class="nav-link menu-link {{ request()->routeIs('admin.password_requests.index') ? 'active' : '' }}" href="{{ route('admin.password_requests.index') }}">
-                    <i class="ri-lock-password-line"></i> <span data-key="t-pass-requests">Şifre Talepleri</span>
-                    {{-- YENİ: Menü Rozeti --}}
-                    @php
-                        // Sadece 'NewPasswordRequestNotification' tipindeki okunmamışları say
-                        $passRequestCount = Auth::user()->unreadNotifications
-                            ->where('type', 'App\Notifications\NewPasswordRequestNotification')
-                            ->count();
-                    @endphp
-                    
-                    @if($passRequestCount > 0)
-                        <span class="badge badge-pill bg-danger ms-2" data-key="t-new">{{ $passRequestCount }}</span>
-                    @endif
-                </a>
-            </li>
-                {{-- Not: Buraya 'Kullanıcı Yönetimi' ve 'Bayi Yönetimi' linkleri eklenebilir --}}
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.deposit_methods.index') || request()->routeIs('admin.users*') || request()->routeIs('admin.settings*') || request()->routeIs('admin.password_requests.index') ? 'active' : '' }}" 
+                       href="#sidebarSistem" data-bs-toggle="collapse" role="button" 
+                       aria-expanded="{{ request()->routeIs('admin.deposit_methods.index') || request()->routeIs('admin.users*') || request()->routeIs('admin.settings*') || request()->routeIs('admin.password_requests.index') ? 'true' : 'false' }}" 
+                       aria-controls="sidebarSistem">
+                        <i class="ri-settings-2-line"></i> <span data-key="t-sistem">Sistem</span>
+                    </a>
+                    <div class="collapse menu-dropdown {{ request()->routeIs('admin.deposit_methods.index') || request()->routeIs('admin.users*') || request()->routeIs('admin.settings*') || request()->routeIs('admin.password_requests.index') ? 'show' : '' }}" id="sidebarSistem">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.deposit_methods.index') ? 'active' : '' }}" href="{{ route('admin.deposit_methods.index') }}">
+                                    <span data-key="t-deposit-methods">Yatırım Hesapları (Şirket)</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                                    <span data-key="t-users">Kullanıcı Yönetimi</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.settings*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
+                                    <span data-key="t-settings">Genel Ayarlar</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-link {{ request()->routeIs('admin.password_requests.index') ? 'active' : '' }}" href="{{ route('admin.password_requests.index') }}">
+                                    <span data-key="t-pass-requests">Şifre Talepleri</span>
+                                    @php
+                                        $passRequestCount = Auth::user()->unreadNotifications
+                                            ->where('type', 'App\Notifications\NewPasswordRequestNotification')
+                                            ->count();
+                                    @endphp
+                                    @if($passRequestCount > 0)
+                                        <span class="badge badge-pill bg-danger ms-2" data-key="t-new">{{ $passRequestCount }}</span>
+                                    @endif
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
 
 
             {{-- =================================================== --}}
-            {{-- 2. BAYİ MENÜSÜ (role == 1) --}}
+            {{-- 2. BAYİ MENÜSÜ (Aynı Kaldı) --}}
             {{-- =================================================== --}}
             @elseif(Auth::user()->isBayi())
-           {{-- PASİFE ALINDI (Şirket İsteği)
+                
+                {{-- PASİFE ALINDI (Şirket İsteği) --}}
+                {{--
                 <li class="nav-item">
-                    <a class="text-decoration-none" href="{{ route('admin.profile.statement') }}">
-                        <div class="card bg-primary-subtle border-0 mx-2 mt-2">
-                            <div class="card-body p-3">
-                                <h6 class="text-primary-emphasis mb-1">Mevcut Bakiye</h6>
-                                <h5 class="text-primary-emphasis mb-0">
-                                    {{ number_format(Auth::user()->balance, 2, ',', '.') }}
-                                </h5>
-                            </div>
-                        </div>
-                    </a>
+                    ... (Bakiye Kartı) ...
                 </li>
                 --}}
+
                 <li class="menu-title"><span data-key="t-menu">IB Paneli</span></li>
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.dashboard') ? 'active' : '' }}" href="{{ route('bayi.dashboard') }}">
@@ -171,7 +195,10 @@
                         <i class="ri-team-line"></i> <span data-key="t-customers">Müşterilerim</span>
                     </a>
                 </li>
-              {{-- GÜNCELLEME: Komisyon Raporu Pasife Alındı --}}
+                
+                <li class="menu-title"><span data-key="t-menu">Finansal Raporlar</span></li>
+                
+                {{-- Komisyon Raporu Pasife Alındı --}}
                 {{--
                  <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.commissions') ? 'active' : '' }}" href="{{ route('bayi.commissions') }}">
@@ -179,11 +206,13 @@
                     </a>
                 </li>
                 --}}
+                
                  <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.withdrawals') ? 'active' : '' }}" href="{{ route('bayi.withdrawals') }}">
                         <i class="ri-line-chart-line"></i> <span data-key="t-reports">Müşteri Çekim Raporu</span>
                     </a>
                 </li>
+
                 <li class="menu-title"><span data-key="t-menu">Kişisel İşlemler</span></li>
                 
                 <li class="nav-item">
@@ -196,7 +225,6 @@
                         <i class="ri-hand-coin-line"></i> <span data-key="t-my-withdrawals">Çekim Taleplerim</span>
                     </a>
                 </li>
-                {{-- Not: Bayi buraya tıklar ve ref linkini görür --}}
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.profile.index') ? 'active' : '' }}" href="{{ route('admin.profile.index') }}">
                         <i class="ri-user-settings-line"></i> <span data-key="t-profile">Hesap Bilgileri</span>
@@ -205,24 +233,17 @@
 
 
             {{-- =================================================== --}}
-            {{-- 3. MÜŞTERİ MENÜSÜ (role == 0) --}}
+            {{-- 3. MÜŞTERİ MENÜSÜ (Aynı Kaldı) --}}
             {{-- =================================================== --}}
             @elseif(Auth::user()->isCustomer())
-           {{-- GÜNCELLEME: ŞİRKET İSTEĞİ ÜZERİNE BU BLOK PASİFE ALINDI --}}
+                
+                {{-- Bakiye Pasife Alındı --}}
                 {{--
                 <li class="nav-item">
-                    <a class="text-decoration-none" href="{{ route('admin.profile.statement') }}">
-                        <div class="card bg-success-subtle border-0 mx-2 mt-2">
-                            <div class="card-body p-3">
-                                <h6 class="text-success-emphasis mb-1">Mevcut Bakiye</h6>
-                                <h5 class="text-success-emphasis mb-0">
-                                    {{ number_format(Auth::user()->balance, 2, ',', '.') }}
-                                </h5>
-                            </div>
-                        </div>
-                    </a>
+                   ... (Bakiye Kartı) ...
                 </li>
                 --}}
+                
                 <li class="menu-title"><span data-key="t-menu">Müşteri Paneli</span></li>
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
