@@ -55,9 +55,9 @@ Route::name('frontend.')->group(function () {
 require __DIR__.'/auth.php';
 
 // Auth sonrası dashboard yönlendirmesi
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::get('/dashboard', function () {
+    return redirect()->route('admin.dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 // YENİ GRUP: Sadece Bayiler (role=1) girebilir
 Route::middleware(['auth', 'bayi'])->prefix('bayi')->name('bayi.')->group(function () {
