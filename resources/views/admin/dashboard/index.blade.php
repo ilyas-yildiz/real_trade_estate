@@ -1,13 +1,5 @@
 @extends('admin.layouts.app')
-{{-- YENİ DEBUGGING KODU --}}
-@php
-    dd([
-        'URL Parametresi (?verified) Var mı?' => request()->has('verified'),
-        'Session (Oturum) (success) Var mı?' => session('success'),
-        'Session (Oturum) (verified) Var mı?' => session('verified')
-    ]);
-@endphp
-{{-- DEBUGGING KODU SONU --}}
+
 @section('title', 'Dashboard')
 
 @section('content')
