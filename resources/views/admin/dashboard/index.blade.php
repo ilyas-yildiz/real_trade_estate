@@ -331,7 +331,7 @@ function copyToClipboard(id) {
             iziToast.success({ title: 'Kopyalandı!', message: 'İçerik panoya kopyalandı.', position: 'topRight' });
         });
     } catch (err) {
-        alert("Kopyalama başarısız oldu.");
+        alert("Kopyalama başarısız oldu... Lütfen manuel olarak kopyalayın: " + err);
     }
 }
 </script>
