@@ -327,7 +327,6 @@ function copyToClipboard(id) {
     
     try {
         navigator.clipboard.writeText(copyText.value).then(() => {
-            // iziToast'u çağır (Eğer admin.layouts.app'de yüklüyse)
             if(typeof iziToast !== 'undefined'){
                 iziToast.success({ title: 'Kopyalandı!', message: 'İçerik panoya kopyalandı.', position: 'topRight' });
             } else {
@@ -341,27 +340,41 @@ function copyToClipboard(id) {
 </script>
 @endif
 
-{{-- iziToast (session mesajları için) --}}
-@if(session('success') || session('verified'))
+{{-- ========================================================== --}}
+{{-- GÜNCELLEME: iziToast (session mesajları ve 'verified' uyarısı için) --}}
+{{-- ========================================================== --}}
+
+{{-- GÜNCELLEME: 'session('verified')' -> 'request()->has('verified')' olarak değiştirildi --}}
+{{-- Bu @if bloğu, iziToast JS dosyasını sadece bir mesaj varsa yükler --}}
+@if(session('success') || request()->has('verified'))
+
+    {{-- iziToast JS (Sadece gerektiğinde yüklenir) --}}
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            @if(session('verified'))
+            
+            {{-- GÜNCELLEME: 'session' -> 'request' --}}
+            @if(request()->has('verified'))
                 iziToast.success({
                     title: 'Başarılı!',
                     message: 'E-posta adresiniz başarıyla doğrulandı.',
-                    position: 'topRight'
+                    position: 'topRight',
+                    timeout: 5000
                 });
             @endif
+
             @if(session('success'))
                 iziToast.success({
                     title: 'Başarılı!',
                     message: '{{ session('success') }}',
-                    position: 'topRight'
+                    position: 'topRight',
+                    timeout: 5000
                 });
             @endif
         });
     </script>
 @endif
+{{-- GÜNCELLEME SONU --}}
 
 @endpush
