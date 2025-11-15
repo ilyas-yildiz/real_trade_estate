@@ -316,31 +316,31 @@
 @endsection
 
 @push('scripts')
+{{-- Kopyalama scripti (Müşteri Dashboard'u için) --}}
+@if(Auth::user()->isCustomer())
 <script>
 function copyToClipboard(id) {
     var copyText = document.getElementById(id);
     copyText.select();
-    copyText.setSelectionRange(0, 99999); // Mobil için
+    copyText.setSelectionRange(0, 99999);
     
     try {
         navigator.clipboard.writeText(copyText.value).then(() => {
-            // Basit bir alert yerine daha şık bir geri bildirim için:
-            // Eğer iziToast kütüphanesi sayfada yüklüyse:
+            // iziToast'u çağır (Eğer admin.layouts.app'de yüklüyse)
             if(typeof iziToast !== 'undefined'){
-                iziToast.success({ title: 'Kopyalandı!', message: copyText.value, position: 'topRight' });
+                iziToast.success({ title: 'Kopyalandı!', message: 'İçerik panoya kopyalandı.', position: 'topRight' });
             } else {
-                // Yoksa standart alert
-                alert("Kopyalandı: " + copyText.value); 
+                alert("Kopyalandı!"); 
             }
         });
     } catch (err) {
-        // Eski tarayıcılar için fallback
-        document.execCommand('copy');
-        alert("Kopyalandı: " + copyText.value);
+        alert("Kopyalama başarısız oldu.");
     }
 }
 </script>
+@endif
 
+{{-- iziToast (session mesajları için) --}}
 @if(session('success') || session('verified'))
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
     <script>
