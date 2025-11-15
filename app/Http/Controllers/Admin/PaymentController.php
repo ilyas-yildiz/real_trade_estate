@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
+use App\Notifications\NewPaymentNotification;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\User;
@@ -83,6 +83,17 @@ class PaymentController extends Controller
             'user_notes' => $validated['user_notes'],
             'status' => 'pending',
         ]);
+
+// YENİ: Adminlere Bildirim Gönder
+        $admins = User::where('role', 2)->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewPaymentNotification([
+                'user_name' => $user->name,
+                'amount' => $validated['amount'],
+                'payment_id' => $payment->id,
+            ]));
+        }
+        // BİLDİRİM SONU
 
         return redirect()->route('admin.payments.index')->with('success', 'Ödeme bildiriminiz başarıyla alındı.');
     }

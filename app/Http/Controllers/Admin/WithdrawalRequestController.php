@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
+use App\Notifications\NewWithdrawalNotification;
 use App\Http\Controllers\Controller;
 use App\Models\WithdrawalRequest;
 use App\Models\User;
@@ -125,6 +125,16 @@ class WithdrawalRequestController extends Controller
             'status' => 'pending',
         ]);
 
+        // YENİ: Adminlere Bildirim Gönder
+        $admins = User::where('role', 2)->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewWithdrawalNotification([
+                'user_name' => $user->name,
+                'amount' => $validated['amount'],
+                'withdrawal_id' => $withdrawal->id,
+            ]));
+        }
+        // BİLDİRİM SONU
         return redirect()->route('admin.withdrawals.index')->with('success', 'Çekim talebiniz başarıyla alındı.');
     }
 
