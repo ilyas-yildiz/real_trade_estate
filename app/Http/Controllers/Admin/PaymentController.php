@@ -50,12 +50,12 @@ class PaymentController extends Controller
         return view('admin.payments.create');
     }
 
-    /**
+/**
      * Kullanıcının gönderdiği yeni ödeme bildirimini kaydeder.
      */
     public function store(Request $request)
     {
-        if (Auth::user()->isAdmin()) {
+        if (Auth::user()->isAdmin()) { // is_admin -> isAdmin()
             abort(403, 'Adminler ödeme bildirimi oluşturamaz.');
         }
 
@@ -75,7 +75,9 @@ class PaymentController extends Controller
             return back()->with('error', 'Dekont yüklenirken bir hata oluştu.');
         }
 
-        $user->payments()->create([
+        // === DÜZELTME BURADA ===
+        // Oluşturulan kaydı $payment değişkenine atıyoruz
+        $payment = $user->payments()->create([
             'amount' => $validated['amount'],
             'payment_date' => $validated['payment_date'],
             'reference_number' => $validated['reference_number'],
@@ -83,17 +85,17 @@ class PaymentController extends Controller
             'user_notes' => $validated['user_notes'],
             'status' => 'pending',
         ]);
+        // === DÜZELTME SONU ===
 
-// YENİ: Adminlere Bildirim Gönder
+        // YENİ: Adminlere Bildirim Gönder (Artık $payment->id çalışacak)
         $admins = User::where('role', 2)->get();
         foreach ($admins as $admin) {
             $admin->notify(new NewPaymentNotification([
                 'user_name' => $user->name,
                 'amount' => $validated['amount'],
-                'payment_id' => $payment->id,
+                'payment_id' => $payment->id, // Hata veren satır buydu
             ]));
         }
-        // BİLDİRİM SONU
 
         return redirect()->route('admin.payments.index')->with('success', 'Ödeme bildiriminiz başarıyla alındı.');
     }
