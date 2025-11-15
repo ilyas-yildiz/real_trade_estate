@@ -335,11 +335,8 @@ function copyToClipboard(id) {
     
     try {
         navigator.clipboard.writeText(copyText.value).then(() => {
-            if(typeof iziToast !== 'undefined'){
-                iziToast.success({ title: 'Kopyalandı!', message: 'İçerik panoya kopyalandı.', position: 'topRight' });
-            } else {
-                alert("Kopyalandı!"); 
-            }
+            // iziToast'u çağıracağız (çünkü aşağıda koşulsuz yüklüyoruz)
+            iziToast.success({ title: 'Kopyalandı!', message: 'İçerik panoya kopyalandı.', position: 'topRight' });
         });
     } catch (err) {
         alert("Kopyalama başarısız oldu.");
@@ -349,40 +346,31 @@ function copyToClipboard(id) {
 @endif
 
 {{-- ========================================================== --}}
-{{-- GÜNCELLEME: iziToast (session mesajları ve 'verified' uyarısı için) --}}
+{{-- GÜNCELLEME: iziToast JS dosyasını KOŞULSUZ yüklüyoruz --}}
 {{-- ========================================================== --}}
+<script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
 
-{{-- GÜNCELLEME: 'session('verified')' -> 'request()->has('verified')' olarak değiştirildi --}}
-{{-- Bu @if bloğu, iziToast JS dosyasını sadece bir mesaj varsa yükler --}}
-@if(session('success') || request()->has('verified'))
+{{-- Sadece JavaScript çağrılarını koşula bağlıyoruz --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        @if(request()->has('verified'))
+            iziToast.success({
+                title: 'Başarılı!',
+                message: 'E-posta adresiniz başarıyla doğrulandı.',
+                position: 'topRight',
+                timeout: 5000
+            });
+        @endif
 
-    {{-- iziToast JS (Sadece gerektiğinde yüklenir) --}}
-    <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            
-            {{-- GÜNCELLEME: 'session' -> 'request' --}}
-            @if(request()->has('verified'))
-                iziToast.success({
-                    title: 'Başarılı!',
-                    message: 'E-posta adresiniz başarıyla doğrulandı.',
-                    position: 'topRight',
-                    timeout: 5000
-                });
-            @endif
-
-            @if(session('success'))
-                iziToast.success({
-                    title: 'Başarılı!',
-                    message: '{{ session('success') }}',
-                    position: 'topRight',
-                    timeout: 5000
-                });
-            @endif
-        });
-    </script>
-@endif
-{{-- GÜNCELLEME SONU --}}
-
+        @if(session('success'))
+            iziToast.success({
+                title: 'Başarılı!',
+                message: '{{ session('success') }}',
+                position: 'topRight',
+                timeout: 5000
+            });
+        @endif
+    });
+</script>
 @endpush
