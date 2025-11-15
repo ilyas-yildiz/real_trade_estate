@@ -84,7 +84,31 @@
                     </div>
                     
                     {{-- Şifre Değişiklik Talep Formu --}}
-                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Şifre Değiştirme Talebi</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-warning small">
+                                    Şifrenizi değiştirdiğinizde, MetaTrader 5 şifreniz de değişecektir. Bu işlem yönetici onayı gerektirir.
+                                </div>
+                                <form action="{{ route('admin.profile.requestPasswordChange') }}" method="POST">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label>Yeni Şifre</label>
+                                        <input type="password" name="new_password" class="form-control" required minlength="8">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Yeni Şifre (Tekrar)</label>
+                                        <input type="password" name="new_password_confirmation" class="form-control" required minlength="8">
+                                    </div>
+                                    <button type="submit" class="btn btn-warning">Değişiklik Talep Et</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 @endif
                 {{-- MT5 BÖLÜMÜ SONU --}}
 
