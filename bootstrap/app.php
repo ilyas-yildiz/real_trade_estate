@@ -10,6 +10,7 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        home: '/admin/dashboard'
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // YENİ EKLENDİ: 'admin' kısayolunu AdminMiddleware'e bağlıyoruz
