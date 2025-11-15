@@ -18,61 +18,73 @@
             </div>
 
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col" style="width: 50px;">Durum</th>
-                                <th scope="col">Mesaj</th>
-                                <th scope="col">Tarih</th>
-                                <th scope="col" style="width: 100px;">İşlem</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($notifications as $notification)
-                                <tr class="{{ $notification->read_at ? '' : 'bg-light' }}">
-                                    <td>
-                                        <div class="avatar-xs">
-                                            <span class="avatar-title rounded-circle fs-16 bg-{{ $notification->data['color'] ?? 'primary' }}-subtle text-{{ $notification->data['color'] ?? 'primary' }}">
-                                                <i class="{{ $notification->data['icon'] ?? 'ri-notification-line' }}"></i>
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin.notifications.read', $notification->id) }}" class="text-reset d-block">
-                                            <h6 class="mb-1 {{ $notification->read_at ? 'fw-normal' : 'fw-bold' }}">
-                                                {{ $notification->data['message'] }}
-                                            </h6>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <span class="text-muted small">{{ $notification->created_at->diffForHumans() }}</span>
-                                        <br>
-                                        <span class="text-muted fs-11">{{ $notification->created_at->format('d.m.Y H:i') }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="hstack gap-2">
-                                            <a href="{{ route('admin.notifications.read', $notification->id) }}" class="btn btn-sm btn-soft-primary" title="Görüntüle">
-                                                <i class="ri-eye-line"></i>
-                                            </a>
-                                            <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" class="d-inline">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-soft-danger" title="Sil">
-                                                    <i class="ri-delete-bin-line"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="4" class="text-center text-muted py-5">Hiç bildiriminiz yok.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                 <div class="mt-3">
-                    {{ $notifications->links() }}
-                </div>
+                
+                {{-- Başarı/Hata mesajları --}}
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                {{-- =================================================== --}}
+                {{-- 1. ADMİN İÇİN SEKMELİ GÖRÜNÜM --}}
+                {{-- =================================================== --}}
+                @if(Auth::user()->isAdmin())
+                    
+                    <ul class="nav nav-tabs nav-tabs-custom nav-success nav-justified mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tab_pass" role="tab">
+                                Şifre Talepleri <span class="badge badge-pill bg-danger">{{ $passwordRequests->total() }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab_payments" role="tab">
+                                Ödeme Bildirimleri <span class="badge badge-pill bg-danger">{{ $paymentRequests->total() }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab_withdrawals" role="tab">
+                                Çekim Talepleri <span class="badge badge-pill bg-danger">{{ $withdrawalRequests->total() }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#tab_users" role="tab">
+                                Yeni Üyeler <span class="badge badge-pill bg-danger">{{ $newUserRequests->total() }}</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        
+                        {{-- Sekme 1: Şifre Talepleri --}}
+                        <div class="tab-pane active" id="tab_pass" role="tabpanel">
+                            @include('admin.notifications.partials._notification_table', ['notifications' => $passwordRequests, 'pageName' => 'pass_page'])
+                        </div>
+
+                        {{-- Sekme 2: Ödeme Bildirimleri --}}
+                        <div class="tab-pane" id="tab_payments" role="tabpanel">
+                             @include('admin.notifications.partials._notification_table', ['notifications' => $paymentRequests, 'pageName' => 'pay_page'])
+                        </div>
+
+                        {{-- Sekme 3: Çekim Talepleri --}}
+                        <div class="tab-pane" id="tab_withdrawals" role="tabpanel">
+                             @include('admin.notifications.partials._notification_table', ['notifications' => $withdrawalRequests, 'pageName' => 'withdraw_page'])
+                        </div>
+
+                        {{-- Sekme 4: Yeni Üyeler --}}
+                        <div class="tab-pane" id="tab_users" role="tabpanel">
+                             @include('admin.notifications.partials._notification_table', ['notifications' => $newUserRequests, 'pageName' => 'user_page'])
+                        </div>
+                    </div>
+
+                {{-- =================================================== --}}
+                {{-- 2. MÜŞTERİ/BAYİ İÇİN BASİT LİSTE --}}
+                {{-- =================================================== --}}
+                @else
+                    @include('admin.notifications.partials._notification_table', ['notifications' => $notifications, 'pageName' => 'page'])
+                @endif
+
             </div>
         </div>
     </div>

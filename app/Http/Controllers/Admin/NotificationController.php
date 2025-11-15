@@ -11,11 +11,35 @@ class NotificationController extends Controller
     /**
      * YENİ: Tüm bildirimleri listeler.
      */
-    public function index()
+   public function index()
     {
-        // Tüm bildirimleri (okunmuş/okunmamış) al ve sayfala
-        $notifications = Auth::user()->notifications()->paginate(20);
-        return view('admin.notifications.index', compact('notifications'));
+        $user = Auth::user();
+
+        // Admin ise, sekmeler için ayrı ayrı sorgula
+        if ($user->isAdmin()) {
+            
+            $data['passwordRequests'] = $user->notifications()
+                ->where('type', 'App\Notifications\NewPasswordRequestNotification')
+                ->latest()->paginate(10, ['*'], 'pass_page'); // 'pass_page' ayrı sayfalama için
+                
+            $data['paymentRequests'] = $user->notifications()
+                ->where('type', 'App\Notifications\NewPaymentNotification')
+                ->latest()->paginate(10, ['*'], 'pay_page');
+                
+            $data['withdrawalRequests'] = $user->notifications()
+                ->where('type', 'App\Notifications\NewWithdrawalNotification')
+                ->latest()->paginate(10, ['*'], 'withdraw_page');
+                
+            $data['newUserRequests'] = $user->notifications()
+                ->where('type', 'App\Notifications\NewUserNotification')
+                ->latest()->paginate(10, ['*'], 'user_page');
+
+        // Müşteri veya Bayi ise, tüm bildirimlerini tek listede al
+        } else {
+            $data['notifications'] = $user->notifications()->latest()->paginate(20);
+        }
+        
+        return view('admin.notifications.index', $data);
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+use App\Notifications\NewUserNotification;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -85,6 +85,16 @@ class RegisteredUserController extends Controller
             event(new Registered($user));
 
             Auth::login($user);
+
+// YENİ: Adminlere Bildirim Gönder
+            $admins = User::where('role', 2)->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new NewUserNotification([
+                    'user_name' => $user->name,
+                    'user_id' => $user->id,
+                ]));
+            }
+            // BİLDİRİM SONU
 
             return redirect(route('admin.dashboard', absolute: false));
 
