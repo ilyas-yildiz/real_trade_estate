@@ -51,6 +51,10 @@
     </table>
 </div>
 <div class="mt-3">
-    {{-- Sayfalamanın düzgün çalışması için 'pageName' değişkenini kullanıyoruz --}}
-    {{ $notifications->appends(request()->except($pageName))->links($pageName) }}
+    {{-- 
+        GÜNCELLEME: links($pageName) -> links() olarak düzeltildi.
+        Controller'da 'paginate' metodunda sayfa adını ('pass_page' vb.) zaten belirttik.
+        'appends' metodu bu ayarı otomatik olarak devralıp ?pass_page=2 şeklinde link üretecektir.
+    --}}
+    {{ $notifications->appends(request()->except($pageName))->links() }}
 </div>
