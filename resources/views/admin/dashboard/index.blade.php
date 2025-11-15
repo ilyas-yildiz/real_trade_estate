@@ -38,6 +38,16 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
+
+                {{-- YENİ EKLENEN BLOK: E-posta Onay Uyarısı --}}
+                @if (session('verified'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>E-posta Doğrulandı!</strong> E-posta adresiniz başarıyla onaylanmıştır.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                {{-- Uyarı Bitişi --}}
+
                 {{-- =================================================== --}}
                 {{-- YENİ: MÜŞTERİYE ÖZEL MT5 BİLGİLERİ --}}
                 {{-- =================================================== --}}
@@ -330,4 +340,27 @@ function copyToClipboard(id) {
     }
 }
 </script>
+
+@if(session('success') || session('verified'))
+    <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('verified'))
+                iziToast.success({
+                    title: 'Başarılı!',
+                    message: 'E-posta adresiniz başarıyla doğrulandı.',
+                    position: 'topRight'
+                });
+            @endif
+            @if(session('success'))
+                iziToast.success({
+                    title: 'Başarılı!',
+                    message: '{{ session('success') }}',
+                    position: 'topRight'
+                });
+            @endif
+        });
+    </script>
+@endif
+
 @endpush
