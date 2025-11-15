@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // --- Controllers ---
 use App\Http\Controllers\ProfileController;
@@ -55,8 +56,13 @@ Route::name('frontend.')->group(function () {
 require __DIR__.'/auth.php';
 
 // Auth sonrası dashboard yönlendirmesi
-Route::get('/dashboard', function () {
-    return redirect()->route('admin.dashboard');
+Route::get('/dashboard', function (Request $request) {
+    // Gelen isteğin tüm sorgu parametrelerini (örn: ?verified=1) al
+    $queryParams = $request->query();
+    
+    // Yönlendirirken bu parametreleri de hedefe ekle
+    return redirect()->route('admin.dashboard', $queryParams);
+
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // YENİ GRUP: Sadece Bayiler (role=1) girebilir

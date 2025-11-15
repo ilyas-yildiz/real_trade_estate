@@ -39,14 +39,15 @@
                     </div>
                 @endif
 
-                {{-- YENİ EKLENEN BLOK: E-posta Onay Uyarısı --}}
-                @if (session('verified'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>E-posta Doğrulandı!</strong> E-posta adresiniz başarıyla onaylanmıştır.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-                {{-- Uyarı Bitişi --}}
+          {{-- YENİ EKLENEN BLOK: E-posta Onay Uyarısı --}}
+{{-- 'session' yerine 'request()->has' (URL parametresi) kontrolü yap --}}
+@if (request()->has('verified'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>E-posta Doğrulandı!</strong> E-posta adresiniz başarıyla onaylanmıştır.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+{{-- Uyarı Bitişi --}}
 
                 {{-- =================================================== --}}
                 {{-- YENİ: MÜŞTERİYE ÖZEL MT5 BİLGİLERİ --}}
