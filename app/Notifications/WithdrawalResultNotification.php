@@ -23,15 +23,37 @@ class WithdrawalResultNotification extends Notification
         return ['database'];
     }
 
-    public function toArray(object $notifiable): array
+   public function toArray(object $notifiable): array
     {
-        $isApproved = $this->status === 'approved';
+        // Duruma göre Mesaj, Renk ve İkon belirle
+        $statusData = match($this->status) {
+            'approved' => [
+                'text' => 'ONAYLANDI',
+                'color' => 'success',
+                'icon' => 'ri-checkbox-circle-line'
+            ],
+            'rejected' => [
+                'text' => 'REDDEDİLDİ',
+                'color' => 'danger',
+                'icon' => 'ri-close-circle-line'
+            ],
+            'processing' => [
+                'text' => 'ÖDEME SÜRECİNE ALINDI',
+                'color' => 'info', // Mavi
+                'icon' => 'ri-loader-2-line' // Dönen yükleme ikonu
+            ],
+            default => [
+                'text' => 'GÜNCELLENDİ',
+                'color' => 'primary',
+                'icon' => 'ri-information-line'
+            ]
+        };
         
         return [
-            'message' => number_format($this->amount, 2, ',', '.') . ' TL tutarındaki çekim talebiniz ' . ($isApproved ? 'ONAYLANDI.' : 'REDDEDİLDİ.'),
-            'link' => route('admin.withdrawals.index'), // Müşteri tıklayınca kendi listesine gitsin
-            'icon' => $isApproved ? 'ri-checkbox-circle-line' : 'ri-close-circle-line',
-            'color' => $isApproved ? 'success' : 'danger',
+            'message' => number_format($this->amount, 2, ',', '.') . ' TL tutarındaki çekim talebiniz ' . $statusData['text'] . '.',
+            'link' => route('admin.withdrawals.index'),
+            'icon' => $statusData['icon'],
+            'color' => $statusData['color'],
         ];
     }
 }
