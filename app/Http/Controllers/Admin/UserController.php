@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Notifications\Mt5IdChangedNotification;
 
 class UserController extends Controller
 {
@@ -86,6 +87,7 @@ class UserController extends Controller
             'role' => ['required', Rule::in([0, 1, 2])],
             // YENİ: Komisyon oranı doğrulaması eklendi (%0 ile %100 arası)
             'commission_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'mt5_id' => ['required', 'numeric', 'digits:6', Rule::unique('users', 'mt5_id')->ignore($user->id)],
         ]);
 
         $newRole = (int) $validated['role'];
@@ -110,14 +112,20 @@ class UserController extends Controller
         }
         
         // === GÜNCELLEME İŞLEMİ ===
-        $user->update([
+      $user->update([
             'role' => $newRole,
-            // YENİ: Sadece 'Bayi' (role=1) ise komisyon oranını kaydet, değilse 0 yap.
             'commission_rate' => $newCommissionRate,
-            'bayi_id' => ($newRole === 1) ? null : $user->bayi_id, 
+            'bayi_id' => ($newRole === 1) ? null : $user->bayi_id,
+            'mt5_id' => $newMt5Id, // Güncelle
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Kullanıcı rolü ve komisyonu başarıyla güncellendi.']);
+// Eğer MT5 ID değiştiyse bildirim gönder
+        if ($originalMt5Id != $newMt5Id) {
+            $user->notify(new Mt5IdChangedNotification($newMt5Id));
+        }
+
+return response()->json(['success' => true, 'message' => 'Kullanıcı bilgileri güncellendi.']);
+
     }
 
     /**

@@ -22,6 +22,12 @@
                             <label class="form-label">Email</label>
                             <input type="text" name="email" class="form-control" readonly>
                         </div>
+                        {{-- YENİ ALAN: MT5 ID Düzenleme --}}
+                        <div class="col-md-6 mt-3">
+                            <label class="form-label fw-bold text-primary">MT5 ID (Düzenlenebilir)</label>
+                            <input type="text" name="mt5_id" class="form-control" required maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);">
+                            <div class="form-text">Sadece 6 rakam. Değişirse kullanıcıya bildirim gider.</div>
+                        </div>
                         {{-- YENİ EKLENEN ALAN --}}
                         <div class="col-md-12 mt-3">
                             <label class="form-label text-danger fw-bold">MetaTrader 5 & Site Şifresi</label>

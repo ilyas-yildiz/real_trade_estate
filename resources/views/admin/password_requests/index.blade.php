@@ -27,12 +27,15 @@
                 @endif
 
                 <div class="table-responsive">
+                 <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle mb-0">
                         <thead>
                             <tr>
                                 <th scope="col">Kullanıcı</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Mevcut MT5 ID</th>
+                                {{-- YENİ SÜTUN --}}
+                                <th scope="col">Talep Edilen Şifre</th>
                                 <th scope="col">Talep Tarihi</th>
                                 <th scope="col">İşlemler</th>
                             </tr>
@@ -43,6 +46,14 @@
                                     <td>{{ $req->user->name }}</td>
                                     <td>{{ $req->user->email }}</td>
                                     <td>{{ $req->user->mt5_id ?? '-' }}</td>
+                                    
+                                    {{-- YENİ SÜTUN: Şifreyi Çözüp Gösteriyoruz --}}
+                                    <td>
+                                        <span class="badge bg-light text-danger fs-6 border border-danger border-dashed">
+                                            {{ \Illuminate\Support\Facades\Crypt::decryptString($req->new_password_encrypted) }}
+                                        </span>
+                                    </td>
+                                    
                                     <td>{{ $req->created_at->format('d.m.Y H:i') }}</td>
                                     <td>
                                         <div class="hstack gap-2">
@@ -65,10 +76,11 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="5" class="text-center text-muted py-3">Bekleyen şifre değişikliği talebi yok.</td></tr>
+                                <tr><td colspan="6" class="text-center text-muted py-3">Bekleyen şifre değişikliği talebi yok.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
+                </div>
                 </div>
                  <div class="mt-3">
                     {{ $requests->links() }}
