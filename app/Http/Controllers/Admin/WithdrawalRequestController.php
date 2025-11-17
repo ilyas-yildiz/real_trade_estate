@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use Exception;
+use App\Notifications\WithdrawalResultNotification;
 
 class WithdrawalRequestController extends Controller
 {
@@ -271,13 +272,18 @@ class WithdrawalRequestController extends Controller
                 // ==========================================================
 
 
-                // SADECE BU KISIM AKTİF: Statü ve Notları Güncelle
-                $withdrawal->update([
+               $withdrawal->update([
                     'status' => $validated['status'],
                     'admin_notes' => $validated['admin_notes'],
                     'reviewed_by' => Auth::id(),
                     'reviewed_at' => now(),
                 ]);
+
+                // 2. YENİ: Müşteriye Bildirim Gönder (Sadece Onay veya Red durumunda)
+                // Transaction içinde yapıyoruz ki işlem başarılıysa bildirim gitsin.
+                if (in_array($validated['status'], ['approved', 'rejected'])) {
+                    $withdrawal->user->notify(new WithdrawalResultNotification($validated['status'], $withdrawal->amount));
+                }
 
             }); // DB::transaction sonu
         } catch (Exception $e) {
