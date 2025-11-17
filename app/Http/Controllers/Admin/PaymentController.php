@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Response;
+use App\Notifications\PaymentResultNotification;
 
 class PaymentController extends Controller
 {
@@ -224,16 +225,25 @@ public function storeForUser(Request $request)
             $user->decrement('balance', $amount);
         }
         */
+if ($payment->status === $request->status) {
+             return response()->json(['success' => true, 'message' => 'Durum zaten aynı, değişiklik yapılmadı.']);
+        }
 
-        $payment->update([
-            'status' => $validated['status'],
-            'admin_notes' => $validated['admin_notes'],
+       $payment->update([
+            'status' => $request->status,
+            'admin_notes' => $request->admin_notes,
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Ödeme durumu başarıyla güncellendi.']);
-    }
+// YENİ: Müşteriye Bildirim Gönder (Sadece Onay veya Red durumunda)
+        if (in_array($request->status, ['approved', 'rejected'])) {
+            $payment->user->notify(new PaymentResultNotification($request->status, $payment->amount));
+        }
+
+return response()->json(['success' => true, 'message' => 'Ödeme durumu başarıyla güncellendi.']);    
+
+}
 
     /**
      * Bir ödeme bildirimini siler.
