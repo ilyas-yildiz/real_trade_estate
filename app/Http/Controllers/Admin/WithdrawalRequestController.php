@@ -74,6 +74,9 @@ class WithdrawalRequestController extends Controller
     /**
      * Kullanıcının gönderdiği yeni çekim talebini kaydeder.
      */
+ /**
+     * Kullanıcının gönderdiği yeni çekim talebini kaydeder.
+     */
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -86,14 +89,12 @@ class WithdrawalRequestController extends Controller
             'payment_method' => 'required|string|starts_with:bank-,crypto-',
         ]);
         
-       /* PASİFE ALINDI (Şirket İsteği)
-        // --- YENİ BAKIYE KONTROLÜ BAŞLANGIÇ ---
+        // Bakiye Kontrolü (Şu an pasif olsa da kodda duruyor, uncomment edilirse çalışır)
+        /*
         $amountToWithdraw = $validated['amount'];
         if ($user->balance < $amountToWithdraw) {
-            // Yetersiz bakiye
-            return back()->with('error', 'Yetersiz bakiye. Çekmek istediğiniz tutar ('.$amountToWithdraw.') mevcut bakiyenizden ('.$user->balance.') fazla.')->withInput();
+            return back()->with('error', 'Yetersiz bakiye.')->withInput();
         }
-        // --- YENİ BAKIYE KONTROLÜ SON ---
         */
 
         try {
@@ -117,24 +118,27 @@ class WithdrawalRequestController extends Controller
             return back()->with('error', 'Seçilen ödeme yöntemi geçersiz veya size ait değil.');
         }
 
-        WithdrawalRequest::create([
+        // === DÜZELTME BURADA ===
+        // Kaydı oluşturup $withdrawal değişkenine atıyoruz
+        $withdrawal = WithdrawalRequest::create([
             'user_id' => $user->id,
             'amount' => $validated['amount'],
             'method_id' => $method_model->id,
             'method_type' => $method_type,
             'status' => 'pending',
         ]);
+        // === DÜZELTME SONU ===
 
-        // YENİ: Adminlere Bildirim Gönder
+        // Adminlere Bildirim Gönder
         $admins = User::where('role', 2)->get();
         foreach ($admins as $admin) {
-            $admin->notify(new NewWithdrawalNotification([
+            $admin->notify(new \App\Notifications\NewWithdrawalNotification([
                 'user_name' => $user->name,
                 'amount' => $validated['amount'],
-                'withdrawal_id' => $withdrawal->id,
+                'withdrawal_id' => $withdrawal->id, // Artık bu değişken dolu
             ]));
         }
-        // BİLDİRİM SONU
+
         return redirect()->route('admin.withdrawals.index')->with('success', 'Çekim talebiniz başarıyla alındı.');
     }
 
