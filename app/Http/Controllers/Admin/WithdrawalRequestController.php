@@ -281,7 +281,8 @@ class WithdrawalRequestController extends Controller
 
                 // 2. YENİ: Müşteriye Bildirim Gönder (Sadece Onay veya Red durumunda)
                 // Transaction içinde yapıyoruz ki işlem başarılıysa bildirim gitsin.
-                if (in_array($validated['status'], ['approved', 'rejected'])) {
+                if (in_array($validated['status'], ['approved', 'rejected', 'processing'])) {
+                    
                     $withdrawal->user->notify(new WithdrawalResultNotification($validated['status'], $withdrawal->amount));
                 }
 
