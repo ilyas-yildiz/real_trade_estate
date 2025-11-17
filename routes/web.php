@@ -46,6 +46,8 @@ Route::name('frontend.')->group(function () {
     Route::get('/blog/{slug}', [FrontendController::class, 'blogDetail'])->name('blog.detail');
     Route::get('/iletisim', [FrontendController::class, 'contact'])->name('contact');
     Route::post('/iletisim', [FrontendController::class, 'handleContactForm'])->name('contact.submit');
+    // YENİ: Dil Değiştirme Rotası
+    Route::get('/lang/{lang}', [FrontendController::class, 'changeLanguage'])->name('lang.switch');
 });
 
 /*

@@ -1,7 +1,9 @@
 ﻿@extends('frontend.layouts.app')
 
-{{-- GÜNCELLEME: SEO Başlığı ve Açıklaması bloga özel --}}
-@section('title', $blog->title . ' - Real Trade Estate')
+{{-- SEO Başlığı --}}
+@section('title', $blog->title . ' - ' . __('messages.site_title'))
+
+{{-- Meta Description --}}
 @section('description', $blog->short_description ?? Str::limit(strip_tags($blog->content), 160))
 
 @section('content')
@@ -14,15 +16,15 @@
             <div class="container">
                 <div class="inner-content">
                     <div class="title">
-                        <h2>Blog Details</h2>
+                        {{-- GÜNCELLEME: Çeviri --}}
+                        <h2>{{ __('messages.blog_details') }}</h2>
                     </div>
                     <div class="breadcrumb-menu">
                         <ul class="clearfix">
-                            <li><a href="{{ route('frontend.home') }}">Home</a></li>
+                            <li><a href="{{ route('frontend.home') }}">{{ __('messages.home') }}</a></li>
                             <li><span class="icon-right-arrow"></span></li>
-                            <li><a href="{{ route('frontend.blog.index') }}">Blog</a></li>
+                            <li><a href="{{ route('frontend.blog.index') }}">{{ __('messages.blog') }}</a></li>
                             <li><span class="icon-right-arrow"></span></li>
-                            {{-- GÜNCELLEME: Aktif blog başlığı --}}
                             <li class="active">{{ Str::limit($blog->title, 30) }}</li>
                         </ul>
                     </div>
@@ -30,6 +32,7 @@
             </div>
         </div>
     </section>
+
     <section class="blog-details pdtop pdbottom">
         <div class="container">
             <div class="row">
@@ -43,98 +46,71 @@
                                         <div class="icon">
                                             <i class="icon-hashtag"></i>
                                         </div>
-                                        {{-- GÜNCELLEME: Dinamik Kategori --}}
-                                        <h6>{{ $blog->category->name ?? 'Category' }}</h6>
+                                        {{-- Dinamik Kategori --}}
+                                        <h6>{{ $blog->category->name ?? __('messages.category') }}</h6>
                                     </div>
                                     <ul>
                                         <li>
                                             <div class="icon">
                                                 <i class="fa fa fa-calendar"></i>
                                             </div>
-                                            {{-- GÜNCELLEME: Dinamik Tarih --}}
+                                            {{-- Dinamik Tarih --}}
                                             <h6>{{ $blog->created_at->format('d.m.Y') }}</h6>
                                         </li>
                                         <li>
                                             <div class="icon">
                                                 <i class="icon-add-user"></i>
                                             </div>
-                                            {{-- GÜNCELLEME: Dinamik Yazar --}}
+                                            {{-- Dinamik Yazar --}}
                                             <h6>{{ $blog->user->name ?? 'Admin' }}</h6>
                                         </li>
-                                        {{-- 
-                                            Not: Yorum sayısı (10 Cmts) statik olduğu 
-                                            ve veritabanında karşılığı olmadığı için kaldırıldı.
-                                        --}}
                                     </ul>
                                 </div>
                                 <div class="title-box">
-                                    <h3>
-                                        {{-- GÜNCELLEME: Dinamik Başlık --}}
-                                        {{ $blog->title }}
-                                    </h3>
+                                    <h3>{{ $blog->title }}</h3>
                                 </div>
                             </div>
                             <div class="img-box">
-                                {{-- GÜNCELLEME: İsteğin üzerine $blog->image_url kullanıldı --}}
                                 <img src="{{ $blog->image_url ? asset('storage/blog-images/730x365/' . $blog->image_url) : asset('frontend/assets/images/blog/blog-v5-2.jpg') }}" alt="{{ $blog->title }}">
                             </div>
                         </div>
 
-                        {{-- GÜNCELLEME: Dinamik İçerik --}}
                         <div class="blog-details-text1">
-                            {{-- 
-                                {!! !!} kullanıyoruz ki admin panelinden eklenen
-                                <p>, <ul>, <h3> gibi HTML etiketleri düzgün görünsün.
-                            --}}
                             {!! $blog->content !!}
                         </div>
 
-                        {{-- 
-                            Not: Statik "Quote" (Alıntı), "Tags" (Etiketler), 
-                            "Prev/Next Post" (Önceki/Sonraki Yazı) bölümleri
-                            veritabanında karşılığı olmadığı için kaldırıldı.
-                        --}}
-
-                        {{-- Yazar Kutusu (Basitleştirilmiş) --}}
+                        {{-- Yazar Kutusu --}}
                         <div class="blog-details-author">
                             <div class="blog-details-author-inner">
                                 <div class="img-box">
-                                    {{-- TODO: Yazar resmi dinamikleştirilebilir --}}
                                     <img src="{{ asset('frontend/assets/images/blog/author-1.jpg') }}" alt="author">
                                 </div>
                                 <div class="content-box">
                                     <div class="top">
-                                        <h4>Author</h4>
-                                        {{-- GÜNCELLEME: Dinamik Yazar Adı --}}
+                                        {{-- GÜNCELLEME: Çeviri --}}
+                                        <h4>{{ __('messages.author') }}</h4>
                                         <h3>{{ $blog->user->name ?? 'Admin' }}</h3>
                                     </div>
-                                    {{-- 
-                                        Not: Statik bio, sosyal medya linkleri vb. kaldırıldı.
-                                        Gerekirse user tablosuna "bio" eklenebilir.
-                                    --}}
                                 </div>
                             </div>
                         </div>
 
-                        {{-- Bloga Geri Dön Butonu --}}
+                        {{-- Geri Dön Butonu --}}
                         <div class="back-to-blog-post-btn">
-                            {{-- GÜNCELLEME: Link düzeltildi --}}
                             <a href="{{ route('frontend.blog.index') }}">
                                 <img src="{{ asset('frontend/assets/images/icon/menu-1.png') }}" alt="Icon">
-                                Back to Blog Post
+                                {{ __('messages.back_to_blog') }}
                             </a>
                         </div>
                     </div>
                 </div>
 
-                {{-- GÜNCELLEME: Dinamik Sidebar --}}
                 <div class="col-xl-4">
                     <div class="blog-page__sidebar">
                         
-                        {{-- Statik Arama Kutusu --}}
                         <div class="sidebar-search-box-one">
                             <form class="search-form" action="#">
-                                <input placeholder="Keyword..." type="text">
+                                <input placeholder="{{ __('messages.search_placeholder') }}" type="text">
                                 <button type="submit">
                                     <i class="icon-search"></i>
                                 </button>
@@ -143,12 +119,11 @@
                         
                         <div class="single-sidebar-box">
                             <div class="sidebar-title">
-                                <h3>Categories</h3>
+                                <h3>{{ __('messages.categories') }}</h3>
                             </div>
                             <ul class="single-sidebar__categories clearfix">
                                 @forelse ($categories as $category)
                                     <li>
-                                        {{-- GÜNCELLEME: Kategori linki eklendi --}}
                                         <a href="{{ route('frontend.blog.index', ['category' => $category->slug]) }}">
                                             <p>{{ $category->name }}</p>
                                             <div class="icon">
@@ -157,13 +132,14 @@
                                         </a>
                                     </li>
                                 @empty
-                                    <li><p>No categories found.</p></li>
+                                    <li><p>{{ __('messages.no_categories') }}</p></li>
                                 @endforelse
                             </ul>
                         </div>
+                        
                         <div class="single-sidebar-box">
                             <div class="sidebar-title">
-                                <h3>Latest Posts</h3>
+                                <h3>{{ __('messages.latest_posts') }}</h3>
                             </div>
                             <ul class="single-sidebar__post clearfix">
                                 @forelse ($latestBlogs as $latestPost)
@@ -172,7 +148,7 @@
                                             <div class="icon">
                                                 <i class="icon-hashtag"></i>
                                             </div>
-                                            <h6>{{ $latestPost->category->name ?? 'Category' }}</h6>
+                                            <h6>{{ $latestPost->category->name ?? __('messages.category') }}</h6>
                                         </div>
                                         <div class="title-box">
                                             <h4>
@@ -182,23 +158,19 @@
                                             </h4>
                                         </div>
                                         <div class="btn-box">
-                                            {{-- Not: "Okuma süresi" kaldırıldı --}}
                                             <a class="overlay-btn" href="{{ route('frontend.blog.detail', $latestPost->slug) }}">
-                                                Read More
+                                                {{ __('messages.read_more') }}
                                                 <i class="icon-right-arrow"></i>
                                             </a>
                                         </div>
                                     </li>
                                 @empty
-                                     <li><p>No recent posts found.</p></li>
+                                     <li><p>{{ __('messages.no_recent_posts') }}</p></li>
                                 @endforelse
                             </ul>
                         </div>
-                        {{-- 
-                            Not: Statik "Post Tag" (Etiketler) bölümü kaldırıldı.
-                        --}}
 
-                        {{-- Statik Abone Ol Kutusu --}}
+                        {{-- Subscribe Formu --}}
                         <div class="subscribe-sidebar-box">
                             <div class="shape1">
                                 <img src="{{ asset('frontend/assets/images/shapes/subscribe-sidebar-form-v1-shape1.png') }}" alt="Shape">
@@ -207,23 +179,23 @@
                                 <img src="{{ asset('frontend/assets/images/shapes/subscribe-sidebar-form-v1-shape2.png') }}" alt="Shape">
                             </div>
                             <div class="tilte-box">
-                                <h3>SubscribeUs</h3>
-                                <p>Get updates in your inbox diectly.</p>
+                                <h3>{{ __('messages.subscribe_us') }}</h3>
+                                <p>{{ __('messages.subscribe_desc') }}</p>
                             </div>
                             <div class="subscribe-sidebar-form">
                                 <form action="#" method="post">
                                     <div class="form-group">
-                                        <input type="email" name="email" placeholder="Email address..." required="">
+                                        <input type="email" name="email" placeholder="{{ __('messages.email_placeholder') }}" required="">
                                     </div>
                                     <div class="checked-box1">
                                         <input type="checkbox" name="skipper1" id="skipperr" checked="">
                                         <label for="skipper">
-                                            <span></span>I agree terms & conditions.
+                                            <span></span>{{ __('messages.agree_terms') }}
                                         </label>
                                     </div>
                                     <div class="btn-box">
                                         <button class="submit btn-one">
-                                            <span class="txt">Subscribe</span>
+                                            <span class="txt">{{ __('messages.subscribe') }}</span>
                                             <i class="icon-right-arrow"></i>
                                         </button>
                                     </div>
@@ -237,8 +209,5 @@
             </div>
         </div>
     </section>
-    @endsection
 
-{{-- Bu sayfa için özel bir script gerekmiyorsa boş bırakabiliriz --}}
-@push('scripts')
-@endpush
+@endsection
