@@ -167,4 +167,15 @@ class FrontendController extends Controller
 
         return back()->with('success', 'Mesajınız başarıyla gönderildi!');
     }
+
+    /**
+     * Site dilini değiştirir.
+     */
+    public function changeLanguage($lang)
+    {
+        if (in_array($lang, ['en', 'tr'])) {
+            session(['locale' => $lang]);
+        }
+        return back();
+    }
 }

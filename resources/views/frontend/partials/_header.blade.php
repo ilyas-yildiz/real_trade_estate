@@ -7,61 +7,51 @@
                     <div class="main-header-style1__content-top-left">
                         <div class="header-logo-box-style1">
                             <a href="{{ route('frontend.home') }}">
-                                {{-- Logo'yu ileride $settings'den çekebiliriz, şimdilik statik --}}
-                                {{-- GÜNCELLEME: title="Tradebro" -> title="Real Trade Estate" --}}
-                                <img src="{{ asset('frontend/assets/images/resources/logo-7.png') }}" alt="Logo" title="Real Trade Estate" width="130">
+                                <img src="{{ asset('frontend/assets/images/resources/logo-7.png') }}" alt="Logo" title="Real Trade State" width="130">
                             </a>
                         </div>
-                        {{-- Opsiyonel: Trading saatleri - Şimdilik statik --}}
                         <div class="header-trading-time-style1">
                             <div class="icon">
                                 <i class="icon-hour"></i>
                             </div>
                             <div class="text">
-                                <p><span>Stock:</span> 9.30 am to 4.00 pm</p>
-                                {{-- Detaylı saatler (hover) - statik kalabilir --}}
+                                <p>{{ __('messages.stock_hours') }}</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="main-header-style1__content-top-middle">
-                        {{-- Opsiyonel: Clients/Partners butonları - Şimdilik statik --}}
                         <div class="btn-box">
                             <a class="btn-one active" href="#">
-                                <span class="txt">Clients</span>
+                                <span class="txt">{{ __('messages.clients') }}</span>
                             </a>
                             <a class="btn-one" href="#">
-                                <span class="txt">Partners</span>
+                                <span class="txt">{{ __('messages.partners') }}</span>
                             </a>
                         </div>
                     </div>
 
                     <div class="main-header-style1__content-top-right">
-                        {{-- Login/Register Linkleri --}}
                         <div class="header-login-register-style1">
                             <div class="icon">
                                 <span class="icon-lock"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span><span class="path7"></span><span class="path8"></span>
                                 </span>
                             </div>
                             <div class="title">
-                                <h3>My Portal</h3>
-                                {{-- Auth Kontrolü --}}
+                                <h3>{{ __('messages.my_portal') }}</h3>
                                 @guest
-                                    <p><a href="{{ route('login') }}">Login</a> - or - <a href="{{ route('register') }}">Register</a></p>
+                                    <p><a href="{{ route('login') }}">{{ __('messages.login') }}</a> - {{ __('messages.or') }} - <a href="{{ route('register') }}">{{ __('messages.register') }}</a></p>
                                 @endguest
                                 @auth
-                                    {{-- GÜNCELLEME: 'Hesabım' -> 'My Account', 'Çıkış Yap' -> 'Logout' --}}
-                                    <p><a href="{{ route('admin.dashboard') }}">My Account</a> - (<a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-frontend').submit();">Logout</a>)</p>
+                                    <p><a href="{{ route('admin.dashboard') }}">{{ __('messages.my_account') }}</a> - (<a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form-frontend').submit();">{{ __('messages.logout') }}</a>)</p>
                                     <form id="logout-form-frontend" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
                                 @endauth
-                                {{-- Hover detayları (statik kalabilir) --}}
                             </div>
                         </div>
-                        {{-- Opsiyonel: Yardım Merkezi - Şimdilik statik --}}
                         <div class="header-help-center-style1">
-                            {{-- ... (Yardım merkezi içeriği) ... --}}
+                             {{-- Yardım merkezi içeriği --}}
                         </div>
                     </div>
                 </div>
@@ -73,8 +63,7 @@
                                 <div class="main-menu__wrapper-inner">
                                     <div class="sticky-logo-box-style1">
                                         <a href="{{ route('frontend.home') }}">
-                                            {{-- GÜNCELLEME: title="Tradebro" -> title="Real Trade Estate" --}}
-                                            <img src="{{ asset('frontend/assets/images/resources/logo-7.png') }}" alt="Logo" title="Real Trade Estate" width="130">
+                                            <img src="{{ asset('frontend/assets/images/resources/logo-7.png') }}" alt="Logo" title="Real Trade State" width="130">
                                         </a>
                                     </div>
                                     <div class="main-menu-style1__left">
@@ -84,27 +73,22 @@
                                             </a>
 
                                             <ul class="main-menu__list">
-                                                {{-- Dinamik Menü Linkleri --}}
-                                                {{-- GÜNCELLEME: Menü isimleri Türkçeden İngilizceye çevrildi --}}
+                                                {{-- GÜNCELLEME: Menü isimleri Çeviri Fonksiyonu ile Değiştirildi --}}
                                                 <li class="{{ request()->routeIs('frontend.home') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.home') }}">Home</a>
+                                                    <a href="{{ route('frontend.home') }}">{{ __('messages.home') }}</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.about') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.about') }}">About Us</a>
+                                                    <a href="{{ route('frontend.about') }}">{{ __('messages.about_us') }}</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.services*') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.services') }}">Invest</a>
+                                                    <a href="{{ route('frontend.services') }}">{{ __('messages.invest') }}</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.blog*') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.blog.index') }}">Blog</a>
+                                                    <a href="{{ route('frontend.blog.index') }}">{{ __('messages.blog') }}</a>
                                                 </li>
                                                 <li class="{{ request()->routeIs('frontend.contact') ? 'current' : '' }}">
-                                                    <a href="{{ route('frontend.contact') }}">Contact</a>
+                                                    <a href="{{ route('frontend.contact') }}">{{ __('messages.contact') }}</a>
                                                 </li>
-                                                {{-- 
-                                                    Temadaki orijinal çok seviyeli (dropdown) menü yapısı 
-                                                    ihtiyaç duyulursa buraya eklenebilir, şimdilik basit tuttum.
-                                                --}}
                                             </ul>
                                         </div>
                                     </div>
@@ -114,39 +98,42 @@
                         </div>
 
                     <div class="main-header-style1__content-bottom-right">
-                        {{-- Dil Seçici (Statik) --}}
+                        {{-- GÜNCELLEME: Dil Seçici Aktif Edildi --}}
                         <div class="language-switcher-style1">
                             <div class="icon">
                                 <i class="icon-language"></i>
                             </div>
                             <div class="select-box clearfix">
-                                {{-- GÜNCELLEME: Varsayılan dil EN olarak ayarlandı --}}
-                                <select class="wide">
-                                    <option data-display="EN">EN</option>
-                                    <option value="1">TR</option>
+                                {{-- 
+                                    Not: Temanın 'nice-select' eklentisi <select> elemanını gizleyip 
+                                    kendi HTML yapısını oluşturuyor olabilir. Bu yüzden 'onchange' 
+                                    ile basit bir yönlendirme yapıyoruz.
+                                --}}
+                                <select class="wide" onchange="if (this.value) window.location.href=this.value">
+                                    <option value="{{ route('frontend.lang.switch', 'en') }}" {{ App::getLocale() == 'en' ? 'selected' : '' }}>EN</option>
+                                    <option value="{{ route('frontend.lang.switch', 'tr') }}" {{ App::getLocale() == 'tr' ? 'selected' : '' }}>TR</option>
                                 </select>
                             </div>
                         </div>
-                        {{-- Başlangıç Butonu (Statik) --}}
+                        
                         <div class="header-btn-box-style1">
                             <div class="icon">
                                 <i class="icon-candle"></i>
                             </div>
                             <div class="text">
                                 <a href="{{ route('register') }}">
-                                    {{-- GÜNCELLEME: 'İşleme Başla' -> 'Start Trading' --}}
-                                    Start <br>Trading
+                                    {!! __('messages.start_trading') !!} <br>Trading
                                     <i class="icon-right-arrow"></i>
                                 </a>
                             </div>
                         </div>
-                        {{-- Arama Butonu (Statik) --}}
                         <div class="box-search-style1">
                             <a href="#" class="search-toggler">
                                 <span class="icon-search"></span>
                             </a>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

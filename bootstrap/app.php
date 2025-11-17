@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->redirectUsersTo('/admin/dashboard');
+        
+        // YENİ: Dil. Tüm web isteklerinde çalışsın
+        $middleware->web(append: [
+            \App\Http\Middleware\LanguageMiddleware::class,
+        ]);
 
     })
     ->withExceptions(function (Exceptions $exceptions): void {

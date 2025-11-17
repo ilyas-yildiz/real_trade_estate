@@ -1,9 +1,9 @@
 ﻿@extends('frontend.layouts.app')
 
 {{-- SEO Başlığı (Hakkımızda başlığı veya varsayılan) --}}
-@section('title', isset($about) ? $about->title : ($settings['seo_title'] ?? 'About Us - Real Trade Estate'))
+@section('title', isset($about) ? $about->title : ($settings['seo_title'] ?? __('messages.about_us') . ' - ' . __('messages.site_title')))
 {{-- SEO Açıklaması (Kısa içerik veya varsayılan) --}}
-@section('description', isset($about) ? Str::limit(strip_tags($about->short_content ?? $about->content), 160) : ($settings['seo_description'] ?? 'Learn more about Real Trade Estate.'))
+@section('description', isset($about) ? Str::limit(strip_tags($about->short_content ?? $about->content), 160) : ($settings['seo_description'] ?? __('messages.meta_description_default')))
 
 @section('content')
 
@@ -15,19 +15,21 @@
             <div class="container">
                 <div class="inner-content">
                     <div class="title">
-                        <h2>About Us</h2>
+                        {{-- GÜNCELLEME: Çeviri --}}
+                        <h2>{{ __('messages.about_us') }}</h2>
                     </div>
                     <div class="breadcrumb-menu">
                         <ul class="clearfix">
-                            <li><a href="{{ route('frontend.home') }}">Home</a></li>
+                            <li><a href="{{ route('frontend.home') }}">{{ __('messages.home') }}</a></li>
                             <li><span class="icon-right-arrow"></span></li>
-                            <li class="active">About Us</li>
+                            <li class="active">{{ __('messages.about_us') }}</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    
     {{-- Sadece $about verisi varsa bu bölümü göster --}}
     @if(isset($about))
         <section class="about-style2 pdtop">
@@ -44,11 +46,11 @@
                             <div class="img-box1">
                                 <img src="{{ $about->image_url ? asset('storage/about-images/800x600/' . $about->image_url) : asset('frontend/assets/images/about/about-v2-11.jpg') }}" alt="{{ $about->title }}">
                             </div>
-                            {{-- Küçük resim (Statik kalabilir veya kaldırılabilir) --}}
+                            {{-- Küçük resim --}}
                             <div class="img-box2">
                                 <img src="{{ asset('frontend/assets/images/about/about-v2-2.jpg') }}" alt="Details">
                             </div>
-                            {{-- Yıl kutusu (Statik - İstersen kaldırabiliriz) --}}
+                            {{-- Yıl kutusu --}}
                             <div class="experience-box">
                                 <div class="experience-box__bg"
                                      style="background-image: url({{ asset('frontend/assets/images/shapes/about-v2-shape11.png') }});">
@@ -59,10 +61,12 @@
                                     </span>
                                 </div>
                                 <div class="title">
-                                    <h2>24+ <span>Years</span></h2>
+                                    {{-- GÜNCELLEME: Çeviri --}}
+                                    <h2>24+ <span>{{ __('messages.years') }}</span></h2>
                                 </div>
                                 <div class="text">
-                                    <h3>Experience in the Market</h3>
+                                    {{-- GÜNCELLEME: Çeviri --}}
+                                    <h3>{{ __('messages.market_experience') }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -72,8 +76,8 @@
                         <div class="about-style2__right">
                             <div class="sec-title withtext">
                                 <div class="sub-title">
-                                    {{-- GÜNCELLEME: 'About Tradebro' -> 'About Real Trade Estate' --}}
-                                    <h4>About Real Trade Estate</h4>
+                                    {{-- GÜNCELLEME: 'About Real Trade State' --}}
+                                    <h4>{{ __('messages.about_title_prefix') }} Real Trade State</h4>
                                 </div>
                                 {{-- Ana Başlık (Dinamik) --}}
                                 <h2>{{ $about->title }}</h2>
@@ -82,11 +86,6 @@
                                     {!! $about->content !!}
                                 </div>
                             </div>
-                            {{--
-                                Not: HTML'deki "Our Journey" kısmı ve "Explore History" butonu statik olduğu
-                                ve veritabanında karşılığı olmadığı için kaldırıldı.
-                                Gerekirse $about->short_content buraya eklenebilir.
-                            --}}
                         </div>
                     </div>
 
@@ -97,22 +96,10 @@
         {{-- Eğer veritabanında hakkımızda içeriği yoksa basit bir mesaj göster --}}
         <section class="pdtop pdbottom">
             <div class="container">
-                <p class="text-center">About us content is not available at the moment.</p>
+                <p class="text-center">{{ __('messages.content_not_available') }}</p>
             </div>
         </section>
     @endif
-
-    {{--
-        HTML Temadaki Diğer Bölümler Kaldırıldı:
-        - Statement Style1 (Mission, Vision, Value)
-        - Choose Style1 (Why Choose Us)
-        - Fact Counter Style1
-        - Team Style1
-        - Partners Style1
-        - Awards Style1
-        Bunların veritabanında karşılığı olmadığı için temizlendi.
-        Gerekirse ileride ayrı modüller olarak eklenebilir.
-    --}}
 
 @endsection
 

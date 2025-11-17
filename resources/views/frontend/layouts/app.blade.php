@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     {{-- Dinamik Başlık (Sayfaya özel veya varsayılan) --}}
-    {{-- GÜNCELLEME: 'Tradebro' -> 'Real Trade Estate' --}}
-    <title>@yield('title', config('app.name', 'Real Trade Estate'))</title>
+    {{-- GÜNCELLEME: 'Tradebro' -> 'Real Trade State' --}}
+    <title>@yield('title', config('app.name', 'Real Trade State'))</title>
     
     {{-- Favicons (Bunları public/frontend/assets... içine koyduğunu varsayıyorum) --}}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('frontend/assets/images/favicons/apple-touch-icon.png') }}" />
@@ -15,8 +15,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('frontend/assets/images/favicons/favicon-16x16.png') }}" />
     
     {{-- Meta Açıklama (Sayfaya özel) --}}
-    {{-- GÜNCELLEME: 'Tradebro HTML 5 Template' -> 'Real Trade Estate HTML 5 Template' --}}
-    <meta name="description" content="@yield('description', 'Real Trade Estate HTML 5 Template')" />
+    {{-- GÜNCELLEME: 'Tradebro HTML 5 Template' -> 'Real Trade State HTML 5 Template' --}}
+    <meta name="description" content="@yield('description', 'Real Trade State HTML 5 Template')" />
 
     {{-- Vendor (Plugin) CSS Dosyaları --}}
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/animate/animate.min.css') }}" />
