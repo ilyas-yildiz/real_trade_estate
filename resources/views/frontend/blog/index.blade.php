@@ -1,9 +1,9 @@
 ﻿@extends('frontend.layouts.app')
 
-{{-- SEO Başlığı (Dil dosyasından) --}}
+{{-- SEO Başlığı --}}
 @section('title', __('messages.blog') . ' - ' . __('messages.site_title'))
 
-{{-- Meta Description (Dil dosyasından) --}}
+{{-- Meta Description --}}
 @section('description', __('messages.meta_description_default'))
 
 @section('content')
@@ -16,7 +16,6 @@
             <div class="container">
                 <div class="inner-content">
                     <div class="title">
-                        {{-- GÜNCELLEME: Çeviri --}}
                         <h2>{{ __('messages.our_blog') }}</h2>
                     </div>
                     <div class="breadcrumb-menu">
@@ -30,7 +29,7 @@
             </div>
         </div>
     </section>
-
+    
     <section class="blog-page-one pdtop pdbottom">
         <div class="container">
             <div class="row">
@@ -39,7 +38,8 @@
                     <div class="col-xl-4 col-lg-6 col-md-6">
                         <div class="single-blog-style5 single-blog-style5--style6">
                             <div class="img-box">
-                                <img src="{{ $blog->image_url ? asset('storage/blog-images/365x182/' . $blog->image_url) : asset('frontend/assets/images/blog/blog-v4-1.jpg') }}" alt="{{ $blog->title }}">
+                                <img src="{{ $blog->image_url ? asset('storage/blog-images/365x182/' . $blog->image_url) : asset('frontend/assets/images/blog/blog-v4-1.jpg') }}" 
+                                     alt="{{ $blog->getTranslation('title') }}">
                                 <div class="overlay-icon">
                                     <a class="lightbox-image" data-fancybox="gallery"
                                        href="{{ $blog->image_url ? asset('storage/blog-images/730x365/' . $blog->image_url) : asset('frontend/assets/images/blog/blog-v4-1.jpg') }}">
@@ -53,30 +53,30 @@
                                         <div class="icon">
                                             <i class="icon-hashtag"></i>
                                         </div>
-                                        {{-- Dinamik Kategori --}}
+                                        {{-- Kategori Çevirisi (Eğer kategori adı da çevriliyorsa) --}}
+                                        {{-- Şimdilik name string olduğu varsayılıyor --}}
                                         <h6>{{ $blog->category->name ?? __('messages.category') }}</h6>
                                     </div>
                                     <div class="date">
                                         <div class="icon">
                                             <i class="fa fa fa-calendar"></i>
                                         </div>
-                                        {{-- Dinamik Tarih --}}
                                         <h6>{{ $blog->created_at->format('d.m.Y') }}</h6>
                                     </div>
                                 </div>
                                 <div class="title-box">
                                     <h3>
+                                        {{-- DÜZELTME: Başlık Çevirisi --}}
                                         <a href="{{ route('frontend.blog.detail', $blog->slug) }}">
-                                            {{ $blog->title }}
+                                            {{ $blog->getTranslation('title') }}
                                         </a>
                                     </h3>
-                                    {{-- Kısa Açıklama --}}
+                                    {{-- DÜZELTME: Kısa Açıklama Çevirisi --}}
                                     <p>
-                                        {{ $blog->short_description ?? Str::limit(strip_tags($blog->content), 100) }}
+                                        {{ $blog->getTranslation('short_description') ?? Str::limit(strip_tags($blog->getTranslation('content')), 100) }}
                                     </p>
                                 </div>
                                 <div class="btn-box">
-                                    {{-- GÜNCELLEME: Çeviri --}}
                                     <a class="overlay-btn" href="{{ route('frontend.blog.detail', $blog->slug) }}">
                                         {{ __('messages.read_more') }}
                                         <i class="icon-right-arrow"></i>
@@ -93,7 +93,6 @@
 
             </div>
 
-            {{-- Pagination Linkleri --}}
             <div class="pagination-wrapper text-center">
                 {{ $blogs->links() }}
             </div>

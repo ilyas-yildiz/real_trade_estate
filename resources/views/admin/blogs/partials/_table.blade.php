@@ -18,7 +18,8 @@
                 <td><div class="form-check"><input class="form-check-input row-checkbox" type="checkbox" value="{{ $item->id }}"></div></td>
                 <td class="handle-cell text-center"><i class="ri-menu-2-line handle"></i></td>
                 <td>{{ $item->id }}</td>
-                <td>{{ $item->title }}</td>
+                {{-- getTranslation() metodu HasTranslations trait'inden geliyor --}}
+                <td>{{ $item->getTranslation('title') }}</td>
                 <td>{{ $item->category?->name ?? 'Belirtilmemiş' }}</td>
                 <td>{{ $item->user?->name ?? 'Belirtilmemiş' }}</td>
                 <td>

@@ -20,14 +20,24 @@ class BlogController extends BaseResourceController
     protected function getModelInstance(): Model { return new Blog(); }
     protected function getViewPath(): string { return 'blogs'; }
     protected function getRouteName(): string { return 'blogs'; }
+
+    // Validasyon Kuralları (Çoklu Dil Uyumlu)
     protected function getValidationRules(Request $request, $id = null): array {
         $rules = [
-            'title' => 'required|string|max:255|unique:blogs,title,' . $id,
+            // Dizi validasyonu
+            'title' => 'array',
+            'title.en' => 'required|string|max:255',
+            'title.tr' => 'nullable|string|max:255',
+            
+            'content' => 'array',
+            'content.en' => 'required|string',
+            'content.tr' => 'nullable|string',
+
             'category_id' => 'required|exists:categories,id',
             'author_id' => 'nullable|exists:authors,id',
             'gallery_id' => 'nullable|exists:galleries,id',
-            'content' => 'nullable|string',
             'is_featured' => 'required|boolean',
+            // Slug ve meta alanları
             'slug' => 'nullable|string',
             'meta_description' => 'nullable|string|max:255',
             'meta_keywords' => 'nullable|string|max:255'
@@ -35,9 +45,11 @@ class BlogController extends BaseResourceController
         $rules['image'] = $id ? 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240' : 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240';
         return $rules;
     }
+
     protected function getImageFieldName(): ?string { return 'image'; }
     protected function getImagePath(): ?string { return 'blog-images'; }
     protected function getImageSizes(): array { return ['1460x730', '730x365', '365x182', '128x128']; }
+    
     protected function getAdditionalDataForForms(): array {
         return [
             'categories' => Category::where('status', true)->orderBy('name')->get(),
@@ -46,34 +58,103 @@ class BlogController extends BaseResourceController
         ];
     }
 
-    // GÜNCELLENEN METOT: BaseController ile uyumlu hale getirildi.
-    /**
-     * Belirtilen kaynağı düzenlemek için verileri JSON olarak döndürür.
-     * İmza, BaseResourceController::edit($id) ile uyumludur.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
+// Edit Metodu (JSON Döndürür)
     public function edit($id)
     {
-        // Model'i $id kullanarak manuel olarak buluyoruz.
         $blog = Blog::findOrFail($id);
         
-        // Veriyi JSON olarak döndürüyoruz.
-        return response()->json(['item' => $blog]);
-    }
+        // Model verisini diziye çevir
+        $data = $blog->toArray();
 
+        // 1. Çevirileri Düzleştir (Flatten Translations)
+        // JavaScript'in 'title[en]' inputunu bulabilmesi için veriyi hazırlıyoruz.
+        $translatableFields = ['title', 'content', 'short_description'];
 
-    public function store(Request $request) {
-        $request->merge(['slug' => Str::slug($request->title)]);
-        return parent::store($request);
-    }
-    public function update(Request $request, $id) {
-        $item = $this->model->findOrFail($id);
-        if ($request->title !== $item->title) {
-            $request->merge(['slug' => Str::slug($request->title)]);
+        foreach ($translatableFields as $field) {
+            if (isset($data[$field]) && is_array($data[$field])) {
+                foreach ($data[$field] as $lang => $value) {
+                    // Yeni anahtar oluştur: örn "title[en]" => "Hello"
+                    $data["{$field}[{$lang}]"] = $value;
+                }
+            }
         }
-        return parent::update($request, $id);
+
+        // 2. Resim URL'sini ekle
+        if ($blog->image_url) {
+            $data['image_full_url'] = asset('storage/blog-images/128x128/' . $blog->image_url);
+        }
+
+        // Düzeltilmiş veriyi gönder
+        return response()->json(['item' => $data]);
+    }
+
+    // Store Metodu (AJAX Uyumlu)
+    public function store(Request $request)
+    {
+        // 1. Validasyon
+        $validated = $request->validate($this->getValidationRules($request));
+
+        // 2. Slug Oluştur (İngilizce Başlıktan)
+        $validated['slug'] = Str::slug($request->input('title.en'));
+
+        // 3. Resim Yükle
+        if ($request->hasFile('image')) {
+            $filename = $this->imageService->saveImage(
+                $request->file('image'),
+                $this->getImagePath(),
+                $this->getImageSizes()
+            );
+            if ($filename) {
+                $validated['image_url'] = $filename;
+            }
+        }
+
+        // 4. Kayıt (Eloquent $casts sayesinde 'array' olan title ve content otomatik JSON olur)
+        // Ancak Author ID'yi manuel eklemeliyiz (BaseController bunu yapmaz)
+        $validated['author_id'] = $request->author_id; 
+        
+        // Eğer yazar seçilmediyse ve sistemde 'author_id' kullanılıyorsa:
+        // $validated['author_id'] = Auth::id(); 
+
+        $this->model->create($validated);
+
+        // 5. AJAX Yanıtı
+        return response()->json(['success' => true, 'message' => 'Blog başarıyla oluşturuldu.']);
+    }
+
+    // Update Metodu (AJAX Uyumlu)
+    public function update(Request $request, $id)
+    {
+        $blog = $this->model->findOrFail($id);
+        
+        // 1. Validasyon
+        $validated = $request->validate($this->getValidationRules($request, $id));
+
+        // 2. Slug Güncelle (Eğer başlık değiştiyse)
+        if ($request->input('title.en') !== $blog->title['en']) {
+            $validated['slug'] = Str::slug($request->input('title.en'));
+        }
+
+        // 3. Resim Güncelle
+        if ($request->hasFile('image')) {
+            if ($blog->image_url) {
+                $this->imageService->deleteImages($blog->image_url, $this->getImagePath(), $this->getImageSizes());
+            }
+            $filename = $this->imageService->saveImage(
+                $request->file('image'),
+                $this->getImagePath(),
+                $this->getImageSizes()
+            );
+            if ($filename) {
+                $validated['image_url'] = $filename;
+            }
+        }
+
+        // 4. Güncelleme
+        $blog->update($validated);
+
+        // 5. AJAX Yanıtı
+        return response()->json(['success' => true, 'message' => 'Blog başarıyla güncellendi.']);
     }
 
     // --- AI METODLARI ---

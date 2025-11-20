@@ -1,10 +1,10 @@
 ﻿@extends('frontend.layouts.app')
 
 {{-- SEO Başlığı --}}
-@section('title', $blog->title . ' - ' . __('messages.site_title'))
+@section('title', $blog->getTranslation('title') . ' - ' . __('messages.site_title'))
 
 {{-- Meta Description --}}
-@section('description', $blog->short_description ?? Str::limit(strip_tags($blog->content), 160))
+@section('description', $blog->getTranslation('short_description') ?? Str::limit(strip_tags($blog->getTranslation('content')), 160))
 
 @section('content')
 
@@ -25,7 +25,8 @@
                             <li><span class="icon-right-arrow"></span></li>
                             <li><a href="{{ route('frontend.blog.index') }}">{{ __('messages.blog') }}</a></li>
                             <li><span class="icon-right-arrow"></span></li>
-                            <li class="active">{{ Str::limit($blog->title, 30) }}</li>
+                            {{-- GÜNCELLEME: Başlık Çevirisi --}}
+                            <li class="active">{{ Str::limit($blog->getTranslation('title'), 30) }}</li>
                         </ul>
                     </div>
                 </div>
@@ -67,16 +68,20 @@
                                     </ul>
                                 </div>
                                 <div class="title-box">
-                                    <h3>{{ $blog->title }}</h3>
+                                    {{-- GÜNCELLEME: Başlık Çevirisi --}}
+                                    <h3>{{ $blog->getTranslation('title') }}</h3>
                                 </div>
                             </div>
-                            <div class="img-box">
-                                <img src="{{ $blog->image_url ? asset('storage/blog-images/730x365/' . $blog->image_url) : asset('frontend/assets/images/blog/blog-v5-2.jpg') }}" alt="{{ $blog->title }}">
+                       <div class="img-box">
+                                {{-- GÜNCELLEME: Yol 'blog-images/730x365/' olarak düzeltildi --}}
+                                <img src="{{ $blog->image_url ? asset('storage/blog-images/730x365/' . $blog->image_url) : asset('frontend/assets/images/blog/blog-v5-2.jpg') }}" 
+                                     alt="{{ $blog->getTranslation('title') }}">
                             </div>
                         </div>
 
                         <div class="blog-details-text1">
-                            {!! $blog->content !!}
+                            {{-- GÜNCELLEME: İçerik Çevirisi --}}
+                            {!! $blog->getTranslation('content') !!}
                         </div>
 
                         {{-- Yazar Kutusu --}}
@@ -153,7 +158,7 @@
                                         <div class="title-box">
                                             <h4>
                                                 <a href="{{ route('frontend.blog.detail', $latestPost->slug) }}">
-                                                    {{ $latestPost->title }}
+                                                    {{ $latestPost->getTranslation('title') }}
                                                 </a>
                                             </h4>
                                         </div>

@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ImageService; // Görsel silme için dahil edelim
+use App\Traits\HasTranslations; // Trait
 
 class Service extends Model
 {
     use HasFactory;
+    use HasTranslations; // Trait kullanımı
 
     protected $fillable = [
         'order', // Sıralama eklendi
@@ -20,6 +22,11 @@ class Service extends Model
         'status',
     ];
 
+    protected $casts = [
+        'title' => 'array',
+        'content' => 'array',
+    ];
+    
     protected $appends = ['image_full_url'];
 
     /**

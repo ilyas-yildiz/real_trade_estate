@@ -2,77 +2,129 @@
 
 namespace App\Http\Controllers\Admin;
 
-// GÜNCELLENDİ: BaseResourceController'ı kullan
 use App\Http\Controllers\Admin\BaseResourceController; 
 use App\Models\About;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Model; // Model'i dahil et
-use Illuminate\Support\Str; // Str'ı dahil et (eğer slug vs. kullanacaksan)
+use Illuminate\Database\Eloquent\Model;
 
-// GÜNCELLENDİ: Miras alınan sınıfı değiştir
 class AboutController extends BaseResourceController 
 {
-
-    // Gerekli ayar metodları
     protected function getModelInstance(): Model { return new About(); }
-    protected function getViewPath(): string { return 'abouts'; } // View klasör adı
-    protected function getRouteName(): string { return 'abouts'; } // Rota adı öneki
+    protected function getViewPath(): string { return 'abouts'; }
+    protected function getRouteName(): string { return 'abouts'; }
 
-    // Formdan gelen veriyi doğrulamak için kurallar
+  // GÜNCELLENDİ: Türkçe alanlar kurallara eklendi
     protected function getValidationRules(Request $request, $id = null): array {
         return [
-            'title' => 'required|string|max:255',
-            'short_content' => 'nullable|string|max:1000', // Maksimum karakter sayısını ayarla
-            'content' => 'required|string',
-            // Görsel için kurallar (BlogController'daki gibi)
+            'title' => 'array',
+            'title.en' => 'required|string|max:255',
+            'title.tr' => 'nullable|string|max:255', // YENİ EKLENDİ
+            
+            'short_content' => 'array',
+            'short_content.en' => 'nullable|string|max:1000',
+            'short_content.tr' => 'nullable|string|max:1000', // YENİ EKLENDİ
+            
+            'content' => 'array',
+            'content.en' => 'required|string',
+            'content.tr' => 'nullable|string', // YENİ EKLENDİ
+            
             'image' => $id ? 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072' : 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072'
         ];
     }
 
-    // Görsel işlemleri için ayarlar (BlogController'daki gibi, yolları değiştir)
     protected function getImageFieldName(): ?string { return 'image'; }
-    protected function getImagePath(): ?string { return 'about-images'; } // Kaydedilecek klasör
-    protected function getImageSizes(): array { 
-        // Hakkımızda için farklı boyutlar gerekiyorsa güncelle
-        return ['800x600', '400x300', '128x128']; 
-    } 
+    protected function getImagePath(): ?string { return 'about-images'; }
+    protected function getImageSizes(): array { return ['800x600', '400x300', '128x128']; } 
 
-    // Forma ek veri göndermek (şimdilik boş, kategori vs. yok)
-    protected function getAdditionalDataForForms(): array {
-        return [];
-    }
+    protected function getAdditionalDataForForms(): array { return []; }
 
-    // Düzenleme modalı için JSON verisi döndüren edit metodu (BlogController'daki gibi)
+    // GÜNCELLENDİ: Edit (JSON Düzleştirme)
     public function edit($id)
     {
         $about = About::findOrFail($id);
-        // Modeldeki accessor sayesinde 'image_full_url' otomatik eklenecek
-        return response()->json(['item' => $about]);
+        $data = $about->toArray();
+
+        // Çevirileri Düzleştir (JavaScript için)
+        $translatableFields = ['title', 'short_content', 'content'];
+
+        foreach ($translatableFields as $field) {
+            if (isset($data[$field]) && is_array($data[$field])) {
+                foreach ($data[$field] as $lang => $value) {
+                    $data["{$field}[{$lang}]"] = $value;
+                }
+            }
+        }
+
+        // Resim URL'sini ekle
+        if ($about->image_url) {
+            $data['image_full_url'] = asset('storage/about-images/128x128/' . $about->image_url);
+        }
+
+        return response()->json(['item' => $data]);
+    }
+    
+    // GÜNCELLENDİ: Store (AJAX Uyumlu)
+    public function store(Request $request)
+    {
+        // 1. Validasyon
+        $validated = $request->validate($this->getValidationRules($request));
+
+        // 2. Resim Yükle
+        if ($request->hasFile('image')) {
+            $filename = $this->imageService->saveImage(
+                $request->file('image'),
+                $this->getImagePath(),
+                $this->getImageSizes()
+            );
+            if ($filename) {
+                $validated['image_url'] = $filename;
+            }
+        }
+
+        // 3. Kayıt
+        $this->model->create($validated);
+
+        // 4. Yanıt
+        return response()->json(['success' => true, 'message' => 'Kayıt başarıyla oluşturuldu.']);
     }
 
- // YENİ EKLENDİ: BaseResourceController'daki index metodunu eziyoruz (override).
-    /**
-     * Hakkımızda sayfasının içeriğini listeler.
-     * BaseController'ın varsayılan 'order' sıralamasını kullanmaz.
-     *
-     * @return \Illuminate\View\View
-     */
+    // GÜNCELLENDİ: Update (AJAX Uyumlu)
+    public function update(Request $request, $id)
+    {
+        $about = $this->model->findOrFail($id);
+        
+        // 1. Validasyon
+        $validated = $request->validate($this->getValidationRules($request, $id));
+
+        // 2. Resim Güncelle
+        if ($request->hasFile('image')) {
+            if ($about->image_url) {
+                $this->imageService->deleteImages($about->image_url, $this->getImagePath(), $this->getImageSizes());
+            }
+            $filename = $this->imageService->saveImage(
+                $request->file('image'),
+                $this->getImagePath(),
+                $this->getImageSizes()
+            );
+            if ($filename) {
+                $validated['image_url'] = $filename;
+            }
+        }
+
+        // 3. Güncelleme
+        $about->update($validated);
+
+        // 4. Yanıt
+        return response()->json(['success' => true, 'message' => 'Kayıt başarıyla güncellendi.']);
+    }
+
+    // Index metodu aynı kalabilir veya önceki override ettiğin hali kullanabilirsin.
     public function index()
     {
-        // Verileri 'order' sütununa göre sıralamadan çekiyoruz.
-        // Genellikle tek kayıt olacağı için all() yeterli.
-        // İstersen orderBy('id', 'asc') veya orderBy('created_at', 'asc') de kullanabilirsin.
         $data = $this->model->all(); 
-
         $routeName = $this->getRouteName();
         $viewPath = $this->getViewPath();
-        
-        // Forma gönderilecek ek verileri alıyoruz (bizim durumumuzda boş)
         $additionalData = $this->getAdditionalDataForForms();
-
-        // Veriyi view'a gönderiyoruz (BaseController'daki gibi)
         return view('admin.' . $viewPath . '.index', compact('data', 'routeName', 'viewPath') + $additionalData);
     }
-
-
 }

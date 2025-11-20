@@ -49,52 +49,51 @@
             </div>
             <div class="row">
 
-                @forelse($services as $service)
-                    <div class="col-xl-4 col-lg-6 col-md-6">
-                        <div class="single-market-style1">
-                            <div class="img-box img-box3">
-                                {{-- GÜNCELLEME: Dinamik resim yolu (home.blade.php ile aynı mantık) --}}
-                                <img src="{{ $service->image ? asset($service->image) : asset('frontend/assets/images/resources/market-v1-1.jpg') }}" alt="{{ $service->title }}">
-                            </div>
-                            <div class="content-box">
-                                <div class="shape"
-                                     style="background-image: url({{ asset('frontend/assets/images/shapes/market-v2-shape1.png') }});">
-                                </div>
-                                <div class="title">
-                                    <h3>
-                                        <a href="{{ route('frontend.services.detail', $service->slug) }}">{{ $service->title }}</a>
-                                    </h3>
-                                </div>
-                                <div class="text">
-                                    <div class="icon">
-                                        {{-- İkon statik kalabilir veya veritabanında varsa dinamikleştirilebilir --}}
-                                        <span class="icon-currency-exchange"><span class="path1"></span><span
-                                                class="path2"></span><span class="path3"></span><span
-                                                class="path4"></span><span class="path5"></span><span
-                                                class="path6"></span>
-                                        </span>
-                                    </div>
-                                    {{-- Kısa Açıklama --}}
-                                    <p>{{ Str::limit(strip_tags($service->content), 70) }}</p>
-                                </div>
-                                <div class="btn-box">
-                                    <a class="btn-one" href="{{ route('frontend.services.detail', $service->slug) }}">
-                                        <span class="txt">{{ __('messages.read_more') }}</span>
-                                        <i class="icon-right-arrow"></i>
-                                    </a>
-                                </div>
-                                <div class="count-box">
-                                    {{-- Sayfalama uyumlu sıra numarası --}}
-                                    <h2>{{ str_pad($loop->iteration + (($services->currentPage() - 1) * $services->perPage()), 2, '0', STR_PAD_LEFT) }}.</h2>
-                                </div>
-                            </div>
-                        </div>
+@forelse($services as $service)
+    <div class="col-xl-4 col-lg-6 col-md-6">
+        <div class="single-market-style1">
+            <div class="img-box img-box3">
+                {{-- DÜZELTME: Yol 'storage/service-images/400x300/' olarak güncellendi --}}
+                <img src="{{ $service->image_url ? asset('storage/service-images/400x300/' . $service->image_url) : asset('frontend/assets/images/resources/market-v1-1.jpg') }}" alt="{{ $service->getTranslation('title') }}">
+            </div>
+            <div class="content-box">
+                <div class="shape"
+                     style="background-image: url({{ asset('frontend/assets/images/shapes/market-v2-shape1.png') }});">
+                </div>
+                <div class="title">
+                    <h3>
+                        {{-- Başlık Çevirisi --}}
+                        <a href="{{ route('frontend.services.detail', $service->slug) }}">{{ $service->getTranslation('title') }}</a>
+                    </h3>
+                </div>
+                <div class="text">
+                    <div class="icon">
+                        <span class="icon-currency-exchange"><span class="path1"></span><span
+                                class="path2"></span><span class="path3"></span><span
+                                class="path4"></span><span class="path5"></span><span
+                                class="path6"></span>
+                        </span>
                     </div>
-                @empty
-                    <div class="col-12">
-                        <p class="text-center">{{ __('messages.no_services_found') }}</p>
-                    </div>
-                @endforelse
+                    {{-- İçerik Çevirisi ve Kısaltma --}}
+                    <p>{{ Str::limit(strip_tags($service->getTranslation('content')), 70) }}</p>
+                </div>
+                <div class="btn-box">
+                    <a class="btn-one" href="{{ route('frontend.services.detail', $service->slug) }}">
+                        <span class="txt">{{ __('messages.read_more') }}</span>
+                        <i class="icon-right-arrow"></i>
+                    </a>
+                </div>
+                <div class="count-box">
+                    <h2>{{ str_pad($loop->iteration + (($services->currentPage() - 1) * $services->perPage()), 2, '0', STR_PAD_LEFT) }}.</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+@empty
+    <div class="col-12">
+        <p class="text-center">{{ __('messages.no_services_found') }}</p>
+    </div>
+@endforelse
 
             </div>
 
