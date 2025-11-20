@@ -21,7 +21,7 @@
                 {{-- Sıralama Geri Eklendi --}}
                 <td class="handle-cell text-center"><i class="ri-menu-2-line handle"></i></td>
                 <td>{{ $item->id }}</td>
-                <td>{{ $item->title }}</td>
+                <td>{{ $item->getTranslation('title') }}</td>
                 <td>
                     <div class="form-check form-switch form-switch-lg text-center">
                         <input type="checkbox" class="form-check-input status-switch"

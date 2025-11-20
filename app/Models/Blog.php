@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasTranslations; // YENİ
 
 class Blog extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'title',
@@ -28,7 +29,13 @@ class Blog extends Model
         'meta_description',
         'meta_keywords'
     ];
-    
+
+    // YENİ: Veritabanındaki JSON'ı otomatik PHP dizisine çevirir
+    protected $casts = [
+        'title' => 'array',
+        'content' => 'array',
+    ];
+
     // YENİ EKLENDİ: Model JSON'a çevrildiğinde bu 'sanal' alanı da ekle.
     protected $appends = ['image_full_url'];
 

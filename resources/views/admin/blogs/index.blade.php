@@ -76,4 +76,6 @@
 
     {{-- Tüm modüller için TEK ortak JS dosyasını çağırıyoruz --}}
     <script src="{{ asset('js/admin/common/resource-handler.js') }}?v={{ time() }}" defer></script>
+    {{-- Summernote Veri Doldurma Yaması --}}
+
 @endpush

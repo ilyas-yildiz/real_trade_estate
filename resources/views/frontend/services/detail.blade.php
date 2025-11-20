@@ -1,10 +1,10 @@
 ﻿@extends('frontend.layouts.app')
 
-{{-- Sayfa başlığını hizmet başlığı ile ayarlıyoruz --}}
-@section('title', $service->title . ' - ' . __('messages.invest')) 
+{{-- Sayfa başlığı: Çeviri metodu ile --}}
+@section('title', $service->getTranslation('title') . ' - ' . __('messages.invest')) 
 
-{{-- Meta açıklamasını hizmet içeriğinden alalım --}}
-@section('description', Str::limit(strip_tags($service->content), 160)) 
+{{-- Meta açıklaması: Çeviri metodu ile --}}
+@section('description', Str::limit(strip_tags($service->getTranslation('content')), 160)) 
 
 @section('content')
 
@@ -17,18 +17,18 @@
             <div class="container">
                 <div class="inner-content">
                     <div class="title">
-                        {{-- Hizmet başlığı --}}
-                        <h2>{{ $service->title }}</h2>
+                        {{-- Hizmet başlığı (Düzeltildi) --}}
+                        <h2>{{ $service->getTranslation('title') }}</h2>
                     </div>
                     <div class="breadcrumb-menu">
                         <ul class="clearfix">
-                            {{-- GÜNCELLEME: Çeviri --}}
+                            {{-- Çeviri --}}
                             <li><a href="{{ route('frontend.home') }}">{{ __('messages.home') }}</a></li>
                             <li><span class="icon-right-arrow"></span></li>
                             <li><a href="{{ route('frontend.services') }}">{{ __('messages.invest') }}</a></li>
                             <li><span class="icon-right-arrow"></span></li>
-                            {{-- Aktif sayfa adı (Uzunsa kısaltılabilir) --}}
-                            <li class="active">{{ Str::limit($service->title, 30) }}</li> 
+                            {{-- Aktif sayfa adı (Düzeltildi) --}}
+                            <li class="active">{{ Str::limit($service->getTranslation('title'), 30) }}</li> 
                         </ul>
                     </div>
                 </div>
@@ -37,28 +37,30 @@
     </section>
 
     {{-- İçerik Alanı --}}
-    <section class="blog-details pdtop pdbottom"> {{-- Stil sınıfını blog detay ile aynı yaptım, tutarlılık için --}}
+    <section class="blog-details pdtop pdbottom">
         <div class="container">
-            <div class="row justify-content-center"> {{-- Ortalamak için --}}
-                <div class="col-xl-10 col-lg-12"> {{-- Genişlik ayarı --}}
+            <div class="row justify-content-center">
+                <div class="col-xl-10 col-lg-12">
                     <div class="blog-details__content">
                         
                         {{-- Ana Görsel --}}
                         <div class="blog-details-top">
                             <div class="img-box">
                                 @if($service->image_url)
-                                    {{-- GÜNCELLEME: Dinamik resim yolu --}}
-                                    <img src="{{ asset('storage/service-images/' . $service->image_url) }}" alt="{{ $service->title }}">
+                                    {{-- GÜNCELLEME: Resim yolu '800x600' klasörüne göre ayarlandı --}}
+                                    {{-- Alt etiketine çevrilmiş başlık eklendi --}}
+                                    <img src="{{ asset('storage/service-images/800x600/' . $service->image_url) }}" alt="{{ $service->getTranslation('title') }}">
                                 @else
                                     {{-- Varsayılan görsel --}}
-                                    <img src="{{ asset('frontend/assets/images/resources/market-v1-1.jpg') }}" alt="{{ $service->title }}">
+                                    <img src="{{ asset('frontend/assets/images/resources/market-v1-1.jpg') }}" alt="{{ $service->getTranslation('title') }}">
                                 @endif
                             </div>
                         </div>
 
                         {{-- Hizmet İçeriği (HTML) --}}
                         <div class="blog-details-text1 mt-4">
-                            {!! $service->content !!}
+                            {{-- DÜZELTME: İçerik çevirisi --}}
+                            {!! $service->getTranslation('content') !!}
                         </div>
 
                         {{-- Geri Dön Butonu --}}

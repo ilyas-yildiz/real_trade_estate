@@ -175,25 +175,23 @@
         </div>
     </section>
     
-
-    @if(isset($about))
+@if(isset($about))
     <section class="about-style1">
         <div class="container">
             <div class="row">
                 <div class="col-xl-6 col-lg-6">
                     <div class="about-style1__img">
                         <div class="img-box wow fadeInLeft animated" data-wow-delay="00ms" data-wow-duration="1500ms">
-                            <img src="{{ $about->image ? asset($about->image) : asset('frontend/assets/images/about/about-v1-1.jpg') }}" alt="About Image">
+                            {{-- Resim --}}
+                            <img src="{{ $about->image_url ? asset('storage/about-images/800x600/' . $about->image_url) : asset('frontend/assets/images/about/about-v1-1.jpg') }}" alt="About Image">
                         </div>
-                        {{-- Statik Award Badge --}}
                         <div class="about-style1__img-award text-center wow fadeInUp animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                             <div class="about-style1__img-award-top">
                                 <div class="top">
-                                    <div class="shape1"><img src="{{ asset('frontend/assets/images/about/logo-5.png') }}" alt="Real Trade State"></div>
+                                    <div class="shape1"><img src="{{ asset('frontend/assets/images/about/logo-5.png') }}" alt="Real Trade Estate"></div>
                                 </div>
                             </div>
                         </div>
-                        {{-- Statik Yıl --}}
                         <div class="about-style1-round-text wow fadeInRight animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                             <div class="overlay-text"><div class="inner">24</div></div>
                         </div>
@@ -203,18 +201,21 @@
                 <div class="col-xl-6 col-lg-6">
                     <div class="about-style1__content wow fadeInRight animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                         <div class="sec-title">
-                            {{-- GÜNCELLEME: Çeviri --}}
-                            <div class="sub-title"><h4>{{ __('messages.about_title_prefix') }} Real Trade State</h4></div>
-                            <h2>{!! $about->title !!}</h2>
+                            <div class="sub-title"><h4>{{ __('messages.about_title_prefix') }} Real Trade Estate</h4></div>
+                            
+                            {{-- DÜZELTME BURADA: $about->title -> getTranslation('title') --}}
+                            <h2>{!! $about->getTranslation('title') !!}</h2>
                         </div>
                         <div class="text">
-                            <p>{{ $about->short_content }}</p>
+                            {{-- DÜZELTME BURADA: $about->short_content -> getTranslation('short_content') --}}
+                            <p>{{ $about->getTranslation('short_content') }}</p>
                         </div>
                         
                         <div class="text-box">
                             <div class="icon"><div class="inner"><span class="icon-target"><span class="path1"></span></span></div></div>
                             <div class="text1">
-                                <p>{{ Str::limit(strip_tags($about->content), 100) }}</p>
+                                {{-- DÜZELTME BURADA: $about->content -> getTranslation('content') --}}
+                                <p>{{ Str::limit(strip_tags($about->getTranslation('content')), 100) }}</p>
                             </div>
                         </div>
                         <div class="btn-box">
@@ -352,7 +353,7 @@
             </div>
         </section>
 
-    @if(isset($blogs) && $blogs->count() > 0)
+   @if(isset($blogs) && $blogs->count() > 0)
     <section class="blog-style1">
         <div class="container">
             <div class="sec-title withtext text-center">
@@ -360,12 +361,10 @@
                 <h2>{{ __('messages.latest_insights') }}</h2>
             </div>
 
-         <div class="blog-style1__inner">
+            <div class="blog-style1__inner">
                 <div class="blog-style1__tab">
-                    
                     <div class="blog-style1__tab-btn">
                         <ul class="tabs-button-box clearfix">
-                            {{-- Şimdilik sadece bir ana tab kullanıyoruz --}}
                             <li data-tab="#global-analysis" class="tab-btn-item active-btn-item"><h4>Latest News</h4></li>
                         </ul>
                     </div>
@@ -375,7 +374,6 @@
                             <div class="blog-style1-tab-content-box-item">
                                 <div class="row">
                                     <div class="col-xl-8">
-                                        {{-- Ana Blog (Slider) - Sadece ilk blogu alır --}}
                                         @php $firstBlog = $blogs->first(); @endphp
                                         @if($firstBlog)
                                         <div class="blog-style1-carousel">
@@ -384,36 +382,27 @@
                                                     <div class="col-xl-6 col-lg-6">
                                                         <div class="single-blog-style1">
                                                             <div class="img-box">
-                                                                {{-- DÜZELTME: 'storage/' kaldırıldı --}}
-                                                                <img src="{{ $firstBlog->image_url ? asset('storage/blog-images/365x182/' . $firstBlog->image_url) : asset('frontend/assets/images/blog/blog-v1-1.jpg') }}" alt="{{ $firstBlog->title }}">
+                                                                <img src="{{ $firstBlog->image_url ? asset('storage/blog-images/365x182/' . $firstBlog->image_url) : asset('frontend/assets/images/blog/blog-v1-1.jpg') }}" alt="{{ $firstBlog->getTranslation('title') }}">
                                                             </div>
                                                             <div class="content-box">
                                                                 <div class="top-box">
-                                                                    <div class="category">
-                                                                        <div class="icon"><i class="icon-hashtag"></i></div>
-                                                                        {{-- GÜNCELLEME: 'Kategori' -> 'Category' --}}
-                                                                        <h6>{{ $firstBlog->category->name ?? 'Category' }}</h6>
-                                                                    </div>
-                                                                    <div class="date">
-                                                                        <div class="icon"><i class="fa fa fa-calendar"></i></div>
-                                                                        <h6>{{ $firstBlog->created_at->format('d.m.Y') }}</h6>
-                                                                    </div>
+                                                                    <div class="category"><div class="icon"><i class="icon-hashtag"></i></div><h6>{{ $firstBlog->category->name ?? 'Category' }}</h6></div>
+                                                                    <div class="date"><div class="icon"><i class="fa fa fa-calendar"></i></div><h6>{{ $firstBlog->created_at->format('d.m.Y') }}</h6></div>
                                                                 </div>
                                                                 <div class="title-box">
-                                                                    <h3><a href="{{ route('frontend.blog.detail', $firstBlog->slug) }}">{{ $firstBlog->title }}</a></h3>
+                                                                    <h3><a href="{{ route('frontend.blog.detail', $firstBlog->slug) }}">{{ $firstBlog->getTranslation('title') }}</a></h3>
                                                                 </div>
                                                                 <div class="text-box">
-                                                                    <p>{{ $firstBlog->short_description ?? Str::limit(strip_tags($firstBlog->content), 100) }}</p>
+                                                                    <p>{{ $firstBlog->getTranslation('short_description') ?? Str::limit(strip_tags($firstBlog->getTranslation('content')), 100) }}</p>
                                                                 </div>
                                                                 <div class="btn-box">
                                                                     <a class="overlay-btn" href="{{ route('frontend.blog.detail', $firstBlog->slug) }}">
-                                                                        Read More <i class="icon-right-arrow"></i>
+                                                                        {{ __('messages.read_more') }} <i class="icon-right-arrow"></i>
                                                                     </a>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {{-- Yanındaki diğer 2 blog (ilk 3 blogdan 2. ve 3. olanlar) --}}
                                                     <div class="col-xl-6 col-lg-6">
                                                         @if(isset($blogs[1]))
                                                         @php $sideBlog1 = $blogs[1]; @endphp
@@ -422,9 +411,9 @@
                                                                 <div class="category"><div class="icon"><i class="icon-hashtag"></i></div><h6>{{ $sideBlog1->category->name ?? '' }}</h6></div>
                                                                 <div class="date"><div class="icon"><i class="fa fa fa-calendar"></i></div><h6>{{ $sideBlog1->created_at->format('d.m.Y') }}</h6></div>
                                                             </div>
-                                                            <div class="title-box"><h3><a href="{{ route('frontend.blog.detail', $sideBlog1->slug) }}">{{ $sideBlog1->title }}</a></h3></div>
-                                                            <div class="text-box"><p>{{ $sideBlog1->short_description ?? Str::limit(strip_tags($sideBlog1->content), 70) }}</p></div>
-                                                            <div class="btn-box"><a class="overlay-btn" href="{{ route('frontend.blog.detail', $sideBlog1->slug) }}">Read More <i class="icon-right-arrow"></i></a></div>
+                                                            <div class="title-box"><h3><a href="{{ route('frontend.blog.detail', $sideBlog1->slug) }}">{{ $sideBlog1->getTranslation('title') }}</a></h3></div>
+                                                            <div class="text-box"><p>{{ $sideBlog1->getTranslation('short_description') ?? Str::limit(strip_tags($sideBlog1->getTranslation('content')), 70) }}</p></div>
+                                                            <div class="btn-box"><a class="overlay-btn" href="{{ route('frontend.blog.detail', $sideBlog1->slug) }}">{{ __('messages.read_more') }} <i class="icon-right-arrow"></i></a></div>
                                                             <div class="border-line"></div>
                                                         </div>
                                                         @endif
@@ -435,9 +424,9 @@
                                                                 <div class="category"><div class="icon"><i class="icon-hashtag"></i></div><h6>{{ $sideBlog2->category->name ?? '' }}</h6></div>
                                                                 <div class="date"><div class="icon"><i class="fa fa fa-calendar"></i></div><h6>{{ $sideBlog2->created_at->format('d.m.Y') }}</h6></div>
                                                             </div>
-                                                            <div class="title-box"><h3><a href="{{ route('frontend.blog.detail', $sideBlog2->slug) }}">{{ $sideBlog2->title }}</a></h3></div>
-                                                            <div class="text-box"><p>{{ $sideBlog2->short_description ?? Str::limit(strip_tags($sideBlog2->content), 70) }}</p></div>
-                                                            <div class="btn-box"><a class="overlay-btn" href="{{ route('frontend.blog.detail', $sideBlog2->slug) }}">Read More <i class="icon-right-arrow"></i></a></div>
+                                                            <div class="title-box"><h3><a href="{{ route('frontend.blog.detail', $sideBlog2->slug) }}">{{ $sideBlog2->getTranslation('title') }}</a></h3></div>
+                                                            <div class="text-box"><p>{{ $sideBlog2->getTranslation('short_description') ?? Str::limit(strip_tags($sideBlog2->getTranslation('content')), 70) }}</p></div>
+                                                            <div class="btn-box"><a class="overlay-btn" href="{{ route('frontend.blog.detail', $sideBlog2->slug) }}">{{ __('messages.read_more') }} <i class="icon-right-arrow"></i></a></div>
                                                         </div>
                                                         @endif
                                                     </div>
@@ -446,67 +435,30 @@
                                         </div>
                                         @endif
                                     </div>
-
                                     <div class="col-xl-4 col-lg-6">
-                                            <div class="blog-style1-subscribe">
-                                                <div class="shape1">
-                                                    <img class="float-bob-x" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape1.png') }}" alt="Shape">
-                                                </div>
-                                                <div class="shape2">
-                                                    <img class="zoominout" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape2.png') }}" alt="Shape">
-                                                </div>
-                                                <div class="shape3">
-                                                    <img class="zoominout" src="{{ asset('frontend/assets/images/shapes/blog-v1-shape3.png') }}" alt="Shape">
-                                                </div>
-                                                <div class="top-box">
-                                                    <h3>Subscribe Us</h3>
-                                                    <p>Get updates in your inbox diectly.</p>
-                                                </div>
-                                                <div class="blog-style1-subscribe__inner">
-                                                    <ul class="clearfix">
-                                                        <li>
-                                                            <div class="icon">
-                                                                <i class="icon-check"></i>
-                                                            </div>
-                                                            <p>Special Promotions</p>
-                                                        </li>
-                                                        <li>
-                                                            <div class="icon">
-                                                                <i class="icon-check"></i>
-                                                            </div>
-                                                            <p>Exclusive Market Insights</p>
-                                                        </li>
-                                                        <li>
-                                                            <div class="icon">
-                                                                <i class="icon-check"></i>
-                                                            </div>
-                                                            <p>Expert Trading Tips</p>
-                                                        </li>
-                                                    </ul>
-                                                    <div class="blog-style1-subscribe-form">
-                                                        <form action="#" method="POST">
-                                                            <div class="form-group">
-                                                                <input type="email" name="email" placeholder="Email address..." required="">
-                                                            </div>
-                                                            <div class="checked-box1">
-                                                                <input type="checkbox" name="agree" id="termsconditions2" checked="">
-                                                                <label for="termsconditions1">
-                                                                    <span></span>I agree terms &amp; conditions.
-                                                                </label>
-                                                            </div>
-                                                            <div class="btn-box">
-                                                                <button class="submit btn-one">
-                                                                    <span class="txt">
-                                                                        Subscribe
-                                                                        <i class="icon-right-arrow"></i>
-                                                                    </span>
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
+                                        {{-- Subscribe Kutusu (Burada değişiklik yok) --}}
+                                        <div class="blog-style1-subscribe">
+                                            {{-- ... (Subscribe HTML içeriği) ... --}}
+                                             <div class="shape1"><img src="{{ asset('frontend/assets/images/shapes/blog-v1-shape1.png') }}" alt="Shape"></div>
+                                            <div class="shape2"><img src="{{ asset('frontend/assets/images/shapes/blog-v1-shape2.png') }}" alt="Shape"></div>
+                                            <div class="shape3"><img src="{{ asset('frontend/assets/images/shapes/blog-v1-shape3.png') }}" alt="Shape"></div>
+                                            <div class="top-box"><h3>{{ __('messages.subscribe_us') }}</h3><p>{{ __('messages.subscribe_desc') }}</p></div>
+                                            <div class="blog-style1-subscribe__inner">
+                                                <ul class="clearfix">
+                                                    <li><div class="icon"><i class="icon-check"></i></div><p>Special Promotions</p></li>
+                                                    <li><div class="icon"><i class="icon-check"></i></div><p>Exclusive Market Insights</p></li>
+                                                    <li><div class="icon"><i class="icon-check"></i></div><p>Expert Trading Tips</p></li>
+                                                </ul>
+                                                <div class="blog-style1-subscribe-form">
+                                                    <form action="#" method="POST">
+                                                        <div class="form-group"><input type="email" name="email" placeholder="{{ __('messages.email_placeholder') }}" required=""></div>
+                                                        <div class="checked-box1"><input type="checkbox" name="agree" id="termsconditions2" checked=""><label for="termsconditions1"><span></span>{{ __('messages.agree_terms') }}</label></div>
+                                                        <div class="btn-box"><button class="submit btn-one"><span class="txt">{{ __('messages.subscribe') }}<i class="icon-right-arrow"></i></span></button></div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -517,29 +469,69 @@
     </section>
     @endif
 
-{{-- HABERLER BÖLÜMÜ --}}
+{{-- HABERLER BÖLÜMÜ (TRADINGVIEW TIMELINE) --}}
 <section class="news-style1 pdtop pdbottom">
     <div class="container">
         <div class="sec-title withtext text-center">
             <div class="sub-title"><h4>{{ __('messages.market_news') }}</h4></div>
-            <h2>{{ __('messages.latest_crypto_updates') }}</h2>
+            <h2>{{ App::getLocale() == 'tr' ? 'Son Piyasa Gelişmeleri' : 'Latest Market Updates' }}</h2>
         </div>
         
-        <div class="tradingview-widget-container">
+        {{-- 
+            GÜNCELLEME: 
+            1. ID eklendi: 'tv-timeline-container'
+            2. style'a '!important' eklendi (CSS önlemi)
+        --}}
+        <div class="tradingview-widget-container" id="tv-timeline-container" style="width: 800px !important; max-width: 100%; height: 800px !important; margin: 0 auto; display: block;">
           <div class="tradingview-widget-container__widget"></div>
+          <div class="tradingview-widget-copyright">
+            <a href="https://tr.tradingview.com/" rel="noopener nofollow" target="_blank">
+                <span class="blue-text">Piyasa haberleri</span>
+            </a> TradingView tarafından
+          </div>
           <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
           {
-          "displayMode": "regular",
           "feedMode": "all_symbols",
-          "colorTheme": "light",
           "isTransparent": false,
-          // GÜNCELLEME: Widget Dili Dinamik
-          "locale": "{{ App::getLocale() }}",
-          "width": 1200,
-          "height": 550
+          "displayMode": "regular",
+          // GÜNCELLEME: JSON ayarında da 800 diyoruz
+          "width": "800", 
+          "height": "800",
+          "colorTheme": "light",
+          "locale": "{{ App::getLocale() }}" 
         }
           </script>
         </div>
+        
+        {{-- YENİ: Widget Boyutunu Zorlayan Script --}}
+        <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            function forceTimelineSize() {
+                var container = document.getElementById('tv-timeline-container');
+                
+                if (container) {
+                    // Konteyneri zorla 800px yap
+                    container.style.setProperty('width', '1200px', 'important');
+                    container.style.setProperty('height', '800px', 'important');
+                    
+                    // İçindeki iframe'i bul ve onu da zorla
+                    var iframe = container.querySelector('iframe');
+                    if (iframe) {
+                        iframe.style.setProperty('width', '100%', 'important');
+                        iframe.style.setProperty('height', '100%', 'important');
+                    }
+                }
+                
+                // Scriptin yüklenmesi zaman alabileceği için işlemi tekrarla
+                // (TradingView bazen sonradan render eder)
+                setTimeout(forceTimelineSize, 500); 
+                setTimeout(forceTimelineSize, 2000); // 2 saniye sonra son kontrol
+            }
+            
+            // İlk tetikleme
+            forceTimelineSize();
+        });
+        </script>
         </div>
 </section>
 {{-- HABERLER BÖLÜMÜ SONU --}}

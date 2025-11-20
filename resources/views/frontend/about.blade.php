@@ -1,8 +1,8 @@
-﻿@extends('frontend.layouts.app')
+@extends('frontend.layouts.app')
 
-{{-- SEO Başlığı (Hakkımızda başlığı veya varsayılan) --}}
+{{-- SEO Başlığı --}}
 @section('title', isset($about) ? $about->title : ($settings['seo_title'] ?? __('messages.about_us') . ' - ' . __('messages.site_title')))
-{{-- SEO Açıklaması (Kısa içerik veya varsayılan) --}}
+{{-- SEO Açıklaması --}}
 @section('description', isset($about) ? Str::limit(strip_tags($about->short_content ?? $about->content), 160) : ($settings['seo_description'] ?? __('messages.meta_description_default')))
 
 @section('content')
@@ -76,10 +76,10 @@
                         <div class="about-style2__right">
                             <div class="sec-title withtext">
                                 <div class="sub-title">
-                                    {{-- GÜNCELLEME: 'About Real Trade State' --}}
-                                    <h4>{{ __('messages.about_title_prefix') }} Real Trade State</h4>
+                                    {{-- GÜNCELLEME: 'About Real Trade Estate' --}}
+                                    <h4>{{ __('messages.about_title_prefix') }} Real Trade Estate</h4>
                                 </div>
-                                {{-- Ana Başlık (Dinamik) --}}
+                                {{-- Ana Başlık (Dinamik - Modelden JSON çevrili gelir) --}}
                                 <h2>{{ $about->title }}</h2>
                                 {{-- Ana İçerik (Dinamik - HTML destekli) --}}
                                 <div class="text">
@@ -92,8 +92,8 @@
                 </div>
             </div>
         </section>
-        @else
-        {{-- Eğer veritabanında hakkımızda içeriği yoksa basit bir mesaj göster --}}
+    @else
+        {{-- Eğer veritabanında hakkımızda içeriği yoksa --}}
         <section class="pdtop pdbottom">
             <div class="container">
                 <p class="text-center">{{ __('messages.content_not_available') }}</p>
