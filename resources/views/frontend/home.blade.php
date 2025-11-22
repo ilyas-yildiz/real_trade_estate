@@ -115,26 +115,31 @@
                 forceTickerHeight();
             });
             </script>
-            {{-- DİNAMİK SLIDER --}}
+           {{-- DİNAMİK SLIDER --}}
             <div class="swiper-container banner-slider-two">
                 <div class="swiper-wrapper">
 
                     @forelse ($slides as $slide)
                     <div class="swiper-slide">
+                        {{-- Görsel Yolu --}}
                         <div class="image-layer" style="background-image: url({{ $slide->image_url ? asset('storage/slide-images/1920x1080/' . $slide->image_url) : asset('assets/images/main-slider/slider5/slide1.jpg') }});">
                         </div>
+                        
                         <div class="container">
                             <div class="content-box">
                                 <div class="big-title">
-                                    <h2>{!! $slide->title !!}</h2> 
+                                    {{-- GÜNCELLEME: Başlık Çevirisi --}}
+                                    <h2>{!! $slide->getTranslation('title') !!}</h2> 
                                 </div>
                                 <div class="text">
-                                    <p>{{ $slide->subtitle }}</p>
+                                    {{-- GÜNCELLEME: Alt Başlık Çevirisi --}}
+                                    <p>{{ $slide->getTranslation('subtitle') }}</p>
                                 </div>
                                 <div class="bottom-box">
                                     <div class="btn-box">
                                         <a class="btn-one" href="{{ $slide->link ?? '#' }}">
-                                            <span class="txt">{{ $slide->button_text ?? __('messages.details') }}</span>
+                                            {{-- GÜNCELLEME: Buton Metni Çevirisi --}}
+                                            <span class="txt">{{ $slide->getTranslation('button_text') ?: __('messages.read_more') }}</span>
                                             <i class="icon-right-arrow"></i>
                                         </a>
                                     </div>
@@ -143,6 +148,7 @@
                         </div>
                     </div>
                     @empty
+                    {{-- Varsayılan Slide (Veri yoksa) --}}
                     <div class="swiper-slide">
                         <div class="image-layer" style="background-image: url({{ asset('frontend/assets/images/slides/slide-v1-1.jpg') }});">
                         </div>
@@ -171,8 +177,6 @@
                     <span><i class="icon-arrow-right" aria-hidden="true"></i></span>
                 </div>
             </div>
-
-        </div>
     </section>
     
 @if(isset($about))

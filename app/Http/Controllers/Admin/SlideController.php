@@ -9,189 +9,126 @@ use Illuminate\Database\Eloquent\Model;
 use App\Services\ImageService;
 use Illuminate\Support\Str;
 
-class SlideController extends BaseResourceController // Değiştirildi
+class SlideController extends BaseResourceController
 {
-    // app/Http/Controllers/Admin/SlideController.php içine eklenecek
+    protected function getModelInstance(): Model { return new Slide(); }
+    protected function getViewPath(): string { return 'slides'; }
+    protected function getRouteName(): string { return 'slides'; }
 
-    // Gerekli ayar metodları
-    protected function getModelInstance(): Model
-    {
-        return new Slide();
-    }
-    protected function getViewPath(): string
-    {
-        return 'slides';
-    } // View klasör adı
-    protected function getRouteName(): string
-    {
-        return 'slides';
-    } // Rota adı öneki
-
-    // app/Http/Controllers/Admin/SlideController.php içine eklenecek
-
+    // GÜNCELLEME: JSON Validasyonu ve Sketch Kaldırıldı
     protected function getValidationRules(Request $request, $id = null): array
     {
-        return [
-            'title' => 'required|string|max:255',
-            'subtitle' => 'nullable|string|max:255',
-            'link' => 'nullable|url|max:255', // Linkin geçerli bir URL olmasını kontrol edelim
-            'button_text' => 'nullable|string|max:50',
-            // Görsel zorunlu, ilk kayıtta gerekli, güncellemede isteğe bağlı
+       return [
+            // Başlık
+            'title' => 'array',
+            'title.en' => 'required|string|max:255',
+            'title.tr' => 'nullable|string|max:255', // YENİ EKLENDİ
+            
+            // Alt Başlık
+            'subtitle' => 'array',
+            'subtitle.en' => 'nullable|string|max:255',
+            'subtitle.tr' => 'nullable|string|max:255', // YENİ EKLENDİ
+            
+            // Buton Metni
+            'button_text' => 'array',
+            'button_text.en' => 'nullable|string|max:255',
+            'button_text.tr' => 'nullable|string|max:255', // YENİ EKLENDİ
+            
+            // Diğerleri (Dil bağımsız)
+            'link' => 'nullable|url|max:255',
             'image' => $id ? 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240' : 'required|image|mimes:jpeg,png,jpg,webp|max:10240',
-            'image_sketch' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
         ];
     }
 
-    // app/Http/Controllers/Admin/SlideController.php içine eklenecek
+    protected function getImageFieldName(): ?string { return 'image'; }
+    protected function getImagePath(): ?string { return 'slide-images'; }
+    protected function getImageSizes(): array { return ['1920x1080', '128x128']; }
 
-    protected function getImageFieldName(): ?string
-    {
-        return 'image';
-    }
-    protected function getImagePath(): ?string
-    {
-        return 'slide-images';
-    }
-    protected function getImageSizes(): array
-    {
-        return ['1920x1080', '1280x720', '128x128'];
-    }
+    protected function getAdditionalDataForForms(): array { return []; }
 
-    // YENİ: Sketch Görsel Ayarları (Yardımcı metodlar)
-    protected function getSketchImageFieldName(): string
+    // Edit Metodu (JSON Düzleştirme)
+    public function edit($id)
     {
-        return 'image_sketch';
-    }
-    protected function getSketchImagePath(): string
-    {
-        return 'slide-images-sketch';
-    }
-    protected function getSketchImageSizes(): array
-    {
-        return $this->getImageSizes();
-    } // Şimdilik aynı boyutlar
+        $slide = Slide::findOrFail($id);
+        $data = $slide->toArray();
 
-    // app/Http/Controllers/Admin/SlideController.php içine eklenecek
+        // Çevirileri Düzleştir
+        $translatableFields = ['title', 'subtitle', 'button_text'];
+        foreach ($translatableFields as $field) {
+            if (isset($data[$field]) && is_array($data[$field])) {
+                foreach ($data[$field] as $lang => $value) {
+                    $data["{$field}[{$lang}]"] = $value;
+                }
+            }
+        }
 
-    protected function getAdditionalDataForForms(): array
-    {
-        return [];
+        // Görsel
+        if ($slide->image_url) {
+            $data['image_full_url'] = asset('storage/slide-images/128x128/' . $slide->image_url);
+        }
+
+        return response()->json(['item' => $data]);
     }
 
-    // --- STORE METODU OVERRIDE EDİLDİ ---
+    // Store Metodu (AJAX Uyumlu)
     public function store(Request $request)
     {
         $imageService = app(ImageService::class);
         $validatedData = $request->validate($this->getValidationRules($request));
 
-        // Ana görseli işle (saveImage kullanarak)
+        // Ana görseli işle
         if ($request->hasFile($this->getImageFieldName())) {
-            // DÜZELTİLDİ: storeAndResize -> saveImage
             $filename = $imageService->saveImage(
                 $request->file($this->getImageFieldName()),
                 $this->getImagePath(),
                 $this->getImageSizes()
             );
-            // DÜZELTİLDİ: Dönen değeri kontrol et
+            
             if ($filename) {
                 $validatedData['image_url'] = $filename;
             } else {
-                // saveImage başarısız olursa (varsayım: null döner)
-                return back()->withErrors(['image' => 'Ana görsel kaydedilemedi.'])->withInput();
-            }
-        }
-
-        // Sketch görselini işle (saveImage kullanarak)
-        if ($request->hasFile($this->getSketchImageFieldName())) {
-            // DÜZELTİLDİ: storeAndResize -> saveImage
-            $sketchFilename = $imageService->saveImage(
-                $request->file($this->getSketchImageFieldName()),
-                $this->getSketchImagePath(),
-                $this->getSketchImageSizes()
-            );
-            // DÜZELTİLDİ: Dönen değeri kontrol et
-            if ($sketchFilename) {
-                $validatedData['image_sketch_url'] = $sketchFilename;
-            } else {
-                // Eğer ana görsel kaydedildiyse onu silmek iyi olabilir
-                if (isset($validatedData['image_url'])) {
-                    $imageService->deleteImages($validatedData['image_url'], $this->getImagePath(), $this->getImageSizes());
-                }
-                return back()->withErrors(['image_sketch' => 'Sketch görsel kaydedilemedi.'])->withInput();
+                return response()->json(['success' => false, 'message' => 'Görsel yüklenirken hata oluştu.'], 422);
             }
         }
 
         $validatedData['order'] = ($this->model->max('order') ?? -1) + 1;
         $this->model->create($validatedData);
 
-        return response()->json(['success' => true, 'message' => $this->getResourceName() . ' başarıyla eklendi.']);
+        return response()->json(['success' => true, 'message' => 'Slide başarıyla eklendi.']);
     }
 
-    // --- UPDATE METODU OVERRIDE - DOĞRU METOT ADI KULLANILDI ---
+    // Update Metodu (AJAX Uyumlu)
     public function update(Request $request, $id)
     {
         $imageService = app(ImageService::class);
         $item = $this->model->findOrFail($id);
         $validatedData = $request->validate($this->getValidationRules($request, $id));
 
-        // Ana görseli güncelle (saveImage kullanarak)
+        // Ana görseli güncelle
         if ($request->hasFile($this->getImageFieldName())) {
-            // DÜZELTİLDİ: storeAndResize -> saveImage
             $filename = $imageService->saveImage(
                 $request->file($this->getImageFieldName()),
                 $this->getImagePath(),
                 $this->getImageSizes()
             );
-            // DÜZELTİLDİ: Dönen değeri kontrol et
+            
             if ($filename) {
                 if ($item->image_url) {
                     $imageService->deleteImages($item->image_url, $this->getImagePath(), $this->getImageSizes());
                 }
                 $validatedData['image_url'] = $filename;
             } else {
-                return back()->withErrors(['image' => 'Ana görsel güncellenemedi.'])->withInput();
-            }
-        }
-
-        // Sketch görselini güncelle (saveImage kullanarak)
-        if ($request->hasFile($this->getSketchImageFieldName())) {
-            // DÜZELTİLDİ: storeAndResize -> saveImage
-            $sketchFilename = $imageService->saveImage(
-                $request->file($this->getSketchImageFieldName()),
-                $this->getSketchImagePath(),
-                $this->getSketchImageSizes()
-            );
-            // DÜZELTİLDİ: Dönen değeri kontrol et
-            if ($sketchFilename) {
-                if ($item->image_sketch_url) {
-                    $imageService->deleteImages($item->image_sketch_url, $this->getSketchImagePath(), $this->getSketchImageSizes());
-                }
-                $validatedData['image_sketch_url'] = $sketchFilename;
-            } else {
-                // Eğer yeni ana görsel kaydedildiyse onu silmek iyi olabilir
-                if ($request->hasFile($this->getImageFieldName()) && isset($validatedData['image_url'])) {
-                    $imageService->deleteImages($validatedData['image_url'], $this->getImagePath(), $this->getImageSizes());
-                }
-                return response()->json(['success' => false, 'message' => 'Sketch görsel güncellenemedi.'], 422);
+                return response()->json(['success' => false, 'message' => 'Görsel güncellenirken hata oluştu.'], 422);
             }
         }
 
         $item->update($validatedData);
 
-        // DÜZELTİLDİ: Başarılı güncelleme sonrası JSON yerine redirect yapalım (store gibi)
-        return response()->json(['success' => true, 'message' => $this->getResourceName() . ' başarıyla güncellendi.']);
+        return response()->json(['success' => true, 'message' => 'Slide başarıyla güncellendi.']);
     }
 
     protected function getResourceName(): string
     {
-        // Route adından otomatik olarak bir isim türetir (örn: 'slides' -> 'Slide')
         return Str::singular(Str::studly($this->getRouteName()));
-    }
-
-    public function edit($id)
-    {
-        $slide = Slide::findOrFail($id);
-        // Modeldeki accessor sayesinde 'image_full_url' otomatik eklenecek
-        return response()->json(['item' => $slide]);
     }
 }
