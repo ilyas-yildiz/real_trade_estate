@@ -58,7 +58,7 @@
 
     {{-- Sayfaya özel eklenecek CSS'ler için --}}
     @stack('styles')
-    <script src="//code.jivosite.com/widget/3Q6g2W27I8" async></script>
+
 </head>
 
 <body class="body-bg-1">
