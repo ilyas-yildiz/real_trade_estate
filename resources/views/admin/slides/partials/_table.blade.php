@@ -27,13 +27,13 @@
                     <td>
                         {{-- Modeldeki accessor'ı kullanarak küçük önizlemeyi gösterelim --}}
                         @if($item->image_full_url)
-                            <img src="{{ $item->image_full_url }}" alt="{{ $item->title }}"
+                            <img src="{{ $item->image_full_url }}" alt="{{ $item->getTranslation('title') }}"
                                 class="img-thumbnail slide-thumbnail">
                         @else
                             <span class="text-muted">Görsel Yok</span>
                         @endif
                     </td>
-                    <td>{{ $item->title }}</td>
+                    <td>{{ $item->getTranslation('title') }}</td>
                     <td>
                         <div class="form-check form-switch form-switch-lg text-center">
                             <input type="checkbox" class="form-check-input status-switch" data-id="{{ $item->id }}"

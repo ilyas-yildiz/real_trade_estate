@@ -78,6 +78,11 @@ Route::middleware(['auth', 'bayi'])->prefix('bayi')->name('bayi.')->group(functi
     Route::get('/withdrawals', [App\Http\Controllers\Bayi\DashboardController::class, 'withdrawals'])->name('withdrawals');
     Route::get('/commissions', [App\Http\Controllers\Bayi\DashboardController::class, 'commissions'])->name('commissions');
 
+    // Hakedişlerim (Bayi)
+    Route::get('/earnings', [App\Http\Controllers\Bayi\EarningController::class, 'index'])->name('earnings.index');
+    Route::get('/earnings/{earning}/download', [App\Http\Controllers\Bayi\EarningController::class, 'download'])->name('earnings.download');
+    Route::post('/earnings/{earning}/response', [App\Http\Controllers\Bayi\EarningController::class, 'response'])->name('earnings.response');
+
 });
 
 /*
@@ -189,6 +194,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/password-requests', [PasswordRequestController::class, 'index'])->name('password_requests.index');
     Route::post('/password-requests/{id}/approve', [PasswordRequestController::class, 'approve'])->name('password_requests.approve');
     Route::post('/password-requests/{id}/reject', [PasswordRequestController::class, 'reject'])->name('password_requests.reject');
+
+    // Hakediş Yönetimi (Admin)
+    Route::get('/earnings', [App\Http\Controllers\Admin\BayiEarningController::class, 'index'])->name('earnings.index');
+    Route::post('/earnings', [App\Http\Controllers\Admin\BayiEarningController::class, 'store'])->name('earnings.store');
+    Route::delete('/earnings/{earning}', [App\Http\Controllers\Admin\BayiEarningController::class, 'destroy'])->name('earnings.destroy');
+    Route::get('/earnings/{earning}/download', [App\Http\Controllers\Admin\BayiEarningController::class, 'download'])->name('earnings.download');
 
 });
 

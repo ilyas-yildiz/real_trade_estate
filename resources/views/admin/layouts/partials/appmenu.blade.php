@@ -66,6 +66,11 @@
                                     <span data-key="t-financial-report">Genel Hesap Dökümü</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+    <a class="nav-link menu-link {{ request()->routeIs('admin.earnings.index') ? 'active' : '' }}" href="{{ route('admin.earnings.index') }}">
+        <i class="ri-file-excel-2-line"></i> <span data-key="t-earnings">Hakediş Yönetimi</span>
+    </a>
+</li>
                         </ul>
                     </div>
                 </li>
@@ -206,7 +211,11 @@
                     </a>
                 </li>
                 --}}
-                
+                <li class="nav-item">
+    <a class="nav-link menu-link {{ request()->routeIs('bayi.earnings.index') ? 'active' : '' }}" href="{{ route('bayi.earnings.index') }}">
+        <i class="ri-file-list-3-line"></i> <span data-key="t-my-earnings">Hakedişlerim</span>
+    </a>
+</li>
                  <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('bayi.withdrawals') ? 'active' : '' }}" href="{{ route('bayi.withdrawals') }}">
                         <i class="ri-line-chart-line"></i> <span data-key="t-reports">Müşteri Çekim Raporu</span>

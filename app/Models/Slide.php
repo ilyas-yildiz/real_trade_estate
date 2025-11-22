@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ImageService; // Görsel silme için
+use App\Traits\HasTranslations; // Trait
 
 class Slide extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'order',
@@ -20,6 +21,13 @@ class Slide extends Model
         'image_url',
         'image_sketch_url',
         'status',
+    ];
+
+    // JSON Dönüşümü
+    protected $casts = [
+        'title' => 'array',
+        'subtitle' => 'array',
+        'button_text' => 'array',
     ];
 
     // Görselin tam URL'si için accessor
