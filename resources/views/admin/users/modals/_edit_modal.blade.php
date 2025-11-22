@@ -65,7 +65,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                    <button type="submit" class="btn btn-primary">Rolü Güncelle</button>
+                    <button type="submit" class="btn btn-primary">Bilgileri Güncelle</button>
                 </div>
             </div>
         </form>

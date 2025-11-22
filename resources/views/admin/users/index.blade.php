@@ -50,8 +50,10 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">İsim</th>
                                 <th scope="col">Email</th>
+                                {{-- YENİ SÜTUN BAŞLIĞI --}}
+                                <th scope="col">MT5 ID</th> 
                                 <th scope="col">Rol</th>
-                                <th scope="col">Ait Olduğu IB</th>
+                                <th scope="col">Ait Olduğu Bayi</th>
                                 <th scope="col">Kayıt Tarihi</th>
                                 <th scope="col">İşlemler</th>
                             </tr>
@@ -66,7 +68,7 @@
                                     };
                                     $roleText = match ($user->role) {
                                         2 => 'Admin',
-                                        1 => 'IB',
+                                        1 => 'Bayi',
                                         default => 'Müşteri',
                                     };
                                 @endphp
@@ -74,10 +76,13 @@
                                     <td>{{ $user->id }}</td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
+                                    
+                                    {{-- YENİ SÜTUN VERİSİ --}}
+                                    <td class="fw-bold text-primary">{{ $user->mt5_id ?? '-' }}</td>
+                                    
                                     <td><span class="badge {{ $roleClass }}">{{ $roleText }}</span></td>
                                     <td>
                                         @if($user->bayi_id)
-                                            {{-- User modeline 'bayi' ilişkisini eklediğimiz için bunu kullanabiliriz --}}
                                             {{ $user->bayi->name ?? 'Bilinmeyen Bayi' }} (ID: {{ $user->bayi_id }})
                                         @else
                                             <span class="text-muted small">-</span>
@@ -86,8 +91,7 @@
                                     <td>{{ $user->created_at->format('d.m.Y') }}</td>
                                     <td>
                                         <div class="hstack gap-1">
-                                            {{-- GÜNCELLEME: Ödeme Ekle Butonu --}}
-                                            {{-- Sadece Admin olmayanlara (Müşteri/Bayi) para eklenebilir --}}
+                                            {{-- Ödeme Ekle Butonu --}}
                                             @if($user->role != 2)
                                                 <button type="button" class="btn btn-sm btn-soft-success shadow-none py-0 px-1 openAddPaymentModal"
                                                         data-bs-toggle="modal"
@@ -98,7 +102,8 @@
                                                     <i class="ri-money-dollar-circle-line"></i>
                                                 </button>
                                             @endif
-                                            {{-- Admin kendi kendini düzenleyemesin --}}
+
+                                            {{-- Düzenleme Butonu --}}
                                             @if (Auth::id() == $user->id)
                                                 <button type="button" class="btn btn-sm btn-soft-secondary shadow-none py-0 px-1" disabled title="Kendi rolünüzü değiştiremezsiniz">
                                                     <i class="ri-pencil-line"></i>
@@ -110,7 +115,7 @@
                                                         data-id="{{ $user->id }}"
                                                         data-fetch-url="{{ route('admin.users.edit', $user->id) }}"
                                                         data-update-url="{{ route('admin.users.update', $user->id) }}"
-                                                        title="Rolü Düzenle">
+                                                        title="Bilgileri Düzenle">
                                                     <i class="ri-pencil-line"></i>
                                                 </button>
                                             @endif
@@ -118,7 +123,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="text-center text-muted py-3">Kayıt bulunamadı.</td></tr>
+                                <tr><td colspan="8" class="text-center text-muted py-3">Kayıt bulunamadı.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

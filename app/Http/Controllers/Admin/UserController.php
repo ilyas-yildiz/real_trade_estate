@@ -76,23 +76,24 @@ class UserController extends Controller
         return response()->json(['item' => $user]);
     }
 
- /**
-     * Kullanıcının rolünü günceller.
-     * YENİ: Komisyon oranı eklendi.
+/**
+     * Kullanıcının rolünü ve bilgilerini günceller.
      */
     public function update(Request $request, User $user): JsonResponse
     {
-        // 0=Müşteri, 1=Bayi, 2=Admin
         $validated = $request->validate([
             'role' => ['required', Rule::in([0, 1, 2])],
-            // YENİ: Komisyon oranı doğrulaması eklendi (%0 ile %100 arası)
             'commission_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            // MT5 ID Validasyonu
             'mt5_id' => ['required', 'numeric', 'digits:6', Rule::unique('users', 'mt5_id')->ignore($user->id)],
         ]);
 
         $newRole = (int) $validated['role'];
-        // Formdan gelen oranı al, eğer rol Bayi değilse veya boşsa 0 yap
         $newCommissionRate = ($newRole === 1) ? $request->input('commission_rate', 0) : 0.00;
+
+        // *** DÜZELTME BURADA: Değişken tanımlanıyor ***
+        $newMt5Id = $validated['mt5_id']; 
+        $originalMt5Id = $user->mt5_id;
 
         // === GÜVENLİK KONTROLLERİ ===
         if ($user->id === Auth::id()) {
@@ -101,6 +102,7 @@ class UserController extends Controller
                 'message' => 'Güvenlik nedeniyle kendi rolünüzü değiştiremezsiniz.'
             ], 403);
         }
+
         if ($user->isAdmin() && $newRole !== 2) {
             $adminCount = User::where('role', 2)->count();
             if ($adminCount <= 1) {
@@ -112,20 +114,20 @@ class UserController extends Controller
         }
         
         // === GÜNCELLEME İŞLEMİ ===
-      $user->update([
+        $user->update([
             'role' => $newRole,
             'commission_rate' => $newCommissionRate,
             'bayi_id' => ($newRole === 1) ? null : $user->bayi_id,
-            'mt5_id' => $newMt5Id, // Güncelle
+            'mt5_id' => $newMt5Id, // Artık tanımlı değişkeni kullanıyoruz
         ]);
 
-// Eğer MT5 ID değiştiyse bildirim gönder
+        // Eğer MT5 ID değiştiyse bildirim gönder
         if ($originalMt5Id != $newMt5Id) {
-            $user->notify(new Mt5IdChangedNotification($newMt5Id));
+            // Bu sınıfın import edildiğinden emin ol: use App\Notifications\Mt5IdChangedNotification;
+            $user->notify(new \App\Notifications\Mt5IdChangedNotification($newMt5Id));
         }
 
-return response()->json(['success' => true, 'message' => 'Kullanıcı bilgileri güncellendi.']);
-
+        return response()->json(['success' => true, 'message' => 'Kullanıcı bilgileri başarıyla güncellendi.']);
     }
 
     /**
