@@ -40,13 +40,13 @@ class RegisteredUserController extends Controller
     /**
      * Gelen kayıt isteğini işler ve kullanıcıyı kaydeder.
      */
-    public function store(Request $request): RedirectResponse
+public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            // Şifre validasyonu yok çünkü biz üretiyoruz
-            
+            'phone' => ['required', 'string', 'max:20'], // YENİ
+            'id_card' => ['required', 'image', 'max:5120'], // YENİ: Max 5MB resim
             'bayi_id' => [
                 'nullable', 
                 'integer',
@@ -56,11 +56,12 @@ class RegisteredUserController extends Controller
             ],
         ]);
 
-        // 1. Özel Şifre Oluşturma (DÜZELTİLDİ)
-        // Kesin Kural: 6 Rakam + 1 Büyük Harf + 1 Küçük Harf + 1 Sembol = 9 Karakter
-        
-        // A) 6 tane Rakam
-        $digits = '';
+        // Kimlik yükleme
+        $idCardPath = $request->file('id_card')->store('id_cards', 'local'); // Güvenli klasöre kaydet
+
+        // Şifre ve ID oluşturma (Eski kodun aynısı)
+        // ... (digits, upper, lower, symbol, mt5_id döngüsü aynı kalsın) ...
+   $digits = '';
         for ($i = 0; $i < 6; $i++) {
             $digits .= rand(0, 9);
         }
@@ -80,31 +81,31 @@ class RegisteredUserController extends Controller
         // Hepsini birleştir ve karıştır
         $generatedPassword = str_shuffle($digits . $upper . $lower . $symbol);
 
-
-        // 2. MT5 ID Oluşturma (Sadece 6 rakam ve Unique)
         do {
             $mt5_id = (string) rand(100000, 999999);
         } while (User::where('mt5_id', $mt5_id)->exists());
+        // ... (Bitiş) ...
 
         try {
-            // 3. Kullanıcıyı Kaydetme
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($generatedPassword), // Giriş şifresi (Hash)
+                'phone' => $request->phone, // YENİ
+                'id_card_path' => $idCardPath, // YENİ
+                'account_status' => 'pending', // YENİ: Beklemede
                 
-                'mt5_password' => Crypt::encryptString($generatedPassword), // Görüntülenebilir şifre (Encrypt)
+                'password' => Hash::make($generatedPassword),
+                'mt5_password' => Crypt::encryptString($generatedPassword),
                 'mt5_id' => $mt5_id,
-                
                 'bayi_id' => $request->bayi_id,
-                // role varsayılan olarak 0 (Müşteri) gelir
             ]);
 
             event(new Registered($user));
 
-            Auth::login($user);
+            // DİKKAT: Auth::login($user); SATIRINI SİLDİK. 
+            // Kullanıcı otomatik giriş yapmamalı.
 
-            // 4. YENİ: Adminlere Bildirim Gönder (DÜZELTİLDİ - EKLENDİ)
+            // Adminlere "Yeni Üye" bildirimi gönder (Mevcut kodun aynısı)
             $admins = User::where('role', 2)->get();
             foreach ($admins as $admin) {
                 $admin->notify(new NewUserNotification([
@@ -113,11 +114,11 @@ class RegisteredUserController extends Controller
                 ]));
             }
 
-            // Dashboard'a gidince kullanıcı şifresini orada görecek
-            return redirect(route('admin.dashboard', absolute: false))->with('success', 'Kaydınız oluşturuldu. Şifreniz otomatik olarak belirlendi, panelinizden görebilirsiniz.');
+            // Login sayfasına yönlendir ve mesaj göster
+            return redirect()->route('login')->with('status', 'Başvurunuz alındı. Yöneticilerimiz kimlik bilgilerinizi inceledikten sonra giriş bilgileriniz E-Posta adresinize gönderilecektir.');
 
         } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
-            return redirect()->route('login')->with('status', 'Kaydınız zaten oluşturuldu, lütfen giriş yapın.');
+            return redirect()->route('login')->with('status', 'Bu bilgilerle zaten bir kayıt mevcut.');
         }
     }
 }

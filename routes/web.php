@@ -201,6 +201,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/earnings/{earning}', [App\Http\Controllers\Admin\BayiEarningController::class, 'destroy'])->name('earnings.destroy');
     Route::get('/earnings/{earning}/download', [App\Http\Controllers\Admin\BayiEarningController::class, 'download'])->name('earnings.download');
 
+    Route::get('/users/{user}/id-card', [UserController::class, 'showIdCard'])->name('users.showIdCard');
+
 });
 
 /* Sistem Temizleme Rotaları */
@@ -235,3 +237,17 @@ Route::get('/migrate-now', function () {
     }
 });
 
+// Geçici Mail Test Rotası
+Route::get('/test-approval-mail/{id}', function ($id) {
+    try {
+        // Kullanıcıyı bul
+        $user = \App\Models\User::findOrFail($id);
+        
+        // Bildirimi gönder
+        $user->notify(new \App\Notifications\AccountApprovedNotification($user));
+        
+        return "Mail gönderimi başarılı! Lütfen " . $user->email . " kutusunu kontrol edin.";
+    } catch (\Exception $e) {
+        return "HATA: " . $e->getMessage() . "<br>Dosya: " . $e->getFile() . "<br>Satır: " . $e->getLine();
+    }
+});

@@ -1,6 +1,6 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}" id="registerForm">
-        @csrf
+<form method="POST" action="{{ route('register') }}" id="registerForm" enctype="multipart/form-data">
+@csrf
 @if(isset($bayi_id))
         <input type="hidden" name="bayi_id" value="{{ $bayi_id }}">
         
@@ -21,6 +21,19 @@
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
+
+        <div class="mt-4">
+        <x-input-label for="phone" :value="__('Telefon Numarası')" />
+        <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" required />
+        <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+    </div>
+
+    <div class="mt-4">
+        <x-input-label for="id_card" :value="__('Kimlik Ön Yüzü (Fotoğraf)')" />
+        <input id="id_card" class="block mt-1 w-full border rounded p-2" type="file" name="id_card" accept="image/*" required />
+        <x-input-error :messages="$errors->get('id_card')" class="mt-2" />
+        <p class="text-sm text-gray-500 mt-1">Lütfen kimliğinizin okunabilir bir fotoğrafını yükleyin.</p>
+    </div>
 
        <div class="alert alert-info text-sm">
         Güvenliğiniz için şifreniz ve Giriş ID'niz sistem tarafından otomatik oluşturulacaktır. Kayıt olduktan sonra panelinizde görebilirsiniz.

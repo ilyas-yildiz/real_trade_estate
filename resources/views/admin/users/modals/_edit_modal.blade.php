@@ -62,6 +62,31 @@
                             </div>
                         </div>
                         </div>
+                        <hr>
+                    <h6 class="fw-bold text-warning">Üyelik Onay Durumu</h6>
+                    <div class="row">
+                         <div class="col-md-6">
+                            <label class="form-label">Kimlik Görüntüle</label>
+                            <br>
+                            {{-- Bu link JS ile doldurulacak --}}
+                            <a id="id_card_link" href="#" target="_blank" class="btn btn-sm btn-info">
+                                <i class="ri-file-user-line"></i> Kimliği Aç
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Hesap Durumu</label>
+                            <select name="account_status" id="account_status" class="form-select">
+                                <option value="pending">Beklemede (İnceleniyor)</option>
+                                <option value="active">Aktif (Onayla)</option>
+                                <option value="rejected">Reddedildi</option>
+                            </select>
+                        </div>
+                        {{-- Red Sebebi (Sadece Red seçilince görünür - JS ile yapabilirsin veya hep açık kalabilir) --}}
+                        <div class="col-md-12 mt-2" id="rejection_div">
+                            <label class="form-label">Red Sebebi</label>
+                            <input type="text" name="rejection_reason" class="form-control" placeholder="Reddediliyorsa sebep yazın...">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
