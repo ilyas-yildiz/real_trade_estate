@@ -50,8 +50,10 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">İsim</th>
                                 <th scope="col">Email</th>
-                                {{-- YENİ SÜTUN BAŞLIĞI --}}
+                                
+                                {{-- YENİ SÜTUN BAŞLIĞI EKLENDİ --}}
                                 <th scope="col">MT5 ID</th> 
+                                
                                 <th scope="col">Rol</th>
                                 <th scope="col">Ait Olduğu Bayi</th>
                                 <th scope="col">Kayıt Tarihi</th>
@@ -77,7 +79,7 @@
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
                                     
-                                    {{-- YENİ SÜTUN VERİSİ --}}
+                                    {{-- YENİ SÜTUN VERİSİ EKLENDİ --}}
                                     <td class="fw-bold text-primary">{{ $user->mt5_id ?? '-' }}</td>
                                     
                                     <td><span class="badge {{ $roleClass }}">{{ $roleText }}</span></td>
@@ -138,7 +140,7 @@
 
 {{-- MODAL DAHİL --}}
 @include('admin.users.modals._edit_modal')
-@include('admin.users.modals._add_payment_modal') {{-- YENİ --}}
+@include('admin.users.modals._add_payment_modal')
 
 @endsection
 
@@ -154,30 +156,24 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('editModal');
-        // 'editForm' içindeki 'role' ID'li select'i bul
         const roleSelect = modal.querySelector('#editForm [name="role"]'); 
         const commissionWrapper = modal.querySelector('#commissionRateWrapper');
         const commissionInput = modal.querySelector('#commission_rate');
 
         function toggleCommissionField(selectedRole) {
-            // Rol "1" (Bayi) ise göster
             if (selectedRole === '1') {
                 commissionWrapper.style.display = 'block';
                 commissionInput.setAttribute('required', 'required');
             } else {
                 commissionWrapper.style.display = 'none';
                 commissionInput.removeAttribute('required');
-                // commissionInput.value = '0'; // İsteğe bağlı: Bayi değilse 0'a çek
             }
         }
 
-        // 1. Modal açıldığında 'resource-handler.js' formu doldurur.
-        // Biz 'shown.bs.modal' (tamamen açıldıktan sonra) anlık değeri kontrol edelim.
         modal.addEventListener('shown.bs.modal', function () {
             toggleCommissionField(roleSelect.value);
         });
 
-        // 2. Kullanıcı rolu anlık değiştirirse
         roleSelect.addEventListener('change', function () {
             toggleCommissionField(this.value);
         });
@@ -187,13 +183,10 @@
         const addPaymentModal = document.getElementById('addPaymentModal');
         if (addPaymentModal) {
             addPaymentModal.addEventListener('show.bs.modal', function (event) {
-                // Butonu al
                 const button = event.relatedTarget;
-                // Verileri al
                 const userId = button.getAttribute('data-id');
                 const userName = button.getAttribute('data-name');
 
-                // Modal içindeki alanları doldur
                 addPaymentModal.querySelector('#payment_user_id').value = userId;
                 addPaymentModal.querySelector('#payment_user_name').textContent = userName;
             });
