@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail; // Orijinal modelindeki 'implements' için eklendi
 
 // BAYİLİK SİSTEMİ VE İLİŞKİLER İÇİN GEREKLİ 'use' SATIRLARI
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,7 +21,7 @@ use App\Models\BayiCommission;
 
 // 'Laravel\Sanctum\HasApiTokens' satırı KESİNLİKLE KALDIRILDI
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     // DÜZELTME: 'HasApiTokens' trait'i buradan kaldırıldı
     use HasFactory, Notifiable;

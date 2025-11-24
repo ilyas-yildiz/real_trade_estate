@@ -13,6 +13,8 @@ jobs:
     # 1. Adım: Kodu checkout et
     - name: Check out repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Git geçmişini tam al ki sadece değişenleri daha iyi anlasın
 
     # 2. Adım: PHP Ortamını Kur
     - name: Setup PHP
@@ -29,9 +31,10 @@ jobs:
         mkdir -p storage/framework/{sessions,views,cache}
         mkdir -p storage/logs
 
-    # 3. Adım: Composer bağımlılıklarını kur
+    # 3. Adım: Composer bağımlılıklarını kur (Optimize edildi)
+    # --prefer-dist: Zip olarak indirir, daha hızlıdır.
     - name: Install Composer Dependencies
-      run: composer install --no-interaction --no-dev --optimize-autoloader
+      run: composer install --no-interaction --no-dev --optimize-autoloader --prefer-dist
 
     # 4. Adım: Node.js (NPM için) Ortamını Kur
     - name: Setup Node.js
@@ -58,20 +61,26 @@ jobs:
         server-dir: ${{ secrets.SERVER_PATH }}
         protocol: ftp
         port: 21
-        timeout: 30000
         
-        # DÜZELTME: Sıfırlama bitti. Artık 'false' yapıyoruz.
-        # Bu, bir sonraki deploy'un SADECE değişen dosyaları
-        # yüklemesini sağlar ve çok daha hızlı olur.
+        # DÜZELTME 1: Timeout süresi artırıldı
+        # 30000 (30sn) -> 1800000 (30 dakika)
+        timeout: 1800000 
+        
+        # Sadece değişenleri yükle
         dangerous-clean-slate: false
         
+        # DÜZELTME 2: Exclude listesine 'tests' ve gereksizler eklendi
         exclude: |
           **/.git*
           **/.git*/**
           **/node_modules/**
+          **/tests/**
+          **/phpunit.xml
+          **/README.md
           .env
           .env.example
           .github/**
+          .editorconfig
           storage/framework/sessions/*
           storage/framework/views/*
           storage/framework/cache/data/*
@@ -79,6 +88,3 @@ jobs:
           public/storage
           docker-compose.yml
           .dockerignore
-          *.md
-          *.sqlite
-
