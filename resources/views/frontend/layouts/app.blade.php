@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/bootstrap/css/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/bootstrap-touchspin/jquery.bootstrap-touchspin.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/fancybox/fancybox.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/fontawesome/css/all.min.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/jarallax/jarallax.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/jquery-magnific-popup/jquery.magnific-popup.css') }}" />
     <link rel="stylesheet" href="{{ asset('frontend/assets/vendors/jquery-ui/jquery-ui.css') }}" />
@@ -237,6 +237,64 @@
         çünkü o sadece anasayfaya özel ve onu home.blade.php içine koyacağız.
     --}}
     @stack('scripts')
+
+{{-- ================================================== --}}
+    {{-- WHATSAPP MODÜLÜ (Sadece numara girilmişse görünür) --}}
+    {{-- ================================================== --}}
+    @if(!empty($settings['whatsapp_phone']))
+        @php
+            // Numarayı temizle (boşluk, +, - karakterlerini kaldır)
+            $waNumber = preg_replace('/[^0-9]/', '', $settings['whatsapp_phone']);
+            // Varsayılan mesaj (Dil dosyasına da bağlayabilirsin: __('messages.wa_welcome'))
+            $waMessage = "Merhaba, bilgi almak istiyorum.";
+        @endphp
+
+        <a href="https://wa.me/{{ $waNumber }}?text={{ urlencode($waMessage) }}" class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+            <i class="fa-brands fa-whatsapp my-float"></i>
+        </a>
+
+        <style>
+            .whatsapp-float {
+                position: fixed;
+                width: 60px;
+                height: 60px;
+                bottom: 25px;
+                left: 25px; /* Sağda istersen 'right: 25px;' yap */
+                background-color: #25d366;
+                color: #FFF;
+                border-radius: 50px;
+                text-align: center;
+                font-size: 30px;
+                box-shadow: 2px 2px 3px #999;
+                z-index: 10000; /* Her şeyin üstünde dursun */
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .whatsapp-float:hover {
+                background-color: #128C7E; /* Hover rengi (daha koyu) */
+                color: #FFF;
+                transform: scale(1.1); /* Hafif büyüme efekti */
+            }
+
+            .my-float {
+                margin-top: 1px; /* İkon hizalaması */
+            }
+            
+            /* Mobilde biraz daha yukarıda dursun (varsa alt menüden kurtarmak için) */
+            @media (max-width: 768px) {
+                .whatsapp-float {
+                    width: 50px;
+                    height: 50px;
+                    bottom: 20px;
+                    left: 20px;
+                    font-size: 25px;
+                }
+            }
+        </style>
+    @endif
 
 </body>
 </html>

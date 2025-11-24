@@ -35,6 +35,12 @@
                                     <input type="text" class="form-control" id="phone" name="phone" value="{{ $settings['phone'] ?? '' }}">
                                 </div>
                                 <div class="mb-3">
+    <label for="whatsapp_phone" class="form-label text-success"><i class="ri-whatsapp-line"></i> WhatsApp Numarası</label>
+    <input type="text" class="form-control" id="whatsapp_phone" name="whatsapp_phone" 
+           placeholder="90532xxxxxxx" value="{{ $settings['whatsapp_phone'] ?? '' }}">
+    <div class="form-text">Başında '+' olmadan, ülke koduyla birlikte yazınız (Örn: 905551234567).</div>
+</div>
+                                <div class="mb-3">
                                     <label for="fax" class="form-label">Fax</label>
                                     <input type="text" class="form-control" id="fax" name="fax" value="{{ $settings['fax'] ?? '' }}">
                                 </div>
