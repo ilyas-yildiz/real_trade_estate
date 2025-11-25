@@ -63,17 +63,23 @@ class UserController extends Controller
     /**
      * Modal'da düzenlenecek kullanıcının verisini JSON olarak döndürür.
      */
- public function edit(User $user): JsonResponse
+public function edit(User $user): JsonResponse
     {
-        // Admin olduğu için şifreyi çözüp 'decrypted_mt5_password' anahtarıyla gönderiyoruz.
-        // Eğer şifre yoksa boş göndeririz.
+        // Şifreyi çöz (varsa)
         try {
             $user->decrypted_mt5_password = $user->mt5_password ? \Illuminate\Support\Facades\Crypt::decryptString($user->mt5_password) : '';
         } catch (\Exception $e) {
             $user->decrypted_mt5_password = 'Şifre Çözülemedi';
         }
 
-        return response()->json(['item' => $user]);
+        // Veriyi diziye çevir
+        $data = $user->toArray();
+
+        // YENİ: Kimlik Kartı Linkini Hazırla
+        // Eğer dosya yolu varsa, rotayı oluşturup gönderiyoruz
+        $data['id_card_url'] = $user->id_card_path ? route('admin.users.showIdCard', $user->id) : null;
+
+        return response()->json(['item' => $data]);
     }
 
 /**
@@ -163,12 +169,21 @@ class UserController extends Controller
         return redirect()->route('admin.users.index');
     }
 
+/**
+     * Kullanıcının kimlik görselini güvenli şekilde gösterir.
+     */
     public function showIdCard(User $user)
-{
-    if (!Auth::user()->isAdmin()) abort(403);
-    if (!$user->id_card_path) abort(404);
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403);
+        }
 
-    // Dosyayı güvenli alandan okuyup göster
-    return response()->file(storage_path('app/' . $user->id_card_path));
-}
+        if (!$user->id_card_path || !file_exists(storage_path('app/' . $user->id_card_path))) {
+            abort(404, 'Dosya bulunamadı.');
+        }
+        
+        return response()->file(storage_path('app/' . $user->id_card_path));
+    }
+
+
 }
