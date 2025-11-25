@@ -79,33 +79,34 @@ class UserController extends Controller
 /**
      * Kullanıcının rolünü ve bilgilerini günceller.
      */
-/**
-     * Kullanıcının rolünü ve bilgilerini günceller.
-     */
-    public function update(Request $request, User $user): JsonResponse
+public function update(Request $request, User $user): JsonResponse
     {
         // 1. Validasyon Kuralları
         $validated = $request->validate([
             'role' => ['required', Rule::in([0, 1, 2])],
             'commission_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            // MT5 ID Validasyonu (Eğer bu satır yoksa hata alırsın!)
             'mt5_id' => ['required', 'numeric', 'digits:6', Rule::unique('users', 'mt5_id')->ignore($user->id)],
             
             // Hesap Durumu Validasyonu
             'account_status' => ['nullable', Rule::in(['active', 'rejected', 'pending'])],
-            // Red sebebi, SADECE durum 'rejected' ise zorunlu olsun
             'rejection_reason' => 'nullable|string|required_if:account_status,rejected',
         ]);
 
         // 2. Değişkenleri Hazırla
         $newRole = (int) $validated['role'];
         $newCommissionRate = ($newRole === 1) ? $request->input('commission_rate', 0) : 0.00;
-        $newMt5Id = $validated['mt5_id'];
+        $newMt5Id = $validated['mt5_id']; // Değişkeni BURADA tanımlıyoruz
         $originalMt5Id = $user->mt5_id;
 
         // === GÜVENLİK KONTROLLERİ ===
         if ($user->id === Auth::id()) {
-            return response()->json(['success' => false, 'message' => 'Kendi rolünüzü değiştiremezsiniz.'], 403);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Güvenlik nedeniyle kendi rolünüzü değiştiremezsiniz.'
+            ], 403);
         }
+
         if ($user->isAdmin() && $newRole !== 2) {
             $adminCount = User::where('role', 2)->count();
             if ($adminCount <= 1) {
@@ -121,38 +122,31 @@ class UserController extends Controller
         // Hesap Durumu Mantığı
         $oldStatus = $user->account_status;
         $newAccountStatus = $request->input('account_status', $oldStatus);
-        // Red sebebini al
-        $rejectionReason = $request->input('rejection_reason');
 
         $user->update([
             'role' => $newRole,
             'commission_rate' => $newCommissionRate,
             'bayi_id' => ($newRole === 1) ? null : $user->bayi_id,
-            'mt5_id' => $newMt5Id,
+            'mt5_id' => $newMt5Id, // Tanımlanan değişkeni kullanıyoruz
             'account_status' => $newAccountStatus,
         ]);
 
-        // --- BİLDİRİMLER ---
+        // BİLDİRİMLER
 
         // A) MT5 ID Değiştiyse
         if ($originalMt5Id != $newMt5Id) {
             $user->notify(new \App\Notifications\Mt5IdChangedNotification($newMt5Id));
         }
 
-        // B) Hesap Durumu Değişimi
-        // Durum 'active' olduysa (Onaylandı)
+        // B) Hesap Durumu Değiştiyse (Onay/Red)
         if ($oldStatus !== 'active' && $newAccountStatus === 'active') {
             $user->notify(new \App\Notifications\AccountApprovedNotification($user));
         }
-        
-        // C) Durum 'rejected' olduysa (Reddedildi) - DÜZELTİLEN KISIM
-        // Durum önceden rejected değilse VE yeni durum rejected ise
-        elseif ($newAccountStatus === 'rejected' && $oldStatus !== 'rejected') {
-            // Red bildirimini, formdan gelen sebep ile gönder
-            $user->notify(new \App\Notifications\AccountRejectedNotification($rejectionReason));
+        elseif ($newAccountStatus === 'rejected') {
+            $user->notify(new \App\Notifications\AccountRejectedNotification($request->rejection_reason));
         }
 
-        return response()->json(['success' => true, 'message' => 'Kullanıcı bilgileri güncellendi.']);
+        return response()->json(['success' => true, 'message' => 'Kullanıcı bilgileri başarıyla güncellendi.']);
     }
 
     /**
