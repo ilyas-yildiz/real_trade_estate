@@ -192,5 +192,30 @@
             });
         }
     });
+
+    // resources/views/admin/users/index.blade.php içindeki scriptlere eklenebilir
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('editModal');
+        const statusSelect = modal.querySelector('#account_status'); // ID verdiğinden emin ol
+        const rejectionDiv = modal.querySelector('#rejection_div');
+        const rejectionInput = modal.querySelector('[name="rejection_reason"]');
+
+        function toggleRejectionField() {
+            if (statusSelect && statusSelect.value === 'rejected') {
+                rejectionDiv.style.display = 'block';
+                rejectionInput.setAttribute('required', 'required');
+            } else if (rejectionDiv) {
+                rejectionDiv.style.display = 'none';
+                rejectionInput.removeAttribute('required');
+                rejectionInput.value = ''; // Gizlenince temizle
+            }
+        }
+
+        if(statusSelect) {
+            statusSelect.addEventListener('change', toggleRejectionField);
+            // Modal açıldığında da kontrol et
+            modal.addEventListener('shown.bs.modal', toggleRejectionField);
+        }
+    });
     </script>
 @endpush

@@ -10,7 +10,7 @@ class AccountRejectedNotification extends Notification
 {
     use Queueable;
 
-    protected $reason;
+    public $reason; // Public yapıyoruz ki erişilebilsin
 
     public function __construct($reason)
     {
@@ -19,16 +19,18 @@ class AccountRejectedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail']; // Reddedilen adam panele giremeyeceği için sadece mail
+        return ['mail']; // Sadece mail yeterli, çünkü hesabı reddedildiği için panele giremez
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Üyelik Başvurunuz Reddedildi')
-            ->greeting('Merhaba,')
-            ->line('Üyelik başvurunuz ne yazık ki onaylanmadı.')
-            ->line('**Red Sebebi:** ' . $this->reason)
-            ->line('Düzeltme yapmak veya bilgi almak için bizimle iletişime geçebilirsiniz.');
+            ->subject('Üyelik Başvurunuz Hakkında - Real Trade Estate')
+            ->greeting('Merhaba ' . $notifiable->name . ',')
+            ->line('Real Trade Estate platformuna yaptığınız üyelik başvurusu incelenmiştir.')
+            ->line('Ne yazık ki başvurunuz şu an için onaylanamamıştır.')
+            ->line('**Red Sebebi:** ' . ($this->reason ?? 'Belirtilmedi.'))
+            ->line('Eksiklikleri gidererek veya bizimle iletişime geçerek tekrar başvurabilirsiniz.')
+            ->action('Bize Ulaşın', route('frontend.contact'));
     }
 }
