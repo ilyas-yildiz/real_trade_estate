@@ -126,6 +126,14 @@
                                                         title="Bilgileri Düzenle">
                                                     <i class="ri-pencil-line"></i>
                                                 </button>
+                                                {{-- YENİ EKLENEN SİLME BUTONU --}}
+                                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline delete-form">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-soft-danger shadow-none py-0 px-1" title="Kullanıcıyı Sil">
+                                                        <i class="ri-delete-bin-line"></i>
+                                                    </button>
+                                                </form>
+                                                {{-- SİLME BUTONU SONU --}}
                                             @endif
                                         </div>
                                     </td>

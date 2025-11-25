@@ -33,7 +33,7 @@ class AccountApprovedNotification extends Notification
         }
 
         return (new MailMessage)
-            ->subject('Üyeliğiniz Onaylandı - Real Trade Estate')
+            ->subject('Üyeliğiniz Onaylandı - Real Trade State')
             ->greeting('Merhaba ' . $this->user->name . ',')
             ->line('Hesap başvurunuz incelendi ve ONAYLANDI.')
             ->line('Aşağıdaki bilgilerle sisteme ve MetaTrader 5 platformuna giriş yapabilirsiniz:')

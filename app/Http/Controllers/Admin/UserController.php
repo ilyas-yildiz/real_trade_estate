@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use App\Notifications\Mt5IdChangedNotification;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -65,19 +66,22 @@ class UserController extends Controller
      */
 public function edit(User $user): JsonResponse
     {
-        // Şifreyi çöz (varsa)
+        // ... (Şifre çözme işlemleri aynı kalsın) ...
         try {
             $user->decrypted_mt5_password = $user->mt5_password ? \Illuminate\Support\Facades\Crypt::decryptString($user->mt5_password) : '';
         } catch (\Exception $e) {
             $user->decrypted_mt5_password = 'Şifre Çözülemedi';
         }
 
-        // Veriyi diziye çevir
         $data = $user->toArray();
 
-        // YENİ: Kimlik Kartı Linkini Hazırla
-        // Eğer dosya yolu varsa, rotayı oluşturup gönderiyoruz
-        $data['id_card_url'] = $user->id_card_path ? route('admin.users.showIdCard', $user->id) : null;
+        // YENİ: Linki direkt public klasöründen veriyoruz
+        if ($user->id_card_path) {
+            // Eğer yol zaten http ile başlıyorsa (eski kayıtlar) elleme, yoksa asset() ile sar
+            $data['id_card_url'] = asset($user->id_card_path);
+        } else {
+            $data['id_card_url'] = null;
+        }
 
         return response()->json(['item' => $data]);
     }
@@ -161,28 +165,26 @@ public function edit(User $user): JsonResponse
         return response()->json(['success' => true, 'message' => 'Kullanıcı bilgileri güncellendi.']);
     }
 
-    /**
-     * (Bu modülde destroy kullanılmayacak)
+  /**
+     * Kullanıcıyı ve dosyalarını siler.
      */
     public function destroy(User $user)
     {
-        return redirect()->route('admin.users.index');
-    }
-
-/**
-     * Kullanıcının kimlik görselini güvenli şekilde gösterir.
-     */
-    public function showIdCard(User $user)
-    {
-        if (!Auth::user()->isAdmin()) {
-            abort(403);
+        // 1. Kendini silmeyi engelle
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'Güvenlik nedeniyle kendi hesabınızı silemezsiniz.');
         }
 
-        if (!$user->id_card_path || !file_exists(storage_path('app/' . $user->id_card_path))) {
-            abort(404, 'Dosya bulunamadı.');
+        // 2. Varsa kimlik dosyasını fiziksel olarak sil (Public klasöründen)
+        if ($user->id_card_path && file_exists(public_path($user->id_card_path))) {
+            unlink(public_path($user->id_card_path));
         }
-        
-        return response()->file(storage_path('app/' . $user->id_card_path));
+
+        // 3. Kullanıcıyı veritabanından sil
+        // (İlişkili tablolar cascade ayarlıysa onlar da silinir)
+        $user->delete();
+
+        return back()->with('success', 'Kullanıcı ve tüm verileri başarıyla silindi.');
     }
 
 

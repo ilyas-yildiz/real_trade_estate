@@ -56,8 +56,14 @@ public function store(Request $request): RedirectResponse
             ],
         ]);
 
-        // Kimlik yükleme
-        $idCardPath = $request->file('id_card')->store('id_cards', 'local'); // Güvenli klasöre kaydet
+        // YENİ KOD (Public Klasörüne Yükleme):
+        $file = $request->file('id_card');
+        // Benzersiz bir isim oluştur
+        $filename = time() . '_' . \Illuminate\Support\Str::random(10) . '.' . $file->getClientOriginalExtension();
+        // public/uploads/id_cards klasörüne taşı
+        $file->move(public_path('uploads/id_cards'), $filename);
+        // Veritabanına kaydedilecek yol
+        $idCardPath = 'uploads/id_cards/' . $filename;
 
         // Şifre ve ID oluşturma (Eski kodun aynısı)
         // ... (digits, upper, lower, symbol, mt5_id döngüsü aynı kalsın) ...

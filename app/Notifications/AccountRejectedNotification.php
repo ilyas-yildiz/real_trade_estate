@@ -25,9 +25,9 @@ class AccountRejectedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Üyelik Başvurunuz Hakkında - Real Trade Estate')
+            ->subject('Üyelik Başvurunuz Hakkında - Real Trade State')
             ->greeting('Merhaba ' . $notifiable->name . ',')
-            ->line('Real Trade Estate platformuna yaptığınız üyelik başvurusu incelenmiştir.')
+            ->line('Real Trade State platformuna yaptığınız üyelik başvurusu incelenmiştir.')
             ->line('Ne yazık ki başvurunuz şu an için onaylanamamıştır.')
             ->line('**Red Sebebi:** ' . ($this->reason ?? 'Belirtilmedi.'))
             ->line('Eksiklikleri gidererek veya bizimle iletişime geçerek tekrar başvurabilirsiniz.')

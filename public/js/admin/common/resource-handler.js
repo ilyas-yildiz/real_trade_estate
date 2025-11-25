@@ -285,6 +285,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     sketchPreview.src = item.image_sketch_full_url;
                     sketchPreviewContainer.style.display = 'block';
                 }
+                const idCardBtn = editModalEl.querySelector('#id_card_link');
+                if (idCardBtn) {
+                    if (item.id_card_url) {
+                        // Link varsa güncelle ve butonu aktif et
+                        idCardBtn.href = item.id_card_url;
+                        idCardBtn.classList.remove('disabled', 'btn-secondary');
+                        idCardBtn.classList.add('btn-info');
+                        idCardBtn.innerHTML = '<i class="ri-file-user-line"></i> Kimliği Görüntüle';
+                        // Yeni sekmede açılmasını garantiye al
+                        idCardBtn.target = "_blank";
+                    } else {
+                        // Link yoksa pasif yap
+                        idCardBtn.href = 'javascript:void(0);';
+                        idCardBtn.classList.add('disabled', 'btn-secondary');
+                        idCardBtn.classList.remove('btn-info');
+                        idCardBtn.innerHTML = '<i class="ri-error-warning-line"></i> Kimlik Yok';
+                    }
+                }
             }
         });
     }

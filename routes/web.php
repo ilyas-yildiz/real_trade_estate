@@ -180,8 +180,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
     Route::resource('users', UserController::class)->only([
-        'index', 'edit', 'update'
-    ]);
+    'index', 'edit', 'update', 'destroy' // <-- 'destroy' eklendi
+]);
     // YENİ ROTALAR: Adminin Müşteri Adına Ödeme Eklemesi
     Route::post('/payments/create-for-user', [PaymentController::class, 'storeForUser'])->name('payments.storeForUser');
     Route::get('/financial-report', [FinancialReportController::class, 'index'])->name('financial.report');
@@ -201,7 +201,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/earnings/{earning}', [App\Http\Controllers\Admin\BayiEarningController::class, 'destroy'])->name('earnings.destroy');
     Route::get('/earnings/{earning}/download', [App\Http\Controllers\Admin\BayiEarningController::class, 'download'])->name('earnings.download');
 
-    Route::get('/users/{user}/id-card', [UserController::class, 'showIdCard'])->name('users.showIdCard');
 
 });
 
