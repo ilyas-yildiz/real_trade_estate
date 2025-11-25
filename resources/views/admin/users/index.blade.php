@@ -33,7 +33,7 @@
                                 <option value="">Tümü</option>
                                 <option value="2" {{ request('role') == '2' ? 'selected' : '' }}>Admin</option>
                                 <option value="1" {{ request('role') == '1' ? 'selected' : '' }}>Bayi</option>
-                                <option value="0" {{ request('role') == '0' ? 'selected' : '' }}>Müşteri</option>
+                                <option value="0" {{ request('role') == '0' ? 'selected' : '' }}>Müşteri/Aday</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -50,11 +50,8 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">İsim</th>
                                 <th scope="col">Email</th>
-                                
-                                {{-- YENİ SÜTUN BAŞLIĞI EKLENDİ --}}
                                 <th scope="col">MT5 ID</th> 
-                                
-                                <th scope="col">Rol</th>
+                                <th scope="col">Rol / Durum</th>
                                 <th scope="col">Ait Olduğu Bayi</th>
                                 <th scope="col">Kayıt Tarihi</th>
                                 <th scope="col">İşlemler</th>
@@ -63,23 +60,32 @@
                         <tbody>
                             @forelse ($users as $user)
                                 @php
-                                    $roleClass = match ($user->role) {
-                                        2 => 'bg-danger-subtle text-danger', // Admin
-                                        1 => 'bg-success-subtle text-success', // Bayi
-                                        default => 'bg-info-subtle text-info', // Müşteri
-                                    };
-                                    $roleText = match ($user->role) {
-                                        2 => 'Admin',
-                                        1 => 'Bayi',
-                                        default => 'Müşteri',
-                                    };
+                                    // GÜNCELLEME: Aday (Pending) ayrımı için detaylı kontrol
+                                    if ($user->role == 2) {
+                                        $roleText = 'Admin';
+                                        $roleClass = 'bg-danger-subtle text-danger';
+                                    } elseif ($user->role == 1) {
+                                        $roleText = 'Bayi';
+                                        $roleClass = 'bg-success-subtle text-success';
+                                    } else {
+                                        // Müşteri ise statüsüne bak
+                                        if ($user->account_status == 'pending') {
+                                            $roleText = 'Aday (Onay Bekliyor)';
+                                            $roleClass = 'bg-warning-subtle text-warning'; // Turuncu
+                                        } elseif ($user->account_status == 'rejected') {
+                                            $roleText = 'Reddedildi';
+                                            $roleClass = 'bg-secondary-subtle text-secondary'; // Gri
+                                        } else {
+                                            $roleText = 'Müşteri';
+                                            $roleClass = 'bg-info-subtle text-info'; // Mavi
+                                        }
+                                    }
                                 @endphp
                                 <tr data-id="{{ $user->id }}">
                                     <td>{{ $user->id }}</td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
                                     
-                                    {{-- YENİ SÜTUN VERİSİ EKLENDİ --}}
                                     <td class="fw-bold text-primary">{{ $user->mt5_id ?? '-' }}</td>
                                     
                                     <td><span class="badge {{ $roleClass }}">{{ $roleText }}</span></td>
@@ -153,7 +159,9 @@
     
     {{-- Çalışan resource-handler.js'i kullanıyoruz --}}
     <script src="{{ asset('js/admin/common/resource-handler.js') }}?v={{ time() }}" defer></script> 
+    
     <script>
+    // 1. Komisyon Alanı Göster/Gizle
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('editModal');
         const roleSelect = modal.querySelector('#editForm [name="role"]'); 
@@ -179,6 +187,7 @@
         });
     });
 
+    // 2. Ödeme Ekleme Modalı Veri Doldurma
     document.addEventListener('DOMContentLoaded', function () {
         const addPaymentModal = document.getElementById('addPaymentModal');
         if (addPaymentModal) {
@@ -193,10 +202,10 @@
         }
     });
 
-    // resources/views/admin/users/index.blade.php içindeki scriptlere eklenebilir
+    // 3. Red Sebebi Alanı Göster/Gizle
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('editModal');
-        const statusSelect = modal.querySelector('#account_status'); // ID verdiğinden emin ol
+        const statusSelect = modal.querySelector('#account_status'); 
         const rejectionDiv = modal.querySelector('#rejection_div');
         const rejectionInput = modal.querySelector('[name="rejection_reason"]');
 
@@ -207,14 +216,37 @@
             } else if (rejectionDiv) {
                 rejectionDiv.style.display = 'none';
                 rejectionInput.removeAttribute('required');
-                rejectionInput.value = ''; // Gizlenince temizle
+                rejectionInput.value = ''; 
             }
         }
 
         if(statusSelect) {
             statusSelect.addEventListener('change', toggleRejectionField);
-            // Modal açıldığında da kontrol et
             modal.addEventListener('shown.bs.modal', toggleRejectionField);
+        }
+    });
+
+    // 4. YENİ: Kimlik Butonu Linkini Güncelleme (Ajax Success)
+    // Bu kısım resource-handler.js veriyi çektikten sonra çalışır.
+    $(document).ajaxSuccess(function(event, xhr, settings) {
+        if (settings.url.indexOf('/edit') > -1) {
+            const response = xhr.responseJSON;
+            if (response && response.item) {
+                const idCardBtn = document.getElementById('id_card_link');
+                if (idCardBtn) {
+                    if (response.item.id_card_url) {
+                        idCardBtn.href = response.item.id_card_url;
+                        idCardBtn.classList.remove('disabled', 'btn-secondary');
+                        idCardBtn.classList.add('btn-info');
+                        idCardBtn.innerHTML = '<i class="ri-file-user-line"></i> Kimliği Aç';
+                    } else {
+                        idCardBtn.href = 'javascript:void(0);';
+                        idCardBtn.classList.add('disabled', 'btn-secondary');
+                        idCardBtn.classList.remove('btn-info');
+                        idCardBtn.innerHTML = '<i class="ri-error-warning-line"></i> Kimlik Yok';
+                    }
+                }
+            }
         }
     });
     </script>
