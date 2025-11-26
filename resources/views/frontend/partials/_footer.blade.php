@@ -50,7 +50,7 @@
                             </div>
                             <div class="footer-widget-links">
                                 <ul>
-                                    <li><a href="#">Forex Trading <i class="icon-right-arrow"></i></a></li>
+                                    <li><a href="#">Trading <i class="icon-right-arrow"></i></a></li>
                                     <li><a href="#">Commodities <i class="icon-right-arrow"></i></a></li>
                                     <li><a href="#">Indices <i class="icon-right-arrow"></i></a></li>
                                     <li><a href="#">Stocks <i class="icon-right-arrow"></i></a></li>
@@ -69,7 +69,6 @@
                             <div class="footer-widget-links">
                                 <ul>
                                     <li><a href="#">Web Trader <i class="icon-right-arrow"></i></a></li>
-                                    <li><a href="#">Meta Trader 4 <i class="icon-right-arrow"></i></a></li>
                                     <li><a href="#">Meta Trader 5 <i class="icon-right-arrow"></i></a></li>
                                 </ul>
                             </div>

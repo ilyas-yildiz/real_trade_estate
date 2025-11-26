@@ -98,21 +98,28 @@
                         </div>
 
                     <div class="main-header-style1__content-bottom-right">
-                        {{-- GÜNCELLEME: Dil Seçici Aktif Edildi --}}
-                        <div class="language-switcher-style1">
-                            <div class="icon">
-                                <i class="icon-language"></i>
-                            </div>
-                            <div class="select-box clearfix">
-                                {{-- 
-                                    Not: Temanın 'nice-select' eklentisi <select> elemanını gizleyip 
-                                    kendi HTML yapısını oluşturuyor olabilir. Bu yüzden 'onchange' 
-                                    ile basit bir yönlendirme yapıyoruz.
-                                --}}
-                                <select class="wide" onchange="if (this.value) window.location.href=this.value">
-                                    <option value="{{ route('frontend.lang.switch', 'en') }}" {{ App::getLocale() == 'en' ? 'selected' : '' }}>EN</option>
-                                    <option value="{{ route('frontend.lang.switch', 'tr') }}" {{ App::getLocale() == 'tr' ? 'selected' : '' }}>TR</option>
-                                </select>
+                       {{-- GÜNCELLEME: Dil Seçici (Bayraklı ve Açık Yapı) --}}
+                        <div class="language-switcher-style1" style="margin-right: 20px;">
+                            <div class="d-flex align-items-center gap-3">
+                                
+                                {{-- İngilizce Seçeneği --}}
+                                <a href="{{ route('frontend.lang.switch', 'en') }}" 
+                                   class="d-flex align-items-center gap-1 text-decoration-none"
+                                   style="opacity: {{ App::getLocale() == 'en' ? '1' : '0.6' }}; transition: 0.3s;">
+                                    <img src="{{ asset('admin/images/flags/us.svg') }}" alt="EN" style="width: 20px; height: auto; box-shadow: 0 0 3px rgba(0,0,0,0.2);">
+                                    <span style="font-weight: {{ App::getLocale() == 'en' ? '700' : '400' }}; color: var(--thm-white); font-size: 14px;">EN</span>
+                                </a>
+
+                                <span style="color: #ccc;">|</span>
+
+                                {{-- Türkçe Seçeneği --}}
+                                <a href="{{ route('frontend.lang.switch', 'tr') }}" 
+                                   class="d-flex align-items-center gap-1 text-decoration-none"
+                                   style="opacity: {{ App::getLocale() == 'tr' ? '1' : '0.6' }}; transition: 0.3s;">
+                                    <img src="{{ asset('admin/images/flags/tr.svg') }}" alt="TR" style="width: 20px; height: auto; box-shadow: 0 0 3px rgba(0,0,0,0.2);">
+                                    <span style="font-weight: {{ App::getLocale() == 'tr' ? '700' : '400' }}; color: var(--thm-white); font-size: 14px;">TR</span>
+                                </a>
+
                             </div>
                         </div>
                         

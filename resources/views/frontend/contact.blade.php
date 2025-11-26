@@ -153,7 +153,7 @@
                                     </div>
                                     <div class="text">
                                         {{-- Ülke Adı --}}
-                                        <h4>{{ __('messages.country') }}</h4>
+                                        <h4>{{ __('messages.location') }}</h4>
                                         {{-- Dinamik Adres --}}
                                         <p>{{ $settings['address'] ?? '280/5 Granite Run Drive Suite, Houston - 90010.' }}</p>
                                     </div>

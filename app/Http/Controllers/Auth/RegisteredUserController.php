@@ -45,8 +45,8 @@ public function store(Request $request): RedirectResponse
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['required', 'string', 'max:20'], // YENİ
-            'id_card' => ['required', 'image', 'max:5120'], // YENİ: Max 5MB resim
+            'phone' => ['required', 'string', 'max:20'],
+            'id_card' => ['required', 'image', 'max:5120'],
             'bayi_id' => [
                 'nullable', 
                 'integer',
@@ -56,49 +56,59 @@ public function store(Request $request): RedirectResponse
             ],
         ]);
 
-        // YENİ KOD (Public Klasörüne Yükleme):
+        // Dosya Yükleme
         $file = $request->file('id_card');
-        // Benzersiz bir isim oluştur
         $filename = time() . '_' . \Illuminate\Support\Str::random(10) . '.' . $file->getClientOriginalExtension();
-        // public/uploads/id_cards klasörüne taşı
         $file->move(public_path('uploads/id_cards'), $filename);
-        // Veritabanına kaydedilecek yol
         $idCardPath = 'uploads/id_cards/' . $filename;
 
-        // Şifre ve ID oluşturma (Eski kodun aynısı)
-        // ... (digits, upper, lower, symbol, mt5_id döngüsü aynı kalsın) ...
-   $digits = '';
+        // ---------------------------------------------------------
+        // 1. ÖZEL ŞİFRE OLUŞTURMA (YENİ MANTIK)
+        // ---------------------------------------------------------
+        
+        // A) 6 tane Rakam
+        $digits = '';
         for ($i = 0; $i < 6; $i++) {
             $digits .= rand(0, 9);
         }
 
-        // B) 1 tane Büyük Harf (Kesinlikle harf havuzundan)
+        // B) 1 tane Büyük Harf
         $upperPool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $upper = $upperPool[rand(0, strlen($upperPool) - 1)];
 
-        // C) 1 tane Küçük Harf (Kesinlikle harf havuzundan)
+        // C) 1 tane Küçük Harf
         $lowerPool = 'abcdefghijklmnopqrstuvwxyz';
         $lower = $lowerPool[rand(0, strlen($lowerPool) - 1)];
 
-        // D) 1 tane Sembol
-        $symbolsPool = ['@', '#', '$', '!', '%', '*', '?']; 
-        $symbol = $symbolsPool[array_rand($symbolsPool)];
-        
-        // Hepsini birleştir ve karıştır
-        $generatedPassword = str_shuffle($digits . $upper . $lower . $symbol);
+        // D) Soru İşareti (?) Yerleşimi
+        // Önce elimizdeki 8 karakteri (6 rakam + 2 harf) birleştirip karıştıralım
+        $baseString = str_shuffle($digits . $upper . $lower); // 8 Karakter
 
+        // Soru işaretini 1. indeks ile 7. indeks arasına rastgele yerleştir.
+        // 0. indeks (Baş) ve 8. indeks (Son) HARİÇ tutulur.
+        // Örn: A123456b (8 char). 
+        // Ekleme noktası 1 olursa: A?123456b (2. karakter olur)
+        // Ekleme noktası 7 olursa: A123456?b (Sondan 2. karakter olur)
+        $randomPosition = rand(1, 7);
+        
+        // substr_replace(string, eklenecek, nereye, kaç_karakter_silinsin)
+        $generatedPassword = substr_replace($baseString, '?', $randomPosition, 0);
+        
+        // ---------------------------------------------------------
+        // 2. MT5 ID OLUŞTURMA
+        // ---------------------------------------------------------
         do {
             $mt5_id = (string) rand(100000, 999999);
         } while (User::where('mt5_id', $mt5_id)->exists());
-        // ... (Bitiş) ...
+
 
         try {
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'phone' => $request->phone, // YENİ
-                'id_card_path' => $idCardPath, // YENİ
-                'account_status' => 'pending', // YENİ: Beklemede
+                'phone' => $request->phone,
+                'id_card_path' => $idCardPath,
+                'account_status' => 'pending',
                 
                 'password' => Hash::make($generatedPassword),
                 'mt5_password' => Crypt::encryptString($generatedPassword),
@@ -108,10 +118,7 @@ public function store(Request $request): RedirectResponse
 
             event(new Registered($user));
 
-            // DİKKAT: Auth::login($user); SATIRINI SİLDİK. 
-            // Kullanıcı otomatik giriş yapmamalı.
-
-            // Adminlere "Yeni Üye" bildirimi gönder (Mevcut kodun aynısı)
+            // Adminlere Bildirim
             $admins = User::where('role', 2)->get();
             foreach ($admins as $admin) {
                 $admin->notify(new NewUserNotification([
@@ -120,7 +127,6 @@ public function store(Request $request): RedirectResponse
                 ]));
             }
 
-            // Login sayfasına yönlendir ve mesaj göster
             return redirect()->route('login')->with('status', 'Başvurunuz alındı. Yöneticilerimiz kimlik bilgilerinizi inceledikten sonra giriş bilgileriniz E-Posta adresinize gönderilecektir.');
 
         } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {

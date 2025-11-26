@@ -122,7 +122,7 @@ return [
     'live_chat_desc' => 'Chat live with our forex specialist.',
     'start_chat' => 'Start Chat',
     'contact_info' => 'Contact Info',
-    'country' => 'United Kingdom', // Veya 'United States' (Şirket merkezine göre)
+    'location' => 'Location', // Veya 'United States' (Şirket merkezine göre)
     'phone' => 'Phone',
     'email' => 'Email',
     'office_hours' => 'Office Hours',

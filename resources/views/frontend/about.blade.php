@@ -1,9 +1,10 @@
 @extends('frontend.layouts.app')
 
-{{-- SEO Başlığı --}}
-@section('title', isset($about) ? $about->title : ($settings['seo_title'] ?? __('messages.about_us') . ' - ' . __('messages.site_title')))
-{{-- SEO Açıklaması --}}
-@section('description', isset($about) ? Str::limit(strip_tags($about->short_content ?? $about->content), 160) : ($settings['seo_description'] ?? __('messages.meta_description_default')))
+{{-- DÜZELTME: SEO Başlığı (getTranslation eklendi) --}}
+@section('title', isset($about) ? $about->getTranslation('title') : ($settings['seo_title'] ?? __('messages.about_us') . ' - ' . __('messages.site_title')))
+
+{{-- DÜZELTME: SEO Açıklaması (getTranslation eklendi) --}}
+@section('description', isset($about) ? Str::limit(strip_tags($about->getTranslation('short_content') ?? $about->getTranslation('content')), 160) : ($settings['seo_description'] ?? __('messages.meta_description_default')))
 
 @section('content')
 
@@ -15,7 +16,6 @@
             <div class="container">
                 <div class="inner-content">
                     <div class="title">
-                        {{-- GÜNCELLEME: Çeviri --}}
                         <h2>{{ __('messages.about_us') }}</h2>
                     </div>
                     <div class="breadcrumb-menu">
@@ -42,9 +42,10 @@
                             <div class="shape1">
                                 <img class="rotate-me" src="{{ asset('frontend/assets/images/shapes/about-v2-shape22.png') }}" alt="Shape">
                             </div>
-                            {{-- Ana Resim (Dinamik) --}}
+                            {{-- Ana Resim --}}
                             <div class="img-box1">
-                                <img src="{{ $about->image_url ? asset('storage/about-images/800x600/' . $about->image_url) : asset('frontend/assets/images/about/about-v2-11.jpg') }}" alt="{{ $about->title }}">
+                                <img src="{{ $about->image_url ? asset('storage/about-images/800x600/' . $about->image_url) : asset('frontend/assets/images/about/about-v2-11.jpg') }}" 
+                                     alt="{{ $about->getTranslation('title') }}">
                             </div>
                             {{-- Küçük resim --}}
                             <div class="img-box2">
@@ -61,11 +62,9 @@
                                     </span>
                                 </div>
                                 <div class="title">
-                                    {{-- GÜNCELLEME: Çeviri --}}
                                     <h2>24+ <span>{{ __('messages.years') }}</span></h2>
                                 </div>
                                 <div class="text">
-                                    {{-- GÜNCELLEME: Çeviri --}}
                                     <h3>{{ __('messages.market_experience') }}</h3>
                                 </div>
                             </div>
@@ -76,14 +75,14 @@
                         <div class="about-style2__right">
                             <div class="sec-title withtext">
                                 <div class="sub-title">
-                                    {{-- GÜNCELLEME: 'About Real Trade Estate' --}}
                                     <h4>{{ __('messages.about_title_prefix') }} Real Trade Estate</h4>
                                 </div>
-                                {{-- Ana Başlık (Dinamik - Modelden JSON çevrili gelir) --}}
-                                <h2>{{ $about->title }}</h2>
-                                {{-- Ana İçerik (Dinamik - HTML destekli) --}}
+                                {{-- DÜZELTME: getTranslation kullanıldı --}}
+                                <h2>{!! $about->getTranslation('title') !!}</h2>
+                                
+                                {{-- DÜZELTME: getTranslation kullanıldı --}}
                                 <div class="text">
-                                    {!! $about->content !!}
+                                    {!! $about->getTranslation('content') !!}
                                 </div>
                             </div>
                         </div>
@@ -92,7 +91,7 @@
                 </div>
             </div>
         </section>
-    @else
+        @else
         {{-- Eğer veritabanında hakkımızda içeriği yoksa --}}
         <section class="pdtop pdbottom">
             <div class="container">
@@ -103,6 +102,5 @@
 
 @endsection
 
-{{-- Sayfaya özel script gerekmiyorsa bu bölüm boş kalabilir veya silinebilir --}}
 @push('scripts')
 @endpush

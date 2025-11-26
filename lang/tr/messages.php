@@ -122,7 +122,7 @@ return [
     'live_chat_desc' => 'Forex uzmanımızla canlı sohbet edin.',
     'start_chat' => 'Sohbeti Başlat',
     'contact_info' => 'İletişim Bilgileri',
-    'country' => 'Birleşik Krallık',
+    'location' => 'Lokasyon',
     'phone' => 'Telefon',
     'email' => 'E-posta',
     'office_hours' => 'Çalışma Saatleri',
