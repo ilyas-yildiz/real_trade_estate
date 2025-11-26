@@ -45,17 +45,17 @@ return [
     'risk_disclosure' => 'Risk Bildirimi',
 
     // Anasayfa Özel
-    'free_demo' => 'Ücretsiz Demo',
-    'practice_trading' => 'Sanal bakiye ile risksiz işlem yapın.',
-    'start_demo' => 'Demoya Başla',
+    'free_demo' => 'Gerçek Hesap',
+    'practice_trading' => 'Gerçek hesap ile kazanmaya başla.',
+    'start_demo' => 'Şimdi Hesap Aç',
     'verified_reviews' => 'Onaylı Yorum',
     'read_reviews' => 'Yorumları Oku',
     
     // Öne Çıkanlar (HTML içerir)
-    'bonus_offer' => 'İlk Yatırımda <span>$500 Bonus</span> Fırsatı!',
-    'demo_account_offer' => '<a href=":link">Ücretsiz Demo</a> Hesabı ile İşlem Yapın!',
-    'subscribe_offer' => 'Haberdar Olun, <a href="#">Abone Olun</a>!',
-    'download_ebooks' => 'Ücretsiz <a href="#">E-Kitaplarımızı</a> İndirin',
+    'bonus_offer' => 'Kayıt Ol Kazanmaya Başla!',
+    'demo_account_offer' => 'Uygun Spreadler',
+    'subscribe_offer' => 'Hızlı Yatırım ve Çekim',
+    'download_ebooks' => 'Gerçek Hesap Aç',
 
     // Slider Yedek Metinleri
     'details' => 'Detaylar',

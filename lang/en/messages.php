@@ -44,18 +44,18 @@ return [
     'terms_of_service' => 'Terms of Service',
     'risk_disclosure' => 'Risk Disclosure',
 
-    // Homepage Specific
-    'free_demo' => 'Free Demo',
-    'practice_trading' => 'Practice trading with virtual funds.',
-    'start_demo' => 'Start Demo',
+// Homepage Specific
+    'free_demo' => 'Real Account',
+    'practice_trading' => 'Start earning with a real account.',
+    'start_demo' => 'Open Account Now',
     'verified_reviews' => 'Verified Reviews',
     'read_reviews' => 'Read Reviews',
     
     // Highlights (HTML içerir)
-    'bonus_offer' => 'Up to <span>$500 Bonus</span> on First Deposit!',
-    'demo_account_offer' => 'Trading with a <a href=":link">Free Demo</a> Account!',
-    'subscribe_offer' => 'Stay Informed, <a href="#">Subscribe</a> Now!',
-    'download_ebooks' => 'Download our Free <a href="#">eBooks</a>',
+    'bonus_offer' => 'Register & Start Earning!',
+    'demo_account_offer' => 'Competitive Spreads',
+    'subscribe_offer' => 'Fast Deposits & Withdrawals',
+    'download_ebooks' => 'Open Real Account',
 
     // Slider Fallback
     'details' => 'Details',
